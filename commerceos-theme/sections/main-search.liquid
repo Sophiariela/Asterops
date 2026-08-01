@@ -1,0 +1,46 @@
+<div class="container section" data-collection-top>
+  <div class="section__header">
+    {%- if search.performed -%}
+      <h1>{{ 'general.search.view_all_results' | t }}</h1>
+      <p class="section__subheading">{{ 'products.facets.results_count' | t: count: search.results_count }}</p>
+    {%- else -%}
+      <h1>{{ 'general.accessibility.search' | t }}</h1>
+    {%- endif -%}
+  </div>
+
+  <form action="{{ routes.search_url }}" method="get" role="search" class="search-bar" style="max-width: 480px; margin: 0 auto 2.5rem;">
+    <div class="search-bar__field">
+      {% render 'icon', name: 'search', size: 18 %}
+      <input type="search" name="q" class="search-bar__input" value="{{ search.terms | escape }}" placeholder="{{ 'general.search.placeholder' | t }}">
+    </div>
+    <input type="hidden" name="type" value="product">
+  </form>
+
+  {%- if search.performed -%}
+    {%- if search.results.size == 0 -%}
+      <div class="product-grid--empty">
+        <p>{{ 'general.search.no_results' | t: terms: search.terms }}</p>
+      </div>
+    {%- else -%}
+      <div class="product-grid" style="--pg-desktop-cols: 4;">
+        {%- for item in search.results -%}
+          {%- if item.object_type == 'product' -%}
+            {% render 'product-card', product: item %}
+          {%- else -%}
+            <a href="{{ item.url }}" class="search-result-card">
+              <p class="search-result-card__type">{{ item.object_type }}</p>
+              <h3>{{ item.title }}</h3>
+            </a>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+      {% render 'pagination', paginate: search %}
+    {%- endif -%}
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "t:sections.main-search.name"
+}
+{% endschema %}

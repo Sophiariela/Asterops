@@ -1,0 +1,118 @@
+<div class="hero-banner hero-banner--{{ section.settings.height }}" data-slideshow data-autoplay="{{ section.settings.autoplay_seconds }}" style="--overlay-opacity: {{ section.settings.overlay_opacity | divided_by: 100.0 }};">
+  {%- for block in section.blocks -%}
+    <div class="hero-banner__slide{% if forloop.first %} is-active{% endif %}" {{ block.shopify_attributes }}>
+      <div class="hero-banner__media">
+        {%- if block.settings.image -%}
+          <img
+            src="{{ block.settings.image | image_url: width: 1600 }}"
+            srcset="{{ block.settings.image | image_url: width: 800 }} 800w, {{ block.settings.image | image_url: width: 1600 }} 1600w, {{ block.settings.image | image_url: width: 2400 }} 2400w"
+            sizes="100vw"
+            alt="{{ block.settings.image.alt | default: block.settings.heading | escape }}"
+            loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+            class="{% if block.settings.mobile_image %}hide-mobile{% endif %}"
+          >
+          {%- if block.settings.mobile_image -%}
+            <img
+              src="{{ block.settings.mobile_image | image_url: width: 900 }}"
+              alt="{{ block.settings.image.alt | default: block.settings.heading | escape }}"
+              loading="{% if forloop.first %}eager{% else %}lazy{% endif %}"
+              class="hide-desktop"
+            >
+          {%- endif -%}
+        {%- else -%}
+          {{ 'lifestyle-1' | placeholder_svg_tag }}
+        {%- endif -%}
+        <div class="hero-banner__overlay"></div>
+        <div class="hero-banner__content hero-banner__content--{{ section.settings.text_position }}" style="text-align: {{ section.settings.text_align }};">
+          {%- if block.settings.heading != blank -%}<h1>{{ block.settings.heading }}</h1>{%- endif -%}
+          {%- if block.settings.subheading != blank -%}<p>{{ block.settings.subheading }}</p>{%- endif -%}
+          <div class="hero-banner__buttons">
+            {%- if block.settings.button_label != blank -%}
+              <a href="{{ block.settings.button_link }}" class="button button--primary">{{ block.settings.button_label }}</a>
+            {%- endif -%}
+            {%- if block.settings.second_button_label != blank -%}
+              <a href="{{ block.settings.second_button_link }}" class="button button--secondary">{{ block.settings.second_button_label }}</a>
+            {%- endif -%}
+          </div>
+        </div>
+      </div>
+    </div>
+  {%- endfor -%}
+
+  {%- if section.blocks.size > 1 -%}
+    <button type="button" class="hero-banner__nav hero-banner__nav--prev" data-slideshow-prev aria-label="{{ 'general.accessibility.previous_slide' | t }}">
+      {% render 'icon', name: 'chevron-left' %}
+    </button>
+    <button type="button" class="hero-banner__nav hero-banner__nav--next" data-slideshow-next aria-label="{{ 'general.accessibility.next_slide' | t }}">
+      {% render 'icon', name: 'chevron-right' %}
+    </button>
+    <div class="hero-banner__dots">
+      {%- for block in section.blocks -%}
+        <button type="button" class="hero-banner__dot{% if forloop.first %} is-active{% endif %}" data-slideshow-dot aria-label="{{ 'general.accessibility.next_slide' | t }} {{ forloop.index }}"></button>
+      {%- endfor -%}
+    </div>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "t:sections.hero-banner.name",
+  "settings": [
+    {
+      "type": "select",
+      "id": "height",
+      "label": "t:sections.hero-banner.settings.height",
+      "options": [
+        { "value": "small", "label": "Small" },
+        { "value": "medium", "label": "Medium" },
+        { "value": "large", "label": "Large" }
+      ],
+      "default": "large"
+    },
+    { "type": "range", "id": "overlay_opacity", "label": "t:sections.hero-banner.settings.overlay_opacity", "min": 0, "max": 80, "step": 5, "unit": "%", "default": 20 },
+    {
+      "type": "select",
+      "id": "text_position",
+      "label": "t:sections.hero-banner.settings.text_position",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "select",
+      "id": "text_align",
+      "label": "t:sections.hero-banner.settings.text_align",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" }
+      ],
+      "default": "left"
+    },
+    { "type": "range", "id": "autoplay_seconds", "label": "Autoplay (0 to disable)", "min": 0, "max": 12, "step": 1, "default": 0 }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "t:sections.hero-banner.blocks.slide.name",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "t:sections.hero-banner.blocks.slide.settings.image" },
+        { "type": "image_picker", "id": "mobile_image", "label": "t:sections.hero-banner.blocks.slide.settings.mobile_image" },
+        { "type": "text", "id": "heading", "label": "t:sections.hero-banner.blocks.slide.settings.heading", "default": "Timeless pieces, made to last" },
+        { "type": "text", "id": "subheading", "label": "t:sections.hero-banner.blocks.slide.settings.subheading", "default": "The new collection is here" },
+        { "type": "text", "id": "button_label", "label": "t:sections.hero-banner.blocks.slide.settings.button_label", "default": "Shop now" },
+        { "type": "url", "id": "button_link", "label": "t:sections.hero-banner.blocks.slide.settings.button_link" },
+        { "type": "text", "id": "second_button_label", "label": "t:sections.hero-banner.blocks.slide.settings.second_button_label" },
+        { "type": "url", "id": "second_button_link", "label": "t:sections.hero-banner.blocks.slide.settings.second_button_link" }
+      ]
+    }
+  ],
+  "default": {
+    "blocks": [{ "type": "slide" }]
+  },
+  "presets": [
+    { "name": "t:sections.hero-banner.name", "blocks": [{ "type": "slide" }] }
+  ]
+}
+{% endschema %}

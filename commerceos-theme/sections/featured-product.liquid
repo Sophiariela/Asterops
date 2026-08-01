@@ -1,0 +1,36 @@
+{%- assign product = section.settings.product -%}
+<div class="section container">
+  {%- if product -%}
+    <div class="featured-product">
+      <div class="featured-product__media">
+        {%- if product.featured_image -%}
+          <img src="{{ product.featured_image | image_url: width: 1000 }}" alt="{{ product.title | escape }}" loading="lazy">
+        {%- else -%}
+          {{ 'product-2' | placeholder_svg_tag }}
+        {%- endif -%}
+      </div>
+      <div class="featured-product__info">
+        {%- if product.vendor != blank -%}<p class="product-info__vendor">{{ product.vendor }}</p>{%- endif -%}
+        <h2>{{ product.title }}</h2>
+        {% render 'product-rating', product: product %}
+        {% render 'price', product: product, show_from: true %}
+        <div class="rich-text__body">{{ product.description | strip_html | truncatewords: 40 }}</div>
+        <a href="{{ product.url }}" class="button button--primary">{{ 'products.product.view_full_details' | t }}</a>
+      </div>
+    </div>
+  {%- else -%}
+    <div class="rich-text">
+      <p>{{ 'Select a product in the section settings.' }}</p>
+    </div>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "t:sections.featured-product.name",
+  "settings": [
+    { "type": "product", "id": "product", "label": "t:sections.featured-product.settings.product" }
+  ],
+  "presets": [{ "name": "t:sections.featured-product.name" }]
+}
+{% endschema %}

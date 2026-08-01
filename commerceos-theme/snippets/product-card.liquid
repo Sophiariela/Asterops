@@ -1,0 +1,154 @@
+{%- comment -%}
+  Renders a premium product card.
+  Accepts: product, image_ratio (optional override), lazy (bool)
+{%- endcomment -%}
+{%- liquid
+  assign image_ratio = image_ratio | default: settings.card_image_ratio
+  assign featured_image = product.featured_media.preview_image | default: product.featured_image
+  assign second_image = product.media[1].preview_image
+  assign show_hover_image = settings.card_hover_image
+  if second_image == nil
+    assign show_hover_image = false
+  endif
+
+  assign is_new = false
+  if product.tags contains 'new'
+    assign is_new = true
+  endif
+-%}
+<div class="product-card" data-product-card data-product-id="{{ product.id }}">
+  <a href="{{ product.url }}" class="product-card__media-link" aria-label="{{ product.title }}">
+    <div class="product-card__media product-card__media--{{ image_ratio }}">
+      {%- if featured_image -%}
+        <img
+          class="product-card__image product-card__image--primary"
+          srcset="{{ featured_image | image_url: width: 400 }} 400w, {{ featured_image | image_url: width: 600 }} 600w, {{ featured_image | image_url: width: 900 }} 900w"
+          sizes="(min-width: 990px) 25vw, 50vw"
+          src="{{ featured_image | image_url: width: 600 }}"
+          alt="{{ featured_image.alt | default: product.title | escape }}"
+          width="{{ featured_image.width }}"
+          height="{{ featured_image.height }}"
+          loading="{% if lazy == false %}eager{% else %}lazy{% endif %}"
+        >
+      {%- else -%}
+        <div class="product-card__placeholder">{{ 'product-1' | placeholder_svg_tag: 'placeholder-svg' }}</div>
+      {%- endif -%}
+      {%- if show_hover_image -%}
+        <img
+          class="product-card__image product-card__image--hover"
+          src="{{ second_image | image_url: width: 600 }}"
+          alt=""
+          width="{{ second_image.width }}"
+          height="{{ second_image.height }}"
+          loading="lazy"
+          aria-hidden="true"
+        >
+      {%- endif -%}
+    </div>
+
+    <div class="product-card__badges">
+      {%- if product.compare_at_price > product.price and settings.card_show_sale_badge -%}
+        <span class="badge badge--sale">{{ 'products.product.sale' | t }}</span>
+      {%- endif -%}
+      {%- if is_new -%}
+        <span class="badge badge--new">{{ 'products.product.new' | t }}</span>
+      {%- endif -%}
+      {%- unless product.available -%}
+        <span class="badge badge--sold-out">{{ 'products.product.sold_out' | t }}</span>
+      {%- endunless -%}
+    </div>
+  </a>
+
+  {%- if settings.card_show_wishlist -%}
+    <button
+      type="button"
+      class="product-card__wishlist"
+      data-wishlist-toggle
+      data-product-id="{{ product.id }}"
+      data-product-handle="{{ product.handle }}"
+      aria-pressed="false"
+      aria-label="{{ 'wishlist.add' | t }}"
+    >
+      {% render 'icon', name: 'heart', size: 18 %}
+    </button>
+  {%- endif -%}
+
+  {%- if settings.card_show_quick_add and product.available -%}
+    <button
+      type="button"
+      class="product-card__quick-add button button--secondary"
+      data-quick-add-trigger
+      data-product-handle="{{ product.handle }}"
+      data-product-id="{{ product.id }}"
+    >
+      {{ 'products.product.quick_add' | t }}
+    </button>
+    <template data-quick-add-template>
+      <div class="quick-add-form" data-quick-add-form>
+        <div class="quick-add-form__media">
+          {%- if featured_image -%}
+            <img src="{{ featured_image | image_url: width: 300 }}" alt="{{ featured_image.alt | default: product.title | escape }}" width="150" height="150" loading="lazy">
+          {%- endif -%}
+        </div>
+        <div class="quick-add-form__info">
+          <h3 class="quick-add-form__title">{{ product.title }}</h3>
+          {% render 'price', product: product %}
+          <form method="post" action="/cart/add" data-quick-add-real-form>
+            <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}" data-quick-add-variant-id>
+            {%- for option in product.options_with_values -%}
+              <fieldset class="quick-add-form__option">
+                <legend>{{ option.name }}</legend>
+                <div class="quick-add-form__values">
+                  {%- for value in option.values -%}
+                    <label class="option-pill">
+                      <input
+                        type="radio"
+                        name="option-{{ option.position }}"
+                        value="{{ value | escape }}"
+                        {% if value == option.selected_value %}checked{% endif %}
+                        data-quick-add-option
+                        data-option-position="{{ option.position }}"
+                      >
+                      <span>{{ value }}</span>
+                    </label>
+                  {%- endfor -%}
+                </div>
+              </fieldset>
+            {%- endfor -%}
+            <script type="application/json" data-quick-add-variants>
+              {{ product.variants | json }}
+            </script>
+            <div class="quick-add-form__quantity">
+              <label class="visually-hidden" for="quick-add-qty-{{ product.id }}">{{ 'products.product.quantity' | t }}</label>
+              <button type="button" data-quantity-decrease aria-label="{{ 'products.product.quantity' | t }} -">{% render 'icon', name: 'minus', size: 14 %}</button>
+              <input type="number" id="quick-add-qty-{{ product.id }}" name="quantity" value="1" min="1" inputmode="numeric" data-quantity-input>
+              <button type="button" data-quantity-increase aria-label="{{ 'products.product.quantity' | t }} +">{% render 'icon', name: 'plus', size: 14 %}</button>
+            </div>
+            <button type="submit" class="button button--primary quick-add-form__submit" data-quick-add-submit>
+              <span data-button-text>{{ 'products.product.add_to_cart' | t }}</span>
+              {% render 'loading-spinner' %}
+            </button>
+            <p class="quick-add-form__error" data-quick-add-error hidden></p>
+          </form>
+          <a href="{{ product.url }}" class="quick-add-form__full-details">{{ 'products.product.view_full_details' | t }}</a>
+        </div>
+      </div>
+    </template>
+  {%- endif -%}
+
+  <div class="product-card__info">
+    {%- if settings.card_show_vendor and product.vendor != blank -%}
+      <p class="product-card__vendor">{{ product.vendor }}</p>
+    {%- endif -%}
+    <h3 class="product-card__title">
+      <a href="{{ product.url }}">{{ product.title }}</a>
+    </h3>
+    {%- if settings.card_show_rating -%}
+      {% render 'product-rating', product: product %}
+    {%- endif -%}
+    {% render 'price', product: product, show_from: true %}
+    {%- if settings.card_show_swatches -%}
+      {% render 'color-swatches', product: product %}
+    {%- endif -%}
+  </div>
+</div>

@@ -1,0 +1,21 @@
+{%- comment -%} Renders configured social links as icon buttons. {%- endcomment -%}
+<ul class="social-icons" role="list">
+  {%- if settings.social_instagram_link -%}
+    <li><a href="{{ settings.social_instagram_link }}" class="social-icons__link" aria-label="Instagram">{% render 'icon', name: 'instagram' %}</a></li>
+  {%- endif -%}
+  {%- if settings.social_facebook_link -%}
+    <li><a href="{{ settings.social_facebook_link }}" class="social-icons__link" aria-label="Facebook">{% render 'icon', name: 'facebook' %}</a></li>
+  {%- endif -%}
+  {%- if settings.social_pinterest_link -%}
+    <li><a href="{{ settings.social_pinterest_link }}" class="social-icons__link" aria-label="Pinterest">{% render 'icon', name: 'pinterest' %}</a></li>
+  {%- endif -%}
+  {%- if settings.social_tiktok_link -%}
+    <li><a href="{{ settings.social_tiktok_link }}" class="social-icons__link" aria-label="TikTok">{% render 'icon', name: 'tiktok' %}</a></li>
+  {%- endif -%}
+  {%- if settings.social_youtube_link -%}
+    <li><a href="{{ settings.social_youtube_link }}" class="social-icons__link" aria-label="YouTube">{% render 'icon', name: 'youtube' %}</a></li>
+  {%- endif -%}
+  {%- if settings.social_x_link -%}
+    <li><a href="{{ settings.social_x_link }}" class="social-icons__link" aria-label="X">{% render 'icon', name: 'x-social' %}</a></li>
+  {%- endif -%}
+</ul>

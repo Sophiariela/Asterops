@@ -1,0 +1,12 @@
+<div class="container error-page">
+  <p class="error-page__code">404</p>
+  <h1>{{ '404.title' | t }}</h1>
+  <p class="section__subheading">{{ '404.subtext' | t }}</p>
+  <a href="{{ routes.root_url }}" class="button button--primary" style="margin-top: 1.5rem;">{{ '404.back_home' | t }}</a>
+</div>
+
+{% schema %}
+{
+  "name": "t:sections.main-404.name"
+}
+{% endschema %}

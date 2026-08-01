@@ -1,0 +1,38 @@
+{%- comment -%}
+  Cart subtotal + checkout. Accepts: context ('drawer' | 'page')
+{%- endcomment -%}
+<div class="cart-summary">
+  {%- comment -%}
+    Shopify has no public Ajax endpoint to apply a discount code directly to the cart —
+    discounts are only ever validated and applied on the Shopify-hosted checkout. This field
+    stores the code and, on "Apply", sends the shopper straight to checkout through Shopify's
+    native `/discount/{code}` route (the same link generated from Admin → Discounts → Share link),
+    which validates the code and applies it to the checkout session before landing on /checkout.
+  {%- endcomment -%}
+  <div class="cart-discount">
+    <label class="visually-hidden" for="cart-discount-code-{{ context }}">{{ 'cart.discount_code' | t }}</label>
+    <input
+      type="text"
+      id="cart-discount-code-{{ context }}"
+      class="field"
+      placeholder="{{ 'cart.discount_code_placeholder' | t }}"
+      autocapitalize="characters"
+      data-discount-code
+    >
+    <button type="button" class="button button--secondary" data-discount-apply>{{ 'cart.discount_code_apply' | t }}</button>
+  </div>
+  <p class="cart-discount__hint">{{ 'cart.discount_code_info' | t }}</p>
+  <div class="cart-subtotal-row">
+    <span>{{ 'cart.subtotal' | t }}</span>
+    <span>{{ cart.total_price | money }}</span>
+  </div>
+  <p class="section__subheading">{{ 'cart.taxes_included' | t }} &middot; {{ 'cart.shipping_calculated' | t }}</p>
+  <form action="{{ routes.cart_url }}" method="post">
+    <button type="submit" name="checkout" class="button button--primary button--full">{{ 'cart.checkout' | t }}</button>
+  </form>
+  {%- if context == 'drawer' -%}
+    <a href="{{ routes.cart_url }}" class="button button--secondary button--full" style="margin-top: .75rem;">{{ 'cart.title' | t }}</a>
+  {%- else -%}
+    <a href="{{ routes.all_products_collection_url }}" class="button--text" style="display: block; text-align: center; margin-top: 1rem;">{{ 'cart.continue_shopping' | t }}</a>
+  {%- endif -%}
+</div>

@@ -1,0 +1,43 @@
+{%- comment -%}
+  Native social share links for a product — no external API/app required.
+  Usage: {% render 'social-share', product: product %}
+{%- endcomment -%}
+{%- liquid
+  assign share_url = shop.url | append: product.url
+  assign share_title = product.title | escape
+  assign share_image = product.featured_image | image_url: width: 1200
+  assign whatsapp_text = share_title | append: ' — ' | append: share_url
+-%}
+<div class="social-share">
+  <span class="social-share__label">{{ 'products.product.share' | t }}</span>
+  <a
+    class="social-share__link"
+    href="https://wa.me/?text={{ whatsapp_text | url_encode }}"
+    target="_blank"
+    rel="noopener noreferrer nofollow"
+    aria-label="{{ 'products.product.share_whatsapp' | t }}"
+  >
+    {% render 'icon', name: 'whatsapp', size: 16 %}
+  </a>
+  <a
+    class="social-share__link"
+    href="https://www.facebook.com/sharer/sharer.php?u={{ share_url | url_encode }}"
+    target="_blank"
+    rel="noopener noreferrer nofollow"
+    aria-label="{{ 'products.product.share_facebook' | t }}"
+  >
+    {% render 'icon', name: 'facebook', size: 16 %}
+  </a>
+  <a
+    class="social-share__link"
+    href="https://www.pinterest.com/pin/create/button/?url={{ share_url | url_encode }}&media={{ share_image | url_encode }}&description={{ share_title | url_encode }}"
+    target="_blank"
+    rel="noopener noreferrer nofollow"
+    aria-label="{{ 'products.product.share_pinterest' | t }}"
+  >
+    {% render 'icon', name: 'pinterest', size: 16 %}
+  </a>
+  <button type="button" class="social-share__link" data-share-trigger data-url="{{ share_url }}" aria-label="{{ 'products.product.share' | t }}">
+    {% render 'icon', name: 'share', size: 16 %}
+  </button>
+</div>

@@ -1,0 +1,150 @@
+{
+  "general": {
+    "accessibility": {
+      "skip_to_content": "Skip to content",
+      "close": "Close",
+      "menu": "Menu",
+      "search": "Search",
+      "cart": "Cart",
+      "wishlist": "Wishlist",
+      "account": "Account",
+      "next_slide": "Next slide",
+      "previous_slide": "Previous slide",
+      "load_more": "Load more"
+    },
+    "search": {
+      "placeholder": "Search products, collections, and more",
+      "no_results": "No results found for \"{{ terms }}\"",
+      "submit": "Search",
+      "view_all_results": "View all results"
+    },
+    "newsletter": {
+      "placeholder": "Enter your email",
+      "submit": "Subscribe",
+      "success": "Thank you for subscribing.",
+      "error": "Please enter a valid email address."
+    },
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next",
+      "page": "Page {{ number }}"
+    }
+  },
+  "products": {
+    "product": {
+      "sale": "Sale",
+      "new": "New",
+      "sold_out": "Sold out",
+      "add_to_cart": "Add to cart",
+      "quick_add": "Quick add",
+      "unavailable": "Unavailable",
+      "regular_price": "Regular price",
+      "sale_price": "Sale price",
+      "from_price": "From {{ price }}",
+      "quantity": "Quantity",
+      "sku": "SKU: {{ sku }}",
+      "description": "Description",
+      "details": "Details",
+      "shipping_returns": "Shipping & returns",
+      "vendor": "Vendor",
+      "choose_options": "Choose options",
+      "view_full_details": "View full details",
+      "added_to_wishlist": "Added to wishlist",
+      "removed_from_wishlist": "Removed from wishlist",
+      "share": "Share",
+      "share_whatsapp": "Share on WhatsApp",
+      "share_facebook": "Share on Facebook",
+      "share_pinterest": "Share on Pinterest",
+      "in_stock": "In stock",
+      "low_stock": "Only {{ count }} left",
+      "no_reviews": "No reviews yet",
+      "reviews_count": "{{ count }} reviews"
+    },
+    "facets": {
+      "filter_and_sort": "Filter & sort",
+      "filter": "Filter",
+      "sort": "Sort",
+      "sort_by": "Sort by",
+      "clear_all": "Clear all",
+      "clear": "Clear",
+      "apply": "Apply",
+      "results_count": "{{ count }} products",
+      "no_matches": "No products match your filters",
+      "reset": "Reset filters",
+      "sort_options": {
+        "featured": "Featured",
+        "best_selling": "Best selling",
+        "az": "Alphabetically, A-Z",
+        "za": "Alphabetically, Z-A",
+        "price_low_high": "Price, low to high",
+        "price_high_low": "Price, high to low",
+        "date_new_old": "Date, new to old",
+        "date_old_new": "Date, old to new"
+      }
+    }
+  },
+  "cart": {
+    "title": "Your cart",
+    "empty": "Your cart is empty",
+    "empty_subtext": "Looks like you haven't made your selection yet.",
+    "continue_shopping": "Continue shopping",
+    "subtotal": "Subtotal",
+    "checkout": "Checkout",
+    "remove": "Remove",
+    "quantity": "Quantity",
+    "gift_note": "Add a gift note",
+    "gift_note_placeholder": "Write your gift message here",
+    "free_shipping_reached": "You've unlocked free shipping!",
+    "free_shipping_remaining": "You're {{ amount }} away from free shipping",
+    "order_note": "Order note",
+    "update": "Update cart",
+    "taxes_included": "Taxes included",
+    "shipping_calculated": "Shipping calculated at checkout",
+    "discount_code": "Discount code",
+    "discount_code_placeholder": "Enter code",
+    "discount_code_apply": "Apply",
+    "discount_code_info": "Discount codes are applied and validated securely on the Shopify checkout page."
+  },
+  "wishlist": {
+    "title": "Your wishlist",
+    "empty": "Your wishlist is empty",
+    "empty_subtext": "Save the pieces you love and find them here anytime.",
+    "continue_shopping": "Continue shopping",
+    "add": "Add to wishlist",
+    "remove": "Remove from wishlist"
+  },
+  "sections": {
+    "announcement_bar": {
+      "default_message": "Complimentary shipping on all orders over {{ amount }}"
+    },
+    "hero": {
+      "shop_now": "Shop now"
+    },
+    "featured_collections": {
+      "view_all": "View all"
+    },
+    "instagram": {
+      "follow_us": "Follow us"
+    },
+    "testimonials": {
+      "heading": "What our clients say"
+    },
+    "contact": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "message": "Message",
+      "submit": "Send message",
+      "success": "Thanks for reaching out. We'll be in touch shortly.",
+      "error": "There was an error submitting the form, please try again."
+    },
+    "recommendations": {
+      "heading": "You may also like"
+    }
+  },
+  "404": {
+    "title": "Page not found",
+    "subtext": "The page you're looking for doesn't exist or has been moved.",
+    "back_home": "Back to homepage"
+  }
+}

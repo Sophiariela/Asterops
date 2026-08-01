@@ -1,0 +1,21 @@
+<div class="container section" data-cart-section="{{ section.id }}">
+  <h1 style="margin-bottom: 2rem;">{{ 'cart.title' | t }}</h1>
+  {%- if cart.item_count == 0 -%}
+    {% render 'cart-empty' %}
+  {%- else -%}
+    <div class="cart-page">
+      <div class="cart-page__items">
+        {% render 'cart-items' %}
+      </div>
+      <div class="cart-page__summary">
+        {% render 'cart-summary', context: 'page' %}
+      </div>
+    </div>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "t:sections.main-cart.name"
+}
+{% endschema %}

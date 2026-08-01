@@ -1,0 +1,23 @@
+{%- comment -%}
+  Renders a newsletter signup form using Shopify's built-in customer form (no app required).
+  Accepts: id (unique string used to scope the form's DOM id)
+{%- endcomment -%}
+{%- form 'customer', id: 'newsletter-form-' | append: id, class: 'newsletter-form' -%}
+  <input type="hidden" name="contact[tags]" value="newsletter">
+  <label class="visually-hidden" for="newsletter-email-{{ id }}">{{ 'general.newsletter.placeholder' | t }}</label>
+  <input
+    type="email"
+    name="contact[email]"
+    id="newsletter-email-{{ id }}"
+    class="field"
+    placeholder="{{ 'general.newsletter.placeholder' | t }}"
+    required
+  >
+  <button type="submit" class="button button--primary">{{ 'general.newsletter.submit' | t }}</button>
+
+  {%- if form.posted_successfully? -%}
+    <p class="form-status form-status--success" role="status">{{ 'general.newsletter.success' | t }}</p>
+  {%- elsif form.errors -%}
+    <p class="form-status form-status--error" role="alert">{{ form.errors.messages['form'] | default: 'general.newsletter.error' | t }}</p>
+  {%- endif -%}
+{%- endform -%}

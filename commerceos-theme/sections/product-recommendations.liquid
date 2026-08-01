@@ -1,0 +1,44 @@
+<product-recommendations class="section container" data-url="{{ routes.product_recommendations_url }}?section_id={{ section.id }}&product_id={{ product.id }}&limit={{ section.settings.products_to_show }}&intent=related">
+  <div class="section__header">
+    <h2>{{ section.settings.heading | default: 'sections.recommendations.heading' | t }}</h2>
+  </div>
+  <div class="recommendations__grid" data-recommendations-grid>
+    {%- if recommendations.performed and recommendations.products_count > 0 -%}
+      {%- for product in recommendations.products -%}
+        {% render 'product-card', product: product %}
+      {%- endfor -%}
+    {%- endif -%}
+  </div>
+</product-recommendations>
+
+<script>
+  class ProductRecommendations extends HTMLElement {
+    connectedCallback() {
+      fetch(this.dataset.url)
+        .then(function (res) { return res.text(); })
+        .then((html) => {
+          var doc = new DOMParser().parseFromString(html, 'text/html');
+          var fresh = doc.querySelector('[data-recommendations-grid]');
+          var target = this.querySelector('[data-recommendations-grid]');
+          if (fresh && fresh.innerHTML.trim() && target) {
+            target.innerHTML = fresh.innerHTML;
+          } else {
+            this.remove();
+          }
+        });
+    }
+  }
+  if (!customElements.get('product-recommendations')) {
+    customElements.define('product-recommendations', ProductRecommendations);
+  }
+</script>
+
+{% schema %}
+{
+  "name": "t:sections.product-recommendations.name",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "t:sections.product-recommendations.settings.heading" },
+    { "type": "range", "id": "products_to_show", "label": "t:sections.product-recommendations.settings.products_to_show", "min": 2, "max": 8, "step": 1, "default": 4 }
+  ]
+}
+{% endschema %}

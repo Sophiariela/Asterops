@@ -1,0 +1,52 @@
+<div class="section container">
+  <div class="section__header section__header--split">
+    <h2>{{ section.settings.heading | default: 'sections.instagram.follow_us' | t }}</h2>
+    {%- if section.settings.handle != blank -%}
+      <a href="{{ section.settings.handle_link | default: '#' }}" class="section__link" target="_blank" rel="noopener">@{{ section.settings.handle }}</a>
+    {%- endif -%}
+  </div>
+  <div class="instagram-feed__grid">
+    {%- for block in section.blocks -%}
+      <a
+        href="{{ block.settings.link | default: section.settings.handle_link | default: '#' }}"
+        class="instagram-feed__item"
+        target="_blank"
+        rel="noopener"
+        {{ block.shopify_attributes }}
+      >
+        {%- if block.settings.image -%}
+          <img src="{{ block.settings.image | image_url: width: 500 }}" alt="Instagram post" loading="lazy">
+        {%- else -%}
+          {{ 'lifestyle-3' | placeholder_svg_tag }}
+        {%- endif -%}
+      </a>
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "t:sections.instagram-feed.name",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "t:sections.instagram-feed.settings.heading" },
+    { "type": "text", "id": "handle", "label": "t:sections.instagram-feed.settings.handle", "default": "yourbrand" },
+    { "type": "url", "id": "handle_link", "label": "t:sections.instagram-feed.settings.handle_link" }
+  ],
+  "blocks": [
+    {
+      "type": "image",
+      "name": "t:sections.instagram-feed.blocks.image.name",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "t:sections.instagram-feed.blocks.image.settings.image" },
+        { "type": "url", "id": "link", "label": "t:sections.instagram-feed.blocks.image.settings.link" }
+      ]
+    }
+  ],
+  "default": {
+    "blocks": [{ "type": "image" }, { "type": "image" }, { "type": "image" }, { "type": "image" }, { "type": "image" }, { "type": "image" }]
+  },
+  "presets": [
+    { "name": "t:sections.instagram-feed.name", "blocks": [{ "type": "image" }, { "type": "image" }, { "type": "image" }, { "type": "image" }, { "type": "image" }, { "type": "image" }] }
+  ]
+}
+{% endschema %}

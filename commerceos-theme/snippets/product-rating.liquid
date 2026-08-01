@@ -1,0 +1,22 @@
+{%- comment -%}
+  Renders a star rating from the standard `reviews.rating` / `reviews.rating_count` metafields.
+  Accepts: product
+{%- endcomment -%}
+{%- liquid
+  assign rating = product.metafields.reviews.rating.value
+  assign rating_count = product.metafields.reviews.rating_count.value
+-%}
+{%- if rating and rating_count -%}
+  {%- assign rating_percent = rating | times: 20 -%}
+  <div class="product-rating" aria-label="{{ 'products.product.reviews_count' | t: count: rating_count }}">
+    <span class="product-rating__stars">
+      <span class="product-rating__stars-track">
+        {%- for i in (1..5) -%}{% render 'icon', name: 'star' %}{%- endfor -%}
+      </span>
+      <span class="product-rating__stars-fill" style="width: {{ rating_percent }}%;">
+        {%- for i in (1..5) -%}{% render 'icon', name: 'star-filled' %}{%- endfor -%}
+      </span>
+    </span>
+    <span class="product-rating__count">{{ rating_count }}</span>
+  </div>
+{%- endif -%}

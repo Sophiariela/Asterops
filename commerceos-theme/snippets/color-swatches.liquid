@@ -1,0 +1,80 @@
+{%- comment -%}
+  Renders selectable color swatches for a product card, linking to the matching variant URL.
+  Detects an option named Color/Colour and maps common color names to a CSS value;
+  unrecognized names fall back to a neutral swatch with the name as a tooltip.
+  Accepts: product
+{%- endcomment -%}
+{%- liquid
+  assign color_option_index = -1
+  for option in product.options_with_values
+    assign downcased = option.name | downcase
+    if downcased == 'color' or downcased == 'colour'
+      assign color_option_index = forloop.index0
+    endif
+  endfor
+-%}
+{%- if color_option_index >= 0 -%}
+  <div class="color-swatches" role="list">
+    {%- for value in product.options_with_values[color_option_index].values -%}
+      {%- liquid
+        assign matched_variant = product.selected_or_first_available_variant
+        for variant in product.variants
+          if color_option_index == 0 and variant.option1 == value
+            assign matched_variant = variant
+          elsif color_option_index == 1 and variant.option2 == value
+            assign matched_variant = variant
+          elsif color_option_index == 2 and variant.option3 == value
+            assign matched_variant = variant
+          endif
+        endfor
+
+        assign css_color = value | downcase | replace: ' ', ''
+        case css_color
+          when 'black', 'onyx', 'jet'
+            assign css_color = '#181818'
+          when 'white', 'ivory', 'cream'
+            assign css_color = '#F7F4EC'
+          when 'gold', 'champagne'
+            assign css_color = '#C9A24B'
+          when 'silver', 'platinum'
+            assign css_color = '#C7C9CC'
+          when 'rosegold', 'blush'
+            assign css_color = '#E8B7A6'
+          when 'navy', 'midnightblue'
+            assign css_color = '#1B2A4A'
+          when 'burgundy', 'wine', 'maroon'
+            assign css_color = '#6B1F2A'
+          when 'emerald', 'green'
+            assign css_color = '#3E6B4F'
+          when 'camel', 'tan', 'beige', 'nude'
+            assign css_color = '#C7A17A'
+          when 'grey', 'gray', 'charcoal'
+            assign css_color = '#8A8A85'
+          when 'brown', 'chocolate'
+            assign css_color = '#4B3421'
+          when 'red', 'ruby'
+            assign css_color = '#A5312B'
+          when 'pink'
+            assign css_color = '#E3AFC0'
+          when 'blue', 'sapphire'
+            assign css_color = '#3A5A8C'
+          when 'purple', 'lavender'
+            assign css_color = '#7B6398'
+          when 'yellow'
+            assign css_color = '#E4C24B'
+          when 'orange'
+            assign css_color = '#C87A3D'
+        endcase
+      -%}
+      <a
+        href="{{ matched_variant.url | default: product.url }}"
+        class="color-swatch"
+        style="background-color: {{ css_color }};"
+        data-product-card-swatch
+        data-swatch-media="{{ matched_variant.featured_image | image_url: width: 800 }}"
+        aria-label="{{ value }}"
+        title="{{ value }}"
+      ></a>
+    {%- endfor -%}
+  </div>
+{%- endif -%}

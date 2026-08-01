@@ -1,0 +1,50 @@
+{%- liquid
+  assign radius = settings.corner_radius | default: 0
+  assign btn_radius = radius
+  if radius == 0
+    assign btn_radius = 2
+  endif
+-%}
+{%- style -%}
+  :root {
+    --color-background: {{ settings.color_background.red }}, {{ settings.color_background.green }}, {{ settings.color_background.blue }};
+    --color-background-secondary: {{ settings.color_background_secondary.red }}, {{ settings.color_background_secondary.green }}, {{ settings.color_background_secondary.blue }};
+    --color-text: {{ settings.color_text.red }}, {{ settings.color_text.green }}, {{ settings.color_text.blue }};
+    --color-text-muted: {{ settings.color_text_muted.red }}, {{ settings.color_text_muted.green }}, {{ settings.color_text_muted.blue }};
+    --color-primary: {{ settings.color_primary.red }}, {{ settings.color_primary.green }}, {{ settings.color_primary.blue }};
+    --color-primary-text: {{ settings.color_primary_text.red }}, {{ settings.color_primary_text.green }}, {{ settings.color_primary_text.blue }};
+    --color-secondary: {{ settings.color_secondary.red }}, {{ settings.color_secondary.green }}, {{ settings.color_secondary.blue }};
+    --color-secondary-text: {{ settings.color_secondary_text.red }}, {{ settings.color_secondary_text.green }}, {{ settings.color_secondary_text.blue }};
+    --color-border: {{ settings.color_border.red }}, {{ settings.color_border.green }}, {{ settings.color_border.blue }};
+    --color-sale: {{ settings.color_sale.red }}, {{ settings.color_sale.green }}, {{ settings.color_sale.blue }};
+    --color-success: {{ settings.color_success.red }}, {{ settings.color_success.green }}, {{ settings.color_success.blue }};
+    --color-star: {{ settings.color_star.red }}, {{ settings.color_star.green }}, {{ settings.color_star.blue }};
+
+    --font-heading-family: {{ settings.font_heading.family }}, {{ settings.font_heading.fallback_families }};
+    --font-heading-style: {{ settings.font_heading.style }};
+    --font-heading-weight: {{ settings.font_heading.weight }};
+    --font-heading-scale: {{ settings.font_heading_scale | default: 100 }}%;
+    --font-heading-case: {{ settings.font_heading_case | default: 'none' }};
+
+    --font-body-family: {{ settings.font_body.family }}, {{ settings.font_body.fallback_families }};
+    --font-body-style: {{ settings.font_body.style }};
+    --font-body-weight: {{ settings.font_body.weight }};
+    --font-body-scale: {{ settings.font_body_scale | default: 100 }}%;
+
+    --page-width: {{ settings.page_width | default: 1440 }}px;
+    --grid-gutter: {{ settings.grid_gutter | default: 24 }}px;
+    --spacing-sections: {{ settings.spacing_sections | default: 64 }}px;
+    --spacing-sections-mobile: {{ settings.spacing_sections | default: 64 | times: 0.6 | round }}px;
+
+    --radius: {{ radius }}px;
+    --radius-button: {{ btn_radius }}px;
+
+    --button-case: {{ settings.button_case | default: 'uppercase' }};
+  }
+
+  @media screen and (max-width: 749px) {
+    :root {
+      --font-heading-scale: {{ settings.font_heading_scale | default: 100 | times: 0.85 | round }}%;
+    }
+  }
+{%- endstyle -%}

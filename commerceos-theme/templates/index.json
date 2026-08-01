@@ -1,0 +1,152 @@
+{
+  "sections": {
+    "hero": {
+      "type": "hero-banner",
+      "settings": {
+        "height": "large",
+        "overlay_opacity": 20,
+        "text_position": "left",
+        "text_align": "left"
+      },
+      "blocks": {
+        "slide-1": {
+          "type": "slide",
+          "settings": {
+            "heading": "Timeless pieces, made to last",
+            "subheading": "Discover the new collection",
+            "button_label": "Shop now",
+            "button_link": "/collections/all"
+          }
+        }
+      },
+      "block_order": ["slide-1"]
+    },
+    "featured-collections": {
+      "type": "featured-collections",
+      "settings": {
+        "heading": "Shop by category",
+        "subheading": "Curated edits for every occasion"
+      },
+      "blocks": {
+        "col-1": { "type": "collection" },
+        "col-2": { "type": "collection" },
+        "col-3": { "type": "collection" }
+      },
+      "block_order": ["col-1", "col-2", "col-3"]
+    },
+    "bestsellers": {
+      "type": "featured-collection-products",
+      "settings": {
+        "heading": "Bestsellers",
+        "subheading": "The pieces our clients keep coming back for",
+        "products_to_show": 8,
+        "columns_desktop": 4
+      }
+    },
+    "image-with-text": {
+      "type": "image-with-text",
+      "settings": {
+        "layout": "left",
+        "heading": "Crafted with care",
+        "text": "<p>Every piece is designed with intention, sourced responsibly, and finished by hand in small batches.</p>",
+        "button_label": "Our story",
+        "button_link": "/pages/about"
+      }
+    },
+    "collection-list": {
+      "type": "collection-list",
+      "settings": {
+        "heading": "Explore the edit",
+        "columns_desktop": 5
+      },
+      "blocks": {
+        "col-1": { "type": "collection" },
+        "col-2": { "type": "collection" },
+        "col-3": { "type": "collection" },
+        "col-4": { "type": "collection" }
+      },
+      "block_order": ["col-1", "col-2", "col-3", "col-4"]
+    },
+    "testimonials": {
+      "type": "testimonials",
+      "settings": { "heading": "What our clients say" },
+      "blocks": {
+        "t-1": { "type": "testimonial" },
+        "t-2": { "type": "testimonial" },
+        "t-3": { "type": "testimonial" }
+      },
+      "block_order": ["t-1", "t-2", "t-3"]
+    },
+    "instagram": {
+      "type": "instagram-feed",
+      "settings": {
+        "heading": "Follow along",
+        "handle": "yourbrand"
+      },
+      "blocks": {
+        "img-1": { "type": "image" },
+        "img-2": { "type": "image" },
+        "img-3": { "type": "image" },
+        "img-4": { "type": "image" },
+        "img-5": { "type": "image" },
+        "img-6": { "type": "image" }
+      },
+      "block_order": ["img-1", "img-2", "img-3", "img-4", "img-5", "img-6"]
+    },
+    "faq": {
+      "type": "faq",
+      "settings": {
+        "heading": "Frequently asked questions"
+      },
+      "blocks": {
+        "q-1": {
+          "type": "question",
+          "settings": {
+            "question": "How long does shipping take?",
+            "answer": "<p>Orders are processed within 1-2 business days and typically arrive within 3-7 business days, depending on your location. You'll receive a tracking link by email as soon as your order ships.</p>"
+          }
+        },
+        "q-2": {
+          "type": "question",
+          "settings": {
+            "question": "What is your return policy?",
+            "answer": "<p>We accept returns within 30 days of delivery for unused items in their original packaging. Visit our returns page or contact us to start the process.</p>"
+          }
+        },
+        "q-3": {
+          "type": "question",
+          "settings": {
+            "question": "Which payment methods do you accept?",
+            "answer": "<p>We accept all major credit cards and the local payment methods shown at checkout. All transactions are securely processed by Shopify.</p>"
+          }
+        },
+        "q-4": {
+          "type": "question",
+          "settings": {
+            "question": "How can I track my order?",
+            "answer": "<p>Once your order ships you'll receive an email with a tracking number and link. You can also check order status anytime from your account.</p>"
+          }
+        }
+      },
+      "block_order": ["q-1", "q-2", "q-3", "q-4"]
+    },
+    "newsletter": {
+      "type": "newsletter",
+      "settings": {
+        "heading": "Stay in touch",
+        "text": "Sign up for early access to new arrivals and private sales."
+      }
+    }
+  },
+  "order": [
+    "hero",
+    "featured-collections",
+    "bestsellers",
+    "image-with-text",
+    "collection-list",
+    "testimonials",
+    "faq",
+    "instagram",
+    "newsletter"
+  ]
+}

@@ -1,0 +1,4 @@
+<a href="{{ routes.cart_url }}" class="header__icon header__icon--cart" data-cart-icon aria-label="{{ 'general.accessibility.cart' | t }}" {% if settings.cart_type == 'drawer' %}data-cart-drawer-trigger{% endif %}>
+  {% render 'icon', name: 'cart', size: 22 %}
+  <span class="cart-count-bubble" data-cart-count {% if cart.item_count == 0 %}hidden{% endif %}>{{ cart.item_count }}</span>
+</a>

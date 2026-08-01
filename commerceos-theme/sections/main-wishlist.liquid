@@ -1,0 +1,20 @@
+<div class="container section">
+  <div class="section__header">
+    <h1>{{ 'wishlist.title' | t }}</h1>
+  </div>
+
+  <div class="cart-empty" data-wishlist-empty hidden>
+    <div class="cart-empty__icon">{% render 'icon', name: 'heart', size: 40 %}</div>
+    <p>{{ 'wishlist.empty' | t }}</p>
+    <p class="section__subheading">{{ 'wishlist.empty_subtext' | t }}</p>
+    <a href="{{ routes.all_products_collection_url }}" class="button button--primary" style="margin-top: 1.5rem;">{{ 'wishlist.continue_shopping' | t }}</a>
+  </div>
+
+  <div class="product-grid" style="--pg-desktop-cols: 4;" data-wishlist-grid hidden></div>
+</div>
+
+{% schema %}
+{
+  "name": "t:sections.main-wishlist.name"
+}
+{% endschema %}

@@ -1,0 +1,10 @@
+{%- comment -%} Shared quick-add modal shell. Content is injected by assets/quick-add.js from each product card's <template>. {%- endcomment -%}
+<div id="quick-add-modal" class="quick-add-modal" hidden data-quick-add-modal>
+  <div class="quick-add-modal__overlay" data-quick-add-close></div>
+  <div class="quick-add-modal__panel" role="dialog" aria-modal="true" aria-label="{{ 'products.product.quick_add' | t }}">
+    <button type="button" class="quick-add-modal__close" data-quick-add-close aria-label="{{ 'general.accessibility.close' | t }}">
+      {% render 'icon', name: 'close' %}
+    </button>
+    <div class="quick-add-modal__content" data-quick-add-content></div>
+  </div>
+</div>

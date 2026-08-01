@@ -1,0 +1,27 @@
+<div class="section container">
+  <div class="newsletter{% if section.settings.background %} newsletter--image{% endif %}">
+    {%- if section.settings.background -%}
+      <div class="newsletter__bg">
+        <img src="{{ section.settings.background | image_url: width: 1600 }}" alt="" loading="lazy">
+      </div>
+      <div class="newsletter__overlay"></div>
+    {%- endif -%}
+    <div class="newsletter__inner">
+      {%- if section.settings.heading != blank -%}<h2>{{ section.settings.heading }}</h2>{%- endif -%}
+      {%- if section.settings.text != blank -%}<p>{{ section.settings.text }}</p>{%- endif -%}
+      {% render 'newsletter-form', id: 'section' %}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "t:sections.newsletter.name",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "t:sections.newsletter.settings.heading", "default": "Stay in touch" },
+    { "type": "text", "id": "text", "label": "t:sections.newsletter.settings.text", "default": "Sign up for early access to new arrivals and private sales." },
+    { "type": "image_picker", "id": "background", "label": "t:sections.newsletter.settings.background" }
+  ],
+  "presets": [{ "name": "t:sections.newsletter.name" }]
+}
+{% endschema %}

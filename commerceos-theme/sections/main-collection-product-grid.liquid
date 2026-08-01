@@ -1,0 +1,120 @@
+{%- paginate collection.products by section.settings.products_per_page -%}
+  <div data-collection-grid-wrapper data-section-id="{{ section.id }}">
+   <div class="container">
+    <div class="toolbar">
+      {%- if section.settings.enable_filtering and collection.filters.size > 0 -%}
+        <button type="button" class="toolbar__button" data-filters-trigger>
+          {% render 'icon', name: 'filter', size: 16 %}
+          {{ 'products.facets.filter_and_sort' | t }}
+        </button>
+      {%- endif -%}
+
+      <span class="toolbar__count">{{ 'products.facets.results_count' | t: count: collection.products_count }}</span>
+
+      {%- if section.settings.enable_sorting -%}
+        <div class="sort-select">
+          <select data-sort-select aria-label="{{ 'products.facets.sort_by' | t }}">
+            {%- for option in collection.sort_options -%}
+              <option value="{{ option.value }}" {% if option.value == collection.sort_by %}selected{% endif %}>{{ option.name }}</option>
+            {%- endfor -%}
+          </select>
+        </div>
+      {%- endif -%}
+    </div>
+
+    {%- if section.settings.enable_filtering -%}
+      {%- assign has_active_filters = false -%}
+      <div class="active-filters">
+        {%- for filter in collection.filters -%}
+          {%- for value in filter.active_values -%}
+            {%- assign has_active_filters = true -%}
+            <span class="active-filter-pill">
+              {{ value.label }}
+              <button type="button" data-active-filter-remove="{{ value.param_name }}" data-active-filter-value="{{ value.value }}" aria-label="Remove {{ value.label }}">
+                {% render 'icon', name: 'close', size: 12 %}
+              </button>
+            </span>
+          {%- endfor -%}
+        {%- endfor -%}
+        {%- if has_active_filters -%}
+          <button type="button" class="active-filter-pill" data-filters-clear>{{ 'products.facets.clear_all' | t }}</button>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <div class="product-grid" style="--pg-desktop-cols: {{ section.settings.columns_desktop }}; --pg-mobile-cols: {{ section.settings.columns_mobile }};">
+      {%- for product in collection.products -%}
+        {% render 'product-card', product: product %}
+      {%- else -%}
+        <div class="product-grid--empty">
+          <p>{{ 'products.facets.no_matches' | t }}</p>
+        </div>
+      {%- endfor -%}
+    </div>
+
+    {% render 'pagination', paginate: paginate %}
+   </div>
+
+  {%- if section.settings.enable_filtering and collection.filters.size > 0 -%}
+    <div class="filters-drawer" data-filters-drawer hidden>
+      <div class="filters-drawer__header">
+        <p class="font-heading">{{ 'products.facets.filter' | t }}</p>
+        <button type="button" data-filters-close aria-label="{{ 'general.accessibility.close' | t }}">{% render 'icon', name: 'close' %}</button>
+      </div>
+      <div class="filters-drawer__body">
+        {%- for filter in collection.filters -%}
+          <details class="filter-group" open>
+            <summary>{{ filter.label }} {% render 'icon', name: 'chevron-down', size: 14 %}</summary>
+            <div class="filter-group__options">
+              {%- case filter.type -%}
+                {%- when 'price_range' -%}
+                  <div class="filter-price-range">
+                    <label>
+                      {{ 'products.product.regular_price' | t }} min
+                      <input type="number" class="field" data-filter-price-min name="{{ filter.min_value.param_name }}" value="{{ filter.min_value.value }}" placeholder="{{ filter.range_min | money_without_currency }}">
+                    </label>
+                    <label>
+                      max
+                      <input type="number" class="field" data-filter-price-max name="{{ filter.max_value.param_name }}" value="{{ filter.max_value.value }}" placeholder="{{ filter.range_max | money_without_currency }}">
+                    </label>
+                  </div>
+                {%- else -%}
+                  {%- for value in filter.values -%}
+                    <label class="filter-checkbox">
+                      <input
+                        type="checkbox"
+                        data-filter-input
+                        name="{{ value.param_name }}"
+                        value="{{ value.value }}"
+                        {% if value.active %}checked{% endif %}
+                        {% if value.count == 0 and value.active == false %}disabled{% endif %}
+                      >
+                      <span>{{ value.label }} ({{ value.count }})</span>
+                    </label>
+                  {%- endfor -%}
+              {%- endcase -%}
+            </div>
+          </details>
+        {%- endfor -%}
+      </div>
+      <div class="filters-drawer__footer">
+        <button type="button" class="button button--secondary button--full" data-filters-clear>{{ 'products.facets.reset' | t }}</button>
+        <button type="button" class="button button--primary button--full" data-filters-apply>{{ 'products.facets.apply' | t }}</button>
+      </div>
+    </div>
+  {%- endif -%}
+  </div>
+{%- endpaginate -%}
+
+{% schema %}
+{
+  "name": "t:sections.main-collection-product-grid.name",
+  "settings": [
+    { "type": "range", "id": "columns_desktop", "label": "t:sections.main-collection-product-grid.settings.columns_desktop", "min": 2, "max": 5, "step": 1, "default": 4 },
+    { "type": "select", "id": "columns_mobile", "label": "t:sections.main-collection-product-grid.settings.columns_mobile", "options": [{ "value": "1", "label": "1" }, { "value": "2", "label": "2" }], "default": "2" },
+    { "type": "range", "id": "products_per_page", "label": "t:sections.main-collection-product-grid.settings.products_per_page", "min": 8, "max": 48, "step": 4, "default": 24 },
+    { "type": "checkbox", "id": "enable_filtering", "label": "t:sections.main-collection-product-grid.settings.enable_filtering", "default": true },
+    { "type": "checkbox", "id": "enable_sorting", "label": "t:sections.main-collection-product-grid.settings.enable_sorting", "default": true }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,6 @@
+<div class="cart-empty">
+  <div class="cart-empty__icon">{% render 'icon', name: 'cart', size: 40 %}</div>
+  <p>{{ 'cart.empty' | t }}</p>
+  <p class="section__subheading">{{ 'cart.empty_subtext' | t }}</p>
+  <a href="{{ routes.all_products_collection_url }}" class="button button--primary" style="margin-top: 1.5rem;">{{ 'cart.continue_shopping' | t }}</a>
+</div>

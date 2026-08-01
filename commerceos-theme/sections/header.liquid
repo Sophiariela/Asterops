@@ -1,0 +1,196 @@
+{%- liquid
+  assign menu = section.settings.menu
+-%}
+<header class="header{% if section.settings.sticky_header %} is-sticky{% endif %}" data-section-id="{{ section.id }}" data-section-type="header">
+  <div class="container header__inner">
+    <button type="button" class="header__icon header__icon--menu" data-mobile-nav-trigger aria-label="{{ 'general.accessibility.menu' | t }}">
+      {% render 'icon', name: 'menu', size: 24 %}
+    </button>
+
+    <a href="{{ routes.root_url }}" class="header__logo">
+      {%- if section.settings.logo -%}
+        {%- assign logo_width_2x = section.settings.logo_width | times: 2 -%}
+        <img
+          src="{{ section.settings.logo | image_url: width: logo_width_2x }}"
+          alt="{{ shop.name }}"
+          width="{{ section.settings.logo_width }}"
+          height="{{ section.settings.logo_width | divided_by: section.settings.logo.aspect_ratio | round }}"
+        >
+      {%- else -%}
+        {{ shop.name }}
+      {%- endif -%}
+    </a>
+
+    <nav class="header__nav" aria-label="{{ 'general.accessibility.menu' | t }}">
+      {%- for link in menu.links -%}
+        {%- assign mega_block = nil -%}
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'mega_menu' and block.settings.menu_item == link.title -%}
+            {%- assign mega_block = block -%}
+          {%- endif -%}
+        {%- endfor -%}
+        <div class="header__nav-item" {% if mega_block or link.links.size > 0 %}data-has-megamenu{% endif %}>
+          <a href="{{ link.url }}" class="header__nav-link" {% if link.active %}aria-current="page"{% endif %}>
+            {{ link.title }}
+            {%- if mega_block or link.links.size > 0 %}{% render 'icon', name: 'chevron-down', size: 12 %}{% endif -%}
+          </a>
+          {%- if mega_block -%}
+            {%- liquid
+              assign columns = mega_block.settings.columns | default: 3
+              assign per_column = link.links.size | times: 1.0 | divided_by: columns | ceil
+              if per_column < 1
+                assign per_column = 1
+              endif
+            -%}
+            <div class="mega-menu" {{ mega_block.shopify_attributes }}>
+              <div class="container mega-menu__inner">
+                <div class="mega-menu__columns">
+                  {%- for i in (1..columns) -%}
+                    {%- assign start = i | minus: 1 | times: per_column -%}
+                    {%- if start < link.links.size -%}
+                      <div class="mega-menu__column">
+                        <p class="mega-menu__column-title">{{ link.title }}</p>
+                        {%- for child in link.links limit: per_column offset: start -%}
+                          <a href="{{ child.url }}" class="mega-menu__link">{{ child.title }}</a>
+                        {%- endfor -%}
+                      </div>
+                    {%- endif -%}
+                  {%- endfor -%}
+                </div>
+                {%- if mega_block.settings.image -%}
+                  <a href="{{ mega_block.settings.image_link | default: link.url }}" class="mega-menu__feature">
+                    <img src="{{ mega_block.settings.image | image_url: width: 480 }}" alt="{{ mega_block.settings.image_heading | escape }}" width="240" height="300" loading="lazy">
+                    {%- if mega_block.settings.image_heading -%}
+                      <p class="mega-menu__feature-heading">{{ mega_block.settings.image_heading }}</p>
+                    {%- endif -%}
+                  </a>
+                {%- endif -%}
+              </div>
+            </div>
+          {%- elsif link.links.size > 0 -%}
+            <div class="mega-menu">
+              <div class="container mega-menu__inner">
+                <div class="mega-menu__columns">
+                  <div class="mega-menu__column">
+                    {%- for child in link.links -%}
+                      <a href="{{ child.url }}" class="mega-menu__link">{{ child.title }}</a>
+                    {%- endfor -%}
+                  </div>
+                </div>
+              </div>
+            </div>
+          {%- endif -%}
+        </div>
+      {%- endfor -%}
+    </nav>
+
+    <div class="header__icons">
+      <button type="button" class="header__icon" data-search-trigger aria-label="{{ 'general.accessibility.search' | t }}">
+        {% render 'icon', name: 'search', size: 20 %}
+      </button>
+      <a href="{{ routes.account_url }}" class="header__icon hide-mobile" aria-label="{{ 'general.accessibility.account' | t }}">
+        {% render 'icon', name: 'account', size: 20 %}
+      </a>
+      {%- if settings.wishlist_enable -%}
+        <a href="{{ settings.wishlist_page_url }}" class="header__icon hide-mobile" aria-label="{{ 'general.accessibility.wishlist' | t }}">
+          {% render 'icon', name: 'heart', size: 20 %}
+        </a>
+      {%- endif -%}
+      {% render 'cart-icon-bubble' %}
+    </div>
+  </div>
+
+  <div class="search-bar-overlay" data-search-bar hidden>
+    <div class="container">
+      <div class="search-bar" data-predictive-search>
+        <form action="{{ routes.search_url }}" method="get" class="search-bar__field">
+          {% render 'icon', name: 'search', size: 18 %}
+          <input
+            type="search"
+            name="q"
+            class="search-bar__input"
+            placeholder="{{ 'general.search.placeholder' | t }}"
+            data-predictive-search-input
+            autocomplete="off"
+          >
+          <input type="hidden" name="type" value="product">
+          <button type="button" class="header__icon" data-search-close aria-label="{{ 'general.accessibility.close' | t }}">
+            {% render 'icon', name: 'close', size: 18 %}
+          </button>
+        </form>
+        <div class="predictive-search" data-predictive-search-results hidden></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="mobile-nav" data-mobile-nav hidden>
+  <div class="mobile-nav__header">
+    <button type="button" data-mobile-nav-close aria-label="{{ 'general.accessibility.close' | t }}">
+      {% render 'icon', name: 'close', size: 22 %}
+    </button>
+  </div>
+  <ul class="mobile-nav__list">
+    {%- for link in menu.links -%}
+      {%- if link.links.size > 0 -%}
+        <li>
+          <details>
+            <summary>{{ link.title }} {% render 'icon', name: 'chevron-down', size: 14 %}</summary>
+            <div class="mobile-nav__sublist">
+              {%- for child in link.links -%}
+                <a href="{{ child.url }}">{{ child.title }}</a>
+              {%- endfor -%}
+            </div>
+          </details>
+        </li>
+      {%- else -%}
+        <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+      {%- endif -%}
+    {%- endfor -%}
+  </ul>
+  <div class="mobile-nav__footer">
+    <a href="{{ routes.account_url }}" class="header__nav-link">{% render 'icon', name: 'account', size: 18 %} {{ 'general.accessibility.account' | t }}</a>
+    {%- if settings.wishlist_enable -%}
+      <a href="{{ settings.wishlist_page_url }}" class="header__nav-link">{% render 'icon', name: 'heart', size: 18 %} {{ 'general.accessibility.wishlist' | t }}</a>
+    {%- endif -%}
+  </div>
+</div>
+
+<script>
+  document.addEventListener('click', function (event) {
+    var searchTrigger = event.target.closest('[data-search-trigger]');
+    var searchBar = document.querySelector('[data-search-bar]');
+    if (searchTrigger && searchBar) {
+      searchBar.hidden = !searchBar.hidden;
+      if (!searchBar.hidden) searchBar.querySelector('input').focus();
+    }
+    if (event.target.closest('[data-search-close]') && searchBar) {
+      searchBar.hidden = true;
+    }
+  });
+</script>
+
+{% schema %}
+{
+  "name": "t:sections.header.name",
+  "settings": [
+    { "type": "image_picker", "id": "logo", "label": "t:sections.header.settings.logo" },
+    { "type": "range", "id": "logo_width", "label": "t:sections.header.settings.logo_width", "min": 80, "max": 240, "step": 10, "unit": "px", "default": 140 },
+    { "type": "checkbox", "id": "sticky_header", "label": "t:sections.header.settings.sticky_header", "default": true },
+    { "type": "link_list", "id": "menu", "label": "t:sections.header.settings.menu", "default": "main-menu" }
+  ],
+  "blocks": [
+    {
+      "type": "mega_menu",
+      "name": "t:sections.header.blocks.mega_menu.name",
+      "settings": [
+        { "type": "text", "id": "menu_item", "label": "t:sections.header.blocks.mega_menu.settings.menu_item", "info": "Must match a top-level menu label exactly, e.g. \"Collections\"" },
+        { "type": "range", "id": "columns", "label": "t:sections.header.blocks.mega_menu.settings.columns", "min": 1, "max": 4, "step": 1, "default": 2 },
+        { "type": "image_picker", "id": "image", "label": "t:sections.header.blocks.mega_menu.settings.image" },
+        { "type": "text", "id": "image_heading", "label": "t:sections.header.blocks.mega_menu.settings.image_heading" },
+        { "type": "url", "id": "image_link", "label": "t:sections.header.blocks.mega_menu.settings.image_link" }
+      ]
+    }
+  ]
+}
+{% endschema %}
