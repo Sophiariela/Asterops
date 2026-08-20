@@ -118,11 +118,6 @@ export const homeContent: HomeContent = {
     title: "Systems we've built.",
     description: "A look at how Aster infrastructure shows up in real businesses.",
     items: [
-      {
-        name: "Fulô Crochet",
-        description: "E-commerce transformation and premium online shopping experience.",
-        href: "/case-studies/fulo",
-      },
       { name: "Rowing School", description: "Digital enrollment, payment, scheduling and community system." },
       { name: "Startup", description: "AI-powered digital infrastructure." },
     ],

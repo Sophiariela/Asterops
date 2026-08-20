@@ -25,7 +25,16 @@ type Status = "idle" | "submitting" | "success" | "error";
 
 const DEFAULT_ERROR_MESSAGE = "Something went wrong. Please try again.";
 
-export function ContactForm() {
+export interface ContactFormProps {
+  /** Preselects the product dropdown — validated against the allowed options. */
+  defaultProductInterest?: string;
+  /** Seeds the message field, e.g. when arriving from a template page. */
+  defaultMessage?: string;
+  /** Short line above the form explaining the prefilled context. */
+  contextNote?: string;
+}
+
+export function ContactForm({ defaultProductInterest, defaultMessage, contextNote }: ContactFormProps = {}) {
   const [status, setStatus] = React.useState<Status>("idle");
   const [errors, setErrors] = React.useState<Partial<Record<keyof ContactFormValues, string>>>({});
   const [errorMessage, setErrorMessage] = React.useState(DEFAULT_ERROR_MESSAGE);
@@ -85,6 +94,12 @@ export function ContactForm() {
 
   return (
     <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
+      {contextNote ? (
+        <p className="rounded-md border border-accent/30 bg-accent/[0.06] px-4 py-3 text-sm leading-relaxed text-foreground">
+          {contextNote}
+        </p>
+      ) : null}
+
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
         <div className="flex flex-col gap-2">
           <Label htmlFor="name">Full name</Label>
@@ -108,7 +123,7 @@ export function ContactForm() {
         <select
           id="productInterest"
           name="productInterest"
-          defaultValue=""
+          defaultValue={defaultProductInterest ?? ""}
           className="flex h-11 w-full rounded-md border border-border bg-secondary px-4 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
         >
           <option value="" disabled>
@@ -125,7 +140,12 @@ export function ContactForm() {
 
       <div className="flex flex-col gap-2">
         <Label htmlFor="message">What are you trying to build?</Label>
-        <Textarea id="message" name="message" placeholder="Tell us about your business and what you need." />
+        <Textarea
+          id="message"
+          name="message"
+          defaultValue={defaultMessage}
+          placeholder="Tell us about your business and what you need."
+        />
         {errors.message ? <p className="text-xs text-red-400">{errors.message}</p> : null}
       </div>
 

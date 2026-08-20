@@ -6,6 +6,7 @@ import { Mail } from "lucide-react";
 import { Reveal } from "@/components/shared/reveal";
 import { ContactForm } from "@/components/contact/contact-form";
 import { contactContent } from "@/config/content";
+import { getInspirationBySlug } from "@/config/inspirations";
 import { contactEmail, instagramHandle, instagramUrl } from "@/config/socials";
 import { buildMetadata } from "@/lib/seo";
 
@@ -15,8 +16,19 @@ export const metadata: Metadata = buildMetadata({
   path: "/contact",
 });
 
-export default function ContactPage() {
+interface ContactPageProps {
+  searchParams: Promise<{ inspiration?: string }>;
+}
+
+export default async function ContactPage({ searchParams }: ContactPageProps) {
   const { hero, info } = contactContent;
+
+  // Visitors arriving via "Build Something Similar" on a Design Inspirations
+  // card get the form pre-framed around that reference — see
+  // `inspirationContactHref`. The inspiration itself is never sold; this only
+  // seeds the message so the conversation starts with the right context.
+  const { inspiration: inspirationSlug } = await searchParams;
+  const inspiration = inspirationSlug ? getInspirationBySlug(inspirationSlug) : undefined;
 
   return (
     <section className="px-6 pb-24 pt-28 sm:pt-36">
@@ -72,7 +84,14 @@ export default function ContactPage() {
         </div>
 
         <Reveal className="rounded-lg border border-border bg-card p-8">
-          <ContactForm />
+          <ContactForm
+            {...(inspiration
+              ? {
+                  contextNote: `Inspired by ${inspiration.name}. Tell us about your business and we'll design a custom solution around it.`,
+                  defaultMessage: `I'd like to build something similar in spirit to ${inspiration.name}. `,
+                }
+              : {})}
+          />
         </Reveal>
       </div>
     </section>

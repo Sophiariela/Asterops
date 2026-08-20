@@ -4,6 +4,7 @@ import { Hero } from "@/components/sections/hero";
 import { Problems } from "@/components/sections/problems";
 import { ProductsGrid } from "@/components/sections/products-grid";
 import { Industries } from "@/components/sections/industries";
+import { DesignInspirations } from "@/components/sections/design-inspirations";
 import { CaseStudies } from "@/components/sections/case-studies";
 import { HowItWorks } from "@/components/sections/how-it-works";
 import { CtaSection } from "@/components/sections/cta-section";
@@ -24,6 +25,7 @@ export default function HomePage() {
       <Problems />
       <ProductsGrid />
       <Industries />
+      <DesignInspirations />
       <CaseStudies />
       <HowItWorks />
       <CtaSection {...homeContent.finalCta} />
