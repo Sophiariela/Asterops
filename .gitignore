@@ -30,3 +30,6 @@ next-env.d.ts
 
 # vitest
 /coverage
+
+# local Claude Code tooling — not part of the product
+/.claude/

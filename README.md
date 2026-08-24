@@ -115,6 +115,10 @@ to demonstrate craft, not to sell what's shown — keep that framing intact when
   `src/config/theme.ts` / `tailwind.config.ts`.
 - `commerceos-theme/` at the repo root is an unrelated, standalone Shopify Liquid theme — see
   its own README for why it lives here and how it relates (or doesn't) to `src/`.
+- [`docs/design-handoff/`](docs/design-handoff/README.md) is the source brief the five-system
+  redesign was implemented from — exact tokens, verbatim copy, and screenshots. Reference
+  material for future work on the remaining screens it describes, not something the app reads
+  from at runtime.
 - Case studies for projects that aren't ready to be shown publicly should keep
   `isPublicLink: false` and must not link out to the live project.
 

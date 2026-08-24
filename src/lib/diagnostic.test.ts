@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { back, fitPercent, getResult, initialState, pick, score } from "@/lib/diagnostic";
 
 describe("diagnostic scoring", () => {
-  // Documented worked example from design_handoff_aster_platform/screenshots/README.md:
+  // Documented worked example from docs/design-handoff/screenshots/README.md:
   // physical products · 2-5 years · people find us but don't buy · old site nobody
   // updates · through DMs · spreadsheets · follow-up and admin · improving what we
   // have · several tools plus data to migrate → CommerceOS primary, OperationsOS
