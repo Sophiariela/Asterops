@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/nocturne-ec67e50d-68d2-442b-b7af-66139a42fb24/styles.css"></link>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""></link>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet"></link>
+<link rel="stylesheet" href="aster-theme.css"></link>
+<script src="_ds/nocturne-ec67e50d-68d2-442b-b7af-66139a42fb24/_ds_bundle.js"></script>
+<style>body{margin:0;}</style>
+</helmet>
+<div style="min-height:100vh;background:var(--color-bg);display:flex;flex-direction:column;">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:16px clamp(20px,4vw,48px);background:linear-gradient(to right, transparent, var(--color-divider) 48px, var(--color-divider) calc(100% - 48px), transparent) no-repeat bottom / 100% 1px;">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div style="width:32px;height:32px;border-radius:50%;background:var(--color-accent-800);color:var(--color-accent-100);display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);font-weight:500;font-size:13px;">FC</div>
+      <div>
+        <div style="font-family:var(--font-heading);font-weight:500;font-size:14.5px;">Fulô Crochet</div>
+        <div style="font-size:12px;color:color-mix(in srgb, var(--color-text) 55%, transparent);">Aster Client Workspace</div>
+      </div>
+    </div>
+    <a href="Aster-Homepage.dc.html" style="font-size:13.5px;color:color-mix(in srgb, var(--color-text) 55%, transparent);text-decoration:none;">Log out</a>
+  </div>
+
+  <div style="display:flex;flex:1;">
+    <aside style="width:210px;flex-shrink:0;padding:24px 14px;border-right:1px solid var(--color-divider);display:flex;flex-direction:column;gap:4px;">
+      <sc-for list="{{ navItems }}" as="item" hint-placeholder-count="6">
+        <button type="button" onClick="{{ item.select }}" style="display:block;width:100%;text-align:left;border:none;border-left:3px solid {{ item.border }};background:{{ item.bg }};color:{{ item.color }};padding:10px 14px;border-radius:0 var(--radius-sm) var(--radius-sm) 0;font-family:var(--font-body);font-size:14px;cursor:pointer;">{{ item.label }}</button>
+      </sc-for>
+    </aside>
+
+    <main style="flex:1;padding:40px 48px;max-width:900px;">
+
+      <sc-if value="{{ showOverview }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:6px;"><span style="width:24px;height:1px;background:var(--color-accent);display:block;flex-shrink:0;"></span><h2 style="margin:0;">Welcome back, Fulô.</h2></div>
+        <p style="font-size:14.5px;color:color-mix(in srgb, var(--color-text) 65%, transparent);margin:0 0 32px;">Here's where things stand on your projects.</p>
+
+        <div class="card elev-sm" style="margin-bottom:20px;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;">
+            <div><span class="card-kicker">Active Project</span><div class="card-title">Wholesale Portal — Phase 2</div></div>
+            <span class="tag tag-accent" style="flex-shrink:0;">In Progress</span>
+          </div>
+          <div style="height:6px;background:var(--color-neutral-800);border-radius:4px;overflow:hidden;margin:16px 0 14px;">
+            <div style="height:100%;width:62%;background:var(--color-accent);"></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <span style="width:22px;height:22px;border-radius:50%;background:var(--color-accent);color:var(--color-bg);font-size:11px;display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);">✓</span>
+            <span style="height:1px;width:18px;background:var(--color-accent);"></span>
+            <span style="width:22px;height:22px;border-radius:50%;background:var(--color-accent);color:var(--color-bg);font-size:11px;display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);">✓</span>
+            <span style="height:1px;width:18px;background:var(--color-accent);"></span>
+            <span style="width:22px;height:22px;border-radius:50%;border:1.5px solid var(--color-accent);color:var(--color-accent);font-size:11px;display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);">3</span>
+            <span style="height:1px;width:18px;background:var(--color-divider);"></span>
+            <span style="width:22px;height:22px;border-radius:50%;border:1.5px solid var(--color-divider);color:color-mix(in srgb, var(--color-text) 50%, transparent);font-size:11px;display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);">4</span>
+            <span style="height:1px;width:18px;background:var(--color-divider);"></span>
+            <span style="width:22px;height:22px;border-radius:50%;border:1.5px solid var(--color-divider);color:color-mix(in srgb, var(--color-text) 50%, transparent);font-size:11px;display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);">5</span>
+          </div>
+        </div>
+
+        <div class="card elev-sm">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;">
+            <div><span class="card-kicker">Completed</span><div class="card-title">Storefront Launch</div></div>
+            <span class="tag tag-neutral" style="flex-shrink:0;">Launched</span>
+          </div>
+          <p class="card-body" style="margin-top:12px;">Live since May 18 — storefront, checkout, and inventory sync.</p>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ showDeliverables }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:24px;"><span style="width:24px;height:1px;background:var(--color-accent);display:block;flex-shrink:0;"></span><h2 style="margin:0;">Deliverables</h2></div>
+        <table class="table">
+          <thead><tr><th>Deliverable</th><th>Type</th><th>Status</th><th>Updated</th></tr></thead>
+          <tbody>
+            <tr><td>Storefront design system</td><td>Design</td><td><span class="tag tag-neutral">Delivered</span></td><td>Jul 12</td></tr>
+            <tr><td>Wholesale portal wireframes</td><td>UX</td><td><span class="tag tag-accent">In review</span></td><td>Jul 28</td></tr>
+            <tr><td>Checkout flow spec</td><td>Documentation</td><td><span class="tag tag-neutral">Delivered</span></td><td>Jun 30</td></tr>
+            <tr><td>Launch playbook</td><td>Documentation</td><td><span class="tag tag-neutral">Delivered</span></td><td>May 18</td></tr>
+          </tbody>
+        </table>
+      </sc-if>
+
+      <sc-if value="{{ showMessages }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:24px;"><span style="width:24px;height:1px;background:var(--color-accent);display:block;flex-shrink:0;"></span><h2 style="margin:0;">Messages</h2></div>
+        <div style="display:flex;flex-direction:column;gap:1px;background:var(--color-divider);border-radius:var(--radius-md);overflow:hidden;margin-bottom:20px;">
+          <div style="background:var(--color-surface);padding:16px 18px;display:flex;justify-content:space-between;gap:16px;">
+            <div><div style="font-family:var(--font-heading);font-weight:500;font-size:14px;margin-bottom:4px;">Priya · Aster Studio</div><div style="font-size:13.5px;color:color-mix(in srgb, var(--color-text) 65%, transparent);">The wholesale portal wireframes are ready for your review — see Deliverables.</div></div>
+            <span style="font-size:12px;color:color-mix(in srgb, var(--color-text) 45%, transparent);white-space:nowrap;">2d ago</span>
+          </div>
+          <div style="background:var(--color-surface);padding:16px 18px;display:flex;justify-content:space-between;gap:16px;">
+            <div><div style="font-family:var(--font-heading);font-weight:500;font-size:14px;margin-bottom:4px;">Priya · Aster Studio</div><div style="font-size:13.5px;color:color-mix(in srgb, var(--color-text) 65%, transparent);">Kicking off Phase 2 this week — inventory sync for the wholesale portal.</div></div>
+            <span style="font-size:12px;color:color-mix(in srgb, var(--color-text) 45%, transparent);white-space:nowrap;">1w ago</span>
+          </div>
+          <div style="background:var(--color-surface);padding:16px 18px;display:flex;justify-content:space-between;gap:16px;">
+            <div><div style="font-family:var(--font-heading);font-weight:500;font-size:14px;margin-bottom:4px;">You</div><div style="font-size:13.5px;color:color-mix(in srgb, var(--color-text) 65%, transparent);">Storefront looks great — customers have already mentioned the checkout.</div></div>
+            <span style="font-size:12px;color:color-mix(in srgb, var(--color-text) 45%, transparent);white-space:nowrap;">3w ago</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <input class="input" type="text" placeholder="Write a message…" style="flex:1;"></input>
+          <button type="button" class="btn btn-primary">Send</button>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ showDocuments }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:24px;"><span style="width:24px;height:1px;background:var(--color-accent);display:block;flex-shrink:0;"></span><h2 style="margin:0;">Documents</h2></div>
+        <table class="table">
+          <thead><tr><th>Document</th><th>Status</th><th>Date</th></tr></thead>
+          <tbody>
+            <tr><td>Master Service Agreement</td><td><span class="tag tag-neutral">Signed</span></td><td>Mar 2</td></tr>
+            <tr><td>Phase 2 Statement of Work</td><td><span class="tag tag-neutral">Signed</span></td><td>Jun 14</td></tr>
+            <tr><td>Wholesale Portal Proposal</td><td><span class="tag tag-accent">Pending signature</span></td><td>Jul 30</td></tr>
+          </tbody>
+        </table>
+      </sc-if>
+
+      <sc-if value="{{ showBilling }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:24px;"><span style="width:24px;height:1px;background:var(--color-accent);display:block;flex-shrink:0;"></span><h2 style="margin:0;">Billing</h2></div>
+        <div class="card elev-sm" style="margin-bottom:24px;max-width:420px;">
+          <span class="card-kicker">Current plan</span>
+          <div class="card-title">Growth Partnership</div>
+          <p class="card-body">Next invoice Aug 15.</p>
+        </div>
+        <table class="table">
+          <thead><tr><th>Invoice</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead>
+          <tbody>
+            <tr><td>INV-0032</td><td>$4,200</td><td><span class="tag tag-neutral">Paid</span></td><td>Jul 1</td></tr>
+            <tr><td>INV-0031</td><td>$4,200</td><td><span class="tag tag-neutral">Paid</span></td><td>Jun 1</td></tr>
+            <tr><td>INV-0030</td><td>$4,200</td><td><span class="tag tag-neutral">Paid</span></td><td>May 1</td></tr>
+          </tbody>
+        </table>
+      </sc-if>
+
+      <sc-if value="{{ showSupport }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:24px;"><span style="width:24px;height:1px;background:var(--color-accent);display:block;flex-shrink:0;"></span><h2 style="margin:0;">Support</h2></div>
+        <div class="card elev-sm" style="max-width:480px;">
+          <div class="card-title">Need something outside the plan?</div>
+          <p class="card-body">Open a request and your team will respond within one business day.</p>
+          <button type="button" class="btn btn-primary btn-block">New support request</button>
+        </div>
+        <p style="font-size:13.5px;color:color-mix(in srgb, var(--color-text) 55%, transparent);margin-top:20px;">Or reach your team directly — priya@aster.studio</p>
+      </sc-if>
+
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+class Component extends DCLogic {
+  state = { tab: 'overview' };
+  setTab(t) { this.setState({ tab: t }); }
+
+  renderVals() {
+    const tabs = [
+      { id: 'overview', label: 'Overview' },
+      { id: 'deliverables', label: 'Deliverables' },
+      { id: 'messages', label: 'Messages' },
+      { id: 'documents', label: 'Documents' },
+      { id: 'billing', label: 'Billing' },
+      { id: 'support', label: 'Support' },
+    ];
+    const navItems = tabs.map(t => {
+      const active = this.state.tab === t.id;
+      return {
+        label: t.label,
+        select: () => this.setTab(t.id),
+        bg: active ? 'color-mix(in srgb, var(--color-accent) 12%, transparent)' : 'transparent',
+        color: active ? 'var(--color-text)' : 'color-mix(in srgb, var(--color-text) 62%, transparent)',
+        border: active ? 'var(--color-accent)' : 'transparent',
+      };
+    });
+    return {
+      navItems,
+      showOverview: this.state.tab === 'overview',
+      showDeliverables: this.state.tab === 'deliverables',
+      showMessages: this.state.tab === 'messages',
+      showDocuments: this.state.tab === 'documents',
+      showBilling: this.state.tab === 'billing',
+      showSupport: this.state.tab === 'support',
+    };
+  }
+}
+</script>
+</body>
+</html>

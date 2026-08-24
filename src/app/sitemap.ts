@@ -5,7 +5,7 @@ import { getProductSlugs } from "@/config/products";
 import { getCaseStudySlugs } from "@/config/case-studies";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const staticRoutes = ["", "/products", "/about", "/contact", "/legal/privacy", "/legal/terms"];
+  const staticRoutes = ["", "/products", "/diagnostic", "/about", "/contact", "/legal/privacy", "/legal/terms"];
 
   const productRoutes = getProductSlugs().map((slug) => `/product/${slug}`);
   const caseStudyRoutes = getCaseStudySlugs().map((slug) => `/case-studies/${slug}`);

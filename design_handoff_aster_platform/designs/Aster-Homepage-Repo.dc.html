@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/nocturne-ec67e50d-68d2-442b-b7af-66139a42fb24/styles.css"></link>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""></link>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet"></link>
+<link rel="stylesheet" href="aster-theme.css"></link>
+<script src="_ds/nocturne-ec67e50d-68d2-442b-b7af-66139a42fb24/_ds_bundle.js"></script>
+<script src="image-slot.js"></script>
+<style>
+html{scroll-behavior:smooth;}
+body{margin:0;}
+@keyframes astBlobA{0%,100%{transform:translate(0,0);}50%{transform:translate(40px,30px);}}
+@keyframes astBlobB{0%,100%{transform:translate(0,0);}50%{transform:translate(-30px,40px);}}
+</style>
+</helmet>
+<div style="min-height:100vh;background:var(--color-bg);display:flex;flex-direction:column;">
+
+<header style="position:sticky;top:0;z-index:40;border-bottom:1px solid color-mix(in srgb, var(--color-divider) 60%, transparent);background:color-mix(in srgb, var(--color-bg) 80%, transparent);backdrop-filter:blur(12px);">
+  <div style="max-width:1280px;margin:0 auto;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;">
+    <a href="Aster-Homepage-Repo.dc.html" style="display:flex;align-items:center;gap:8px;text-decoration:none;font-family:var(--font-mono);font-size:16px;font-weight:600;letter-spacing:-0.01em;color:var(--color-text);">
+      <span style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:8px;border:1px solid color-mix(in srgb, var(--color-accent) 30%, transparent);background:color-mix(in srgb, var(--color-accent) 10%, transparent);color:var(--color-accent);flex-shrink:0;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 6v12"></path><path d="M17.196 9 6.804 15"></path><path d="M6.804 9l10.392 6"></path></svg>
+      </span>
+      Aster
+    </a>
+    <nav style="display:flex;align-items:center;gap:32px;">
+      <a href="#solutions" style="font-size:14px;font-weight:500;color:var(--color-neutral-400);text-decoration:none;" style-hover="color:var(--color-text);">Solutions</a>
+      <a href="#inspirations" style="font-size:14px;font-weight:500;color:var(--color-neutral-400);text-decoration:none;" style-hover="color:var(--color-text);">About</a>
+      <a href="Aster-Contact.dc.html" style="font-size:14px;font-weight:500;color:var(--color-neutral-400);text-decoration:none;" style-hover="color:var(--color-text);">Contact</a>
+    </nav>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <button type="button" aria-label="Toggle theme" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;border-radius:8px;color:var(--color-text);cursor:pointer;" style-hover="background:var(--color-neutral-900);">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg>
+      </button>
+      <a href="#solutions" class="btn btn-primary" style="text-decoration:none;height:36px;padding:0 16px;font-size:14px;">Explore Solutions</a>
+    </div>
+  </div>
+</header>
+
+<main style="flex:1;">
+
+  <section style="position:relative;overflow:hidden;padding:144px 24px 96px;">
+    <div aria-hidden="true" style="position:absolute;inset:0;pointer-events:none;overflow:hidden;">
+      <div style="position:absolute;inset:0;opacity:0.15;background-image:linear-gradient(to right, var(--color-divider) 1px, transparent 1px),linear-gradient(to bottom, var(--color-divider) 1px, transparent 1px);background-size:64px 64px;mask-image:radial-gradient(ellipse 60% 50% at 50% 0%, black, transparent);-webkit-mask-image:radial-gradient(ellipse 60% 50% at 50% 0%, black, transparent);"></div>
+      <div style="position:absolute;left:25%;top:0;width:420px;height:420px;border-radius:50%;background:color-mix(in srgb, var(--color-accent) 20%, transparent);filter:blur(120px);animation:astBlobA 18s ease-in-out infinite;"></div>
+      <div style="position:absolute;right:25%;top:80px;width:360px;height:360px;border-radius:50%;background:color-mix(in srgb, var(--color-accent) 10%, transparent);filter:blur(120px);animation:astBlobB 22s ease-in-out infinite;"></div>
+      <div style="position:absolute;left:0;right:0;bottom:0;height:160px;background:linear-gradient(to top, var(--color-bg), transparent);"></div>
+    </div>
+    <div style="position:relative;max-width:896px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:32px;text-align:center;">
+      <span style="font-family:var(--font-mono);font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:0.25em;color:var(--color-accent);">Aster</span>
+      <h1 style="font-size:clamp(36px,5.2vw,60px);font-weight:500;line-height:1.1;letter-spacing:-0.025em;text-wrap:balance;margin:0;">Transform your business with intelligent digital systems.</h1>
+      <p style="display:flex;flex-direction:column;font-size:clamp(18px,2vw,20px);line-height:1.625;color:var(--color-neutral-400);margin:0;">
+        <span>From digital presence to AI-powered automation,</span>
+        <span>Aster helps entrepreneurs build scalable businesses</span>
+        <span>through software, design, and artificial intelligence.</span>
+      </p>
+      <div style="display:flex;align-items:center;gap:16px;padding-top:16px;flex-wrap:wrap;justify-content:center;">
+        <a href="Aster-Contact.dc.html" class="btn btn-primary" style="text-decoration:none;height:48px;padding:0 32px;font-size:16px;">Build my system
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+        </a>
+        <a href="#solutions" class="btn btn-secondary" style="text-decoration:none;height:48px;padding:0 32px;font-size:16px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="m10 8 6 4-6 4V8z"></path></svg>
+          Explore solutions
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section style="border-top:1px solid color-mix(in srgb, var(--color-divider) 60%, transparent);padding:96px 24px;">
+    <div style="max-width:1280px;margin:0 auto;">
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <span style="font-family:var(--font-mono);font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:0.2em;color:var(--color-accent);">Problems We Solve</span>
+        <h2 style="max-width:672px;font-size:clamp(30px,3.4vw,36px);font-weight:500;letter-spacing:-0.02em;margin:0;">The real problems behind slow growth.</h2>
+        <p style="max-width:576px;font-size:16px;line-height:1.625;color:var(--color-neutral-400);margin:0;">Every business we work with is dealing with at least one of these — often all four.</p>
+      </div>
+      <div style="margin-top:48px;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;">
+        <sc-for list="{{ problems }}" as="p" hint-placeholder-count="4">
+          <div style="display:flex;flex-direction:column;gap:24px;border:1px solid var(--color-divider);border-radius:10px;background:var(--color-surface);padding:32px;">
+            <span style="display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:8px;border:1px solid color-mix(in srgb, var(--color-accent) 30%, transparent);background:color-mix(in srgb, var(--color-accent) 10%, transparent);color:var(--color-accent);flex-shrink:0;">{{ p.icon }}</span>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <h3 style="font-size:18px;font-weight:500;line-height:1.35;letter-spacing:-0.01em;margin:0;">{{ p.problem }}</h3>
+              <p style="font-size:14px;line-height:1.625;color:var(--color-neutral-400);margin:0;">{{ p.solution }}</p>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section id="solutions" style="border-top:1px solid color-mix(in srgb, var(--color-divider) 60%, transparent);padding:96px 24px;scroll-margin-top:64px;">
+    <div style="max-width:1280px;margin:0 auto;">
+      <div style="display:flex;justify-content:space-between;gap:24px;align-items:flex-end;flex-wrap:wrap;">
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <span style="font-family:var(--font-mono);font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:0.2em;color:var(--color-accent);">Aster Solutions</span>
+          <h2 style="max-width:672px;font-size:clamp(30px,3.4vw,36px);font-weight:500;letter-spacing:-0.02em;margin:0;">Three systems. One mission: smarter businesses.</h2>
+          <p style="max-width:576px;font-size:16px;line-height:1.625;color:var(--color-neutral-400);margin:0;">Foundation, Automation and Intelligence — built to work together as the technology infrastructure behind your business.</p>
+        </div>
+        <a href="#solutions" style="display:flex;flex-shrink:0;align-items:center;gap:6px;font-size:14px;font-weight:500;color:var(--color-text);text-decoration:none;" style-hover="color:var(--color-accent);">View all solutions
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+        </a>
+      </div>
+      <div style="margin-top:48px;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;">
+        <sc-for list="{{ products }}" as="pr" hint-placeholder-count="3">
+          <a href="Aster-Solution-CommerceOS.dc.html" style="display:flex;height:100%;flex-direction:column;gap:24px;border:1px solid var(--color-divider);border-radius:10px;background:var(--color-surface);padding:32px;text-decoration:none;color:var(--color-text);transition:border-color 140ms ease;" style-hover="border-color:color-mix(in srgb, var(--color-accent) 40%, transparent);">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+              <span style="display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:8px;border:1px solid color-mix(in srgb, var(--color-accent) 30%, transparent);background:color-mix(in srgb, var(--color-accent) 10%, transparent);color:var(--color-accent);flex-shrink:0;">{{ pr.icon }}</span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--color-neutral-400);flex-shrink:0;"><path d="M7 17 17 7"></path><path d="M7 7h10v10"></path></svg>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <h3 style="font-size:18px;font-weight:500;letter-spacing:-0.01em;margin:0;">{{ pr.name }}</h3>
+              <p style="font-size:14px;line-height:1.625;color:var(--color-neutral-400);margin:0;">{{ pr.shortDescription }}</p>
+            </div>
+          </a>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section style="border-top:1px solid color-mix(in srgb, var(--color-divider) 60%, transparent);padding:96px 24px;">
+    <div style="max-width:1280px;margin:0 auto;">
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <span style="font-family:var(--font-mono);font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:0.2em;color:var(--color-accent);">Industries</span>
+        <h2 style="max-width:672px;font-size:clamp(30px,3.4vw,36px);font-weight:500;letter-spacing:-0.02em;margin:0;">Built for ambitious businesses, not one niche.</h2>
+        <p style="max-width:576px;font-size:16px;line-height:1.625;color:var(--color-neutral-400);margin:0;">Different industries. Same mission: building smarter businesses.</p>
+      </div>
+      <div style="margin-top:48px;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;">
+        <sc-for list="{{ industries }}" as="ind" hint-placeholder-count="6">
+          <div style="display:flex;align-items:center;gap:14px;border:1px solid var(--color-divider);border-radius:10px;background:var(--color-surface);padding:24px;">
+            <span style="color:var(--color-accent);display:flex;flex-shrink:0;">{{ ind.icon }}</span>
+            <span style="font-size:15px;font-weight:500;">{{ ind.name }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section id="inspirations" style="border-top:1px solid color-mix(in srgb, var(--color-divider) 60%, transparent);padding:96px 24px;scroll-margin-top:64px;">
+    <div style="max-width:1280px;margin:0 auto;">
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <span style="font-family:var(--font-mono);font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:0.2em;color:var(--color-accent);">Design Inspirations</span>
+        <h2 style="max-width:672px;font-size:clamp(30px,3.4vw,36px);font-weight:500;letter-spacing:-0.02em;margin:0;">Digital experiences we've designed.</h2>
+        <p style="max-width:576px;font-size:16px;line-height:1.625;color:var(--color-neutral-400);margin:0;">Visual references that show the standard Aster builds to — the design directions and craft quality behind our work.</p>
+      </div>
+      <div style="margin-top:48px;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;">
+        <sc-for list="{{ inspirations }}" as="ins" hint-placeholder-count="3">
+          <div style="display:flex;flex-direction:column;border:1px solid var(--color-divider);border-radius:10px;background:var(--color-surface);overflow:hidden;">
+            <sc-if value="{{ ins.isLive }}" hint-placeholder-val="{{ true }}">
+              <figure class="lighten" style="margin:0;aspect-ratio:16/10;">
+                <image-slot id="{{ ins.slotId }}" shape="rect" radius="0" placeholder="{{ ins.placeholder }}"></image-slot>
+              </figure>
+            </sc-if>
+            <sc-if value="{{ ins.isConcept }}" hint-placeholder-val="{{ false }}">
+              <div style="aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;background:var(--color-bg);border-bottom:1px solid var(--color-divider);">
+                <span style="color:color-mix(in srgb, var(--color-accent) 40%, transparent);display:flex;">{{ ins.icon }}</span>
+              </div>
+            </sc-if>
+            <div style="display:flex;flex-direction:column;gap:12px;padding:24px;flex:1;">
+              <span style="font-family:var(--font-mono);font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.14em;color:var(--color-accent);">{{ ins.category }}</span>
+              <h3 style="font-size:18px;font-weight:500;letter-spacing:-0.01em;margin:0;">{{ ins.name }}</h3>
+              <p style="font-size:14px;line-height:1.625;color:var(--color-neutral-400);margin:0;flex:1;">{{ ins.description }}</p>
+              <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px;">
+                <sc-if value="{{ ins.isLive }}" hint-placeholder-val="{{ true }}">
+                  <a href="{{ ins.demoUrl }}" target="_blank" rel="noopener" class="btn btn-primary" style="text-decoration:none;height:36px;padding:0 16px;font-size:14px;">View Experience
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"></path><path d="M7 7h10v10"></path></svg>
+                  </a>
+                </sc-if>
+                <a href="Aster-Contact.dc.html" class="btn btn-secondary" style="text-decoration:none;height:36px;padding:0 16px;font-size:14px;">Build Something Similar</a>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <p style="margin:32px 0 0;font-size:14px;line-height:1.625;color:var(--color-neutral-400);max-width:672px;">These are design references, not products. Aster does not sell templates — every project is designed and built for one business.</p>
+    </div>
+  </section>
+
+  <section style="border-top:1px solid color-mix(in srgb, var(--color-divider) 60%, transparent);padding:96px 24px;">
+    <div style="max-width:1280px;margin:0 auto;">
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <span style="font-family:var(--font-mono);font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:0.2em;color:var(--color-accent);">Case Studies</span>
+        <h2 style="max-width:672px;font-size:clamp(30px,3.4vw,36px);font-weight:500;letter-spacing:-0.02em;margin:0;">Systems we've built.</h2>
+        <p style="max-width:576px;font-size:16px;line-height:1.625;color:var(--color-neutral-400);margin:0;">A look at how Aster infrastructure shows up in real businesses.</p>
+      </div>
+      <div style="margin-top:48px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px;">
+        <sc-for list="{{ caseStudies }}" as="cs" hint-placeholder-count="2">
+          <div style="display:flex;flex-direction:column;gap:16px;border:1px solid var(--color-divider);border-radius:10px;background:var(--color-surface);padding:32px;">
+            <h3 style="font-size:18px;font-weight:500;letter-spacing:-0.01em;margin:0;">{{ cs.name }}</h3>
+            <p style="font-size:14px;line-height:1.625;color:var(--color-neutral-400);margin:0;">{{ cs.description }}</p>
+            <span style="font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:0.14em;color:var(--color-neutral-500);">Case study in progress</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section style="border-top:1px solid color-mix(in srgb, var(--color-divider) 60%, transparent);padding:96px 24px;">
+    <div style="max-width:1280px;margin:0 auto;">
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <span style="font-family:var(--font-mono);font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:0.2em;color:var(--color-accent);">How Aster Works</span>
+        <h2 style="max-width:672px;font-size:clamp(30px,3.4vw,36px);font-weight:500;letter-spacing:-0.02em;margin:0;">From decision to live system in four steps.</h2>
+        <p style="max-width:576px;font-size:16px;line-height:1.625;color:var(--color-neutral-400);margin:0;">A clear process, from first conversation to a system that scales with you.</p>
+      </div>
+      <div style="margin-top:48px;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:32px;">
+        <sc-for list="{{ steps }}" as="st" hint-placeholder-count="4">
+          <div style="position:relative;display:flex;flex-direction:column;gap:16px;">
+            <span style="font-family:var(--font-mono);font-size:36px;font-weight:500;line-height:1;letter-spacing:-0.03em;color:color-mix(in srgb, var(--color-accent) 30%, transparent);">{{ st.index }}</span>
+            <h3 style="font-size:18px;font-weight:500;letter-spacing:-0.01em;margin:0;">{{ st.title }}</h3>
+            <p style="font-size:14px;line-height:1.625;color:var(--color-neutral-400);margin:0;">{{ st.description }}</p>
+            <sc-if value="{{ st.hasConnector }}" hint-placeholder-val="{{ false }}">
+              <span aria-hidden="true" style="position:absolute;right:-16px;top:16px;height:1px;width:32px;background:var(--color-divider);"></span>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section style="border-top:1px solid color-mix(in srgb, var(--color-divider) 60%, transparent);padding:96px 24px;">
+    <div style="max-width:768px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:24px;border:1px solid var(--color-divider);border-radius:12px;background:var(--color-surface);padding:64px 32px;text-align:center;">
+      <h2 style="font-size:clamp(30px,3.4vw,36px);font-weight:500;letter-spacing:-0.025em;text-wrap:balance;margin:0;">Your business deserves more than a website. It deserves a system.</h2>
+      <p style="max-width:576px;font-size:16px;line-height:1.625;color:var(--color-neutral-400);margin:0;">Talk to Aster about the infrastructure your business actually needs to attract customers, automate operations, and scale.</p>
+      <div style="display:flex;align-items:center;gap:16px;padding-top:8px;flex-wrap:wrap;justify-content:center;">
+        <a href="Aster-Contact.dc.html" class="btn btn-primary" style="text-decoration:none;height:48px;padding:0 32px;font-size:16px;">Start your transformation
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+        </a>
+        <a href="#solutions" class="btn btn-secondary" style="text-decoration:none;height:48px;padding:0 32px;font-size:16px;">Explore Solutions</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer style="border-top:1px solid color-mix(in srgb, var(--color-divider) 60%, transparent);padding:64px 24px 32px;">
+  <div style="max-width:1280px;margin:0 auto;">
+    <div style="display:flex;justify-content:space-between;gap:48px;flex-wrap:wrap;margin-bottom:48px;">
+      <div style="max-width:300px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;font-family:var(--font-mono);font-size:16px;font-weight:600;color:var(--color-text);">
+          <span style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:8px;border:1px solid color-mix(in srgb, var(--color-accent) 30%, transparent);background:color-mix(in srgb, var(--color-accent) 10%, transparent);color:var(--color-accent);flex-shrink:0;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 6v12"></path><path d="M17.196 9 6.804 15"></path><path d="M6.804 9l10.392 6"></path></svg>
+          </span>
+          Aster
+        </div>
+        <p style="font-size:14px;line-height:1.625;color:var(--color-neutral-400);margin:0;">Intelligent digital systems for ambitious businesses.</p>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:40px;flex:1;max-width:720px;">
+        <sc-for list="{{ footerColumns }}" as="col" hint-placeholder-count="4">
+          <div>
+            <div style="font-size:14px;font-weight:500;color:var(--color-text);margin-bottom:16px;">{{ col.title }}</div>
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <sc-for list="{{ col.links }}" as="lnk" hint-placeholder-count="3">
+                <a href="{{ lnk.href }}" style="font-size:14px;color:var(--color-neutral-400);text-decoration:none;" style-hover="color:var(--color-text);">{{ lnk.label }}</a>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    <div style="padding-top:32px;border-top:1px solid color-mix(in srgb, var(--color-divider) 60%, transparent);display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;">
+      <span style="font-size:13px;color:var(--color-neutral-500);">© 2026 Aster Studio Ltda. All rights reserved.</span>
+      <span style="font-family:var(--font-mono);font-size:12px;color:var(--color-neutral-500);">aster.studio</span>
+    </div>
+  </div>
+</footer>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  ico(paths, size) {
+    return React.createElement('svg', {
+      width: size || 20, height: size || 20, viewBox: '0 0 24 24', fill: 'none',
+      stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round',
+    }, paths.map((d, i) => React.createElement('path', { key: i, d })));
+  }
+
+  renderVals() {
+    const I = (p, s) => this.ico(p, s);
+    const globe = ['M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18', 'M3.6 9h16.8', 'M3.6 15h16.8', 'M12 3a15 15 0 0 1 0 18', 'M12 3a15 15 0 0 0 0 18'];
+    const bot = ['M12 5V3', 'M6 8h12a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2z', 'M9 13h.01', 'M15 13h.01', 'M2 13h2', 'M20 13h2'];
+    const chart = ['M3 20h18', 'M7 20v-8', 'M12 20V6', 'M17 20v-5'];
+    const workflow = ['M4 5h6v5H4z', 'M14 14h6v5h-6z', 'M10 7.5h4a2 2 0 0 1 2 2V14', 'M7 10v4a2 2 0 0 0 2 2h1'];
+    const compass = ['M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18', 'm15.5 8.5-2 5-5 2 2-5z'];
+
+    return {
+      problems: [
+        { icon: I(workflow), problem: 'My business depends too much on manual work.', solution: 'AI automation, workflows, intelligent assistants.' },
+        { icon: I(globe), problem: 'My online presence does not convert visitors into customers.', solution: 'Premium websites, e-commerce, customer journeys.' },
+        { icon: I(chart), problem: "I have data but don't know how to use it.", solution: 'AI analytics and business intelligence.' },
+        { icon: I(compass), problem: "I need technology but don't know where to start.", solution: 'Digital strategy and implementation.' },
+      ],
+      products: [
+        { icon: I(globe), name: 'Aster Foundation', shortDescription: 'The digital infrastructure your business runs on.' },
+        { icon: I(bot), name: 'Aster Automation', shortDescription: "AI systems that run the busywork so your team doesn't have to." },
+        { icon: I(chart), name: 'Aster Intelligence', shortDescription: 'Turn the data your business already has into clear decisions.' },
+      ],
+      industries: [
+        { name: 'E-commerce brands', icon: I(['M3 4h2l2.4 11.2a2 2 0 0 0 2 1.6h7.8a2 2 0 0 0 2-1.55L21 8H6', 'M10 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2', 'M18 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2']) },
+        { name: 'Education businesses', icon: I(['M3 9l9-4 9 4-9 4-9-4Z', 'M7 11v5c0 1.5 2.5 3 5 3s5-1.5 5-3v-5']) },
+        { name: 'Local businesses', icon: I(['M4 7h16l-1 13H5L4 7Z', 'M9 7V5a3 3 0 0 1 6 0v2']) },
+        { name: 'Startups', icon: I(['M5 19c0-3 1-5 3-6l7-7 4 4-7 7c-1 2-3 3-6 3Z', 'M14 6l4 4']) },
+        { name: 'Professional services', icon: I(['M4 8h16v12H4z', 'M9 8V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2', 'M4 13h16']) },
+        { name: 'Communities', icon: I(['M16 20v-2a4 4 0 0 0-8 0v2', 'M12 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6', 'M20 20v-1.5a3 3 0 0 0-2.4-2.9', 'M4 20v-1.5a3 3 0 0 1 2.4-2.9']) },
+      ],
+      inspirations: [
+        { name: 'Fulô Crochet', category: 'Commerce', description: 'A tactile, story-led storefront for a handmade crochet studio — warm pacing, long product narratives, built for considered purchases.', isLive: true, isConcept: false, slotId: 'repo-insp-fulo', placeholder: 'Fulô Crochet — storefront', demoUrl: 'https://fulo-crochet-site.onrender.com/', icon: null },
+        { name: 'Modern Commerce', category: 'Commerce', description: 'A fast, editorial commerce experience for a direct-to-consumer brand scaling past its first storefront.', isLive: false, isConcept: true, slotId: 'repo-insp-modern', placeholder: '', demoUrl: '#', icon: I(['M3 4h2l2.4 11.2a2 2 0 0 0 2 1.6h7.8a2 2 0 0 0 2-1.55L21 8H6', 'M10 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2', 'M18 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2'], 40) },
+        { name: 'Education Platform', category: 'Education', description: 'A cohort-based learning platform with the pacing and polish of a premium product, not a course library.', isLive: false, isConcept: true, slotId: 'repo-insp-edu', placeholder: '', demoUrl: '#', icon: I(['M3 9l9-4 9 4-9 4-9-4Z', 'M7 11v5c0 1.5 2.5 3 5 3s5-1.5 5-3v-5'], 40) },
+      ],
+      caseStudies: [
+        { name: 'Rowing School', description: 'Digital enrollment, payment, scheduling and community system.' },
+        { name: 'Startup', description: 'AI-powered digital infrastructure.' },
+      ],
+      steps: [
+        { index: '01', title: 'Discover', description: 'We analyze your business challenges and where technology is actually holding you back.', hasConnector: true },
+        { index: '02', title: 'Design', description: 'We create the digital strategy — the systems, priorities and sequence that fit your business.', hasConnector: true },
+        { index: '03', title: 'Build', description: 'We develop the software, automation and AI systems that make up your infrastructure.', hasConnector: true },
+        { index: '04', title: 'Scale', description: 'We improve the system continuously, using data and intelligence to guide what’s next.', hasConnector: false },
+      ],
+      footerColumns: [
+        { title: 'Company', links: [{ label: 'About', href: '#inspirations' }] },
+        { title: 'Solutions', links: [
+          { label: 'All Solutions', href: '#solutions' },
+          { label: 'Aster Foundation', href: 'Aster-Solution-CommerceOS.dc.html' },
+          { label: 'Aster Automation', href: '#solutions' },
+          { label: 'Aster Intelligence', href: '#solutions' },
+        ]},
+        { title: 'Contact', links: [
+          { label: 'Contact Us', href: 'Aster-Contact.dc.html' },
+          { label: 'contact@asteropsco.com', href: 'mailto:contact@asteropsco.com' },
+          { label: '@asterops.co', href: '#' },
+        ]},
+        { title: 'Legal', links: [
+          { label: 'Privacy Policy', href: '#' },
+          { label: 'Terms of Service', href: '#' },
+        ]},
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

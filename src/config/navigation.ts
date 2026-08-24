@@ -1,37 +1,43 @@
-import { contactEmail, instagramHandle, instagramUrl } from "@/config/socials";
+import { contactEmail } from "@/config/socials";
+import { products } from "@/config/products";
 import type { FooterColumn, NavLink } from "@/types";
 
 export const headerNav: NavLink[] = [
-  { label: "Solutions", href: "/products" },
-  { label: "About", href: "/about" },
+  { label: "Systems", href: "/#systems" },
+  { label: "Showcase", href: "/#showcase" },
+  { label: "Process", href: "/#process" },
   { label: "Contact", href: "/contact" },
 ];
 
 export const headerCta: NavLink = {
-  label: "Explore Solutions",
-  href: "/products",
+  label: "Book a Consultation",
+  href: "/contact",
+};
+
+export const clientLoginNav: NavLink = {
+  label: "Client login",
+  href: "/portal",
 };
 
 export const footerColumns: FooterColumn[] = [
   {
-    title: "Company",
-    links: [{ label: "About", href: "/about" }],
+    title: "Systems",
+    links: products.map((product) => ({ label: product.name, href: `/product/${product.slug}` })),
   },
   {
-    title: "Solutions",
+    title: "Company",
     links: [
-      { label: "All Solutions", href: "/products" },
-      { label: "Aster Foundation", href: "/product/aster-foundation" },
-      { label: "Aster Automation", href: "/product/aster-automation" },
-      { label: "Aster Intelligence", href: "/product/aster-intelligence" },
+      { label: "Find your system", href: "/diagnostic" },
+      { label: "Showcase", href: "/#showcase" },
+      { label: "Design system", href: "/design-system" },
     ],
   },
   {
     title: "Contact",
     links: [
-      { label: "Contact Us", href: "/contact" },
+      { label: "Start a project", href: "/contact" },
+      { label: "Client login", href: "/portal" },
       { label: contactEmail, href: `mailto:${contactEmail}` },
-      { label: instagramHandle, href: instagramUrl },
     ],
   },
   {

@@ -37,12 +37,21 @@ export interface PricingTier {
   highlighted?: boolean;
 }
 
+export interface HomeSystemCard {
+  /** 3:2 preview image for the homepage systems grid — public/examples/*-os-1.png */
+  previewImage: string;
+  capabilities: string[];
+  outcome: string;
+}
+
 export interface Product {
   slug: string;
   name: string;
   shortDescription: string;
   tagline: string;
   icon: LucideIcon;
+  /** Homepage systems-grid card content — only present on the five-system model. */
+  homeCard?: HomeSystemCard;
   hero: {
     eyebrow: string;
     headline: string;

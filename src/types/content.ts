@@ -9,21 +9,9 @@ export interface HeroContent {
   secondaryCta: CtaLink;
 }
 
-export interface ProblemCard {
-  icon: LucideIcon;
-  problem: string;
-  solution: string;
-}
-
 export interface IndustryItem {
   icon: LucideIcon;
   name: string;
-}
-
-export interface CaseStudyItem {
-  name: string;
-  description: string;
-  href?: string;
 }
 
 export interface HowItWorksStep {
@@ -65,18 +53,46 @@ export interface ContactContent {
   info: { label: string; value: string }[];
 }
 
+export interface StatItem {
+  value: string;
+  label: string;
+}
+
+export interface ComparisonColumn {
+  label: string;
+  items: string[];
+}
+
+export interface ShowcaseFact {
+  label: string;
+  body: string;
+}
+
+export interface TrustPlaceholder {
+  glyph: string;
+  label: string;
+}
+
 export interface HomeContent {
   hero: HeroContent;
-  problems: {
+  stats: StatItem[];
+  systems: {
     eyebrow: string;
     title: string;
     description: string;
-    items: ProblemCard[];
   };
-  solutions: {
-    eyebrow: string;
+  whyAster: {
+    title: string;
+    traditional: ComparisonColumn;
+    aster: ComparisonColumn;
+  };
+  showcase: {
+    kicker: string;
     title: string;
     description: string;
+    facts: ShowcaseFact[];
+    primaryCta: CtaLink;
+    secondaryCta: CtaLink;
   };
   industries: {
     eyebrow: string;
@@ -84,17 +100,16 @@ export interface HomeContent {
     description: string;
     items: IndustryItem[];
   };
-  caseStudies: {
+  process: {
     eyebrow: string;
     title: string;
-    description: string;
-    items: CaseStudyItem[];
-  };
-  howItWorks: {
-    eyebrow: string;
-    title: string;
-    description: string;
     steps: HowItWorksStep[];
+  };
+  trust: {
+    title: string;
+    placeholders: TrustPlaceholder[];
+    trustedByLabel: string;
+    clientPlaceholders: string[];
   };
   finalCta: {
     title: string;

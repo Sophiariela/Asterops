@@ -7,7 +7,7 @@ import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 import { Logo } from "@/components/shared/logo";
-import { headerCta, headerNav } from "@/config/navigation";
+import { clientLoginNav, headerCta, headerNav } from "@/config/navigation";
 
 export function MobileNav() {
   const [open, setOpen] = React.useState(false);
@@ -34,6 +34,14 @@ export function MobileNav() {
               </Link>
             </SheetClose>
           ))}
+          <SheetClose asChild>
+            <Link
+              href={clientLoginNav.href}
+              className="text-lg font-medium text-muted-foreground transition-colors hover:text-foreground"
+            >
+              {clientLoginNav.label}
+            </Link>
+          </SheetClose>
         </nav>
         <SheetClose asChild>
           <Button asChild size="lg" className="mt-auto w-full">

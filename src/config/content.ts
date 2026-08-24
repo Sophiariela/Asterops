@@ -1,18 +1,14 @@
 import {
-  BarChart3,
   Blocks,
   Bot,
   Briefcase,
   Building2,
-  Compass,
   GraduationCap,
-  Globe,
   Rocket,
   ShieldCheck,
-  ShoppingCart,
+  Shirt,
   Store,
   Users,
-  Workflow,
 } from "lucide-react";
 import type { AboutContent, ContactContent, HomeContent } from "@/types";
 
@@ -57,87 +53,100 @@ export const contactContent: ContactContent = {
 
 export const homeContent: HomeContent = {
   hero: {
-    eyebrow: "Aster",
-    headline: "Transform your business with intelligent digital systems.",
+    eyebrow: "Operating systems for modern business",
+    headline: "Build a smarter business.",
     subheadlineLines: [
-      "From digital presence to AI-powered automation,",
-      "Aster helps entrepreneurs build scalable businesses",
-      "through software, design, and artificial intelligence.",
+      "Technology, automation, AI, and digital infrastructure — designed as one system, so growth stops depending on who remembers to do the work.",
     ],
-    primaryCta: { label: "Build my system", href: "/contact" },
-    secondaryCta: { label: "Explore solutions", href: "/products" },
+    primaryCta: { label: "Find your growth system", href: "/diagnostic" },
+    secondaryCta: { label: "Explore the systems", href: "/#systems" },
   },
-  problems: {
-    eyebrow: "Problems We Solve",
-    title: "The real problems behind slow growth.",
-    description: "Every business we work with is dealing with at least one of these — often all four.",
-    items: [
-      {
-        icon: Workflow,
-        problem: "My business depends too much on manual work.",
-        solution: "AI automation, workflows, intelligent assistants.",
-      },
-      {
-        icon: Globe,
-        problem: "My online presence does not convert visitors into customers.",
-        solution: "Premium websites, e-commerce, customer journeys.",
-      },
-      {
-        icon: BarChart3,
-        problem: "I have data but don't know how to use it.",
-        solution: "AI analytics and business intelligence.",
-      },
-      {
-        icon: Compass,
-        problem: "I need technology but don't know where to start.",
-        solution: "Digital strategy and implementation.",
-      },
-    ],
+  stats: [
+    { value: "One", label: "Platform underneath all five systems — no duplicated infrastructure." },
+    { value: "Days", label: "From configuration to a live system, not quarters." },
+    { value: "5", label: "Operating systems, each addressing one part of the business." },
+    { value: "99.98%", label: "Uptime target across deployed Aster infrastructure." },
+  ],
+  systems: {
+    eyebrow: "Systems",
+    title: "Five systems. One mission: smarter businesses.",
+    description: "Each one addresses a different part of the business, built to work together as one platform.",
   },
-  solutions: {
-    eyebrow: "Aster Solutions",
-    title: "Three systems. One mission: smarter businesses.",
+  whyAster: {
+    title: "A website is a page. A system is the business.",
+    traditional: {
+      label: "Traditional agency",
+      items: [
+        "Delivers pages, then moves on",
+        "Priced by the project",
+        "Limited infrastructure underneath",
+        "Every change is a new engagement",
+      ],
+    },
+    aster: {
+      label: "Aster",
+      items: [
+        "Delivers systems that keep working",
+        "Built for long-term growth",
+        "Real business infrastructure",
+        "Automation built in from day one",
+        "AI integrated, not bolted on",
+        "Scalable architecture across five systems",
+      ],
+    },
+  },
+  showcase: {
+    kicker: "CommerceOS in production",
+    title: "Built for modern commerce.",
     description:
-      "Foundation, Automation and Intelligence — built to work together as the technology infrastructure behind your business.",
+      "A real-world example of a CommerceOS implementation — not a template, not a product for sale. Every Aster build is designed for one business.",
+    facts: [
+      { label: "Client", body: "Fulô Crochet — a handmade crochet studio scaling past direct messages." },
+      { label: "System", body: "CommerceOS: storefront, checkout, inventory and customer accounts." },
+      { label: "Highlights", body: "Custom checkout, subscription bundles, and a wholesale portal." },
+      { label: "Outcome", body: "Higher average order value and materially lower cart abandonment." },
+    ],
+    primaryCta: { label: "View experience", href: "https://fulo-crochet-site.onrender.com/" },
+    secondaryCta: { label: "Build something similar", href: "/contact" },
   },
   industries: {
     eyebrow: "Industries",
-    title: "Built for ambitious businesses, not one niche.",
-    description: "Different industries. Same mission: building smarter businesses.",
+    title: "Different industries. Same mission.",
+    description: "Built for ambitious businesses, not one niche.",
     items: [
-      { icon: ShoppingCart, name: "E-commerce brands" },
-      { icon: GraduationCap, name: "Education businesses" },
-      { icon: Store, name: "Local businesses" },
+      { icon: Store, name: "Retail" },
+      { icon: Shirt, name: "Fashion" },
+      { icon: GraduationCap, name: "Education" },
       { icon: Rocket, name: "Startups" },
       { icon: Briefcase, name: "Professional services" },
       { icon: Users, name: "Communities" },
     ],
   },
-  caseStudies: {
-    eyebrow: "Case Studies",
-    title: "Systems we've built.",
-    description: "A look at how Aster infrastructure shows up in real businesses.",
-    items: [
-      { name: "Rowing School", description: "Digital enrollment, payment, scheduling and community system." },
-      { name: "Startup", description: "AI-powered digital infrastructure." },
+  process: {
+    eyebrow: "Process",
+    title: "From discovery to scale.",
+    steps: [
+      { index: "01", title: "Discover", description: "We analyze the business and find where technology is actually holding it back." },
+      { index: "02", title: "Design", description: "We architect the system — the priorities, the sequence, the shape of it." },
+      { index: "03", title: "Build", description: "We develop the software, automation and AI that make up your infrastructure." },
+      { index: "04", title: "Automate", description: "We connect the workflows so the system runs without manual handoffs." },
+      { index: "05", title: "Scale", description: "We improve continuously, using data to guide what comes next." },
     ],
   },
-  howItWorks: {
-    eyebrow: "How Aster Works",
-    title: "From decision to live system in four steps.",
-    description: "A clear process, from first conversation to a system that scales with you.",
-    steps: [
-      { index: "01", title: "Discover", description: "We analyze your business challenges and where technology is actually holding you back." },
-      { index: "02", title: "Design", description: "We create the digital strategy — the systems, priorities and sequence that fit your business." },
-      { index: "03", title: "Build", description: "We develop the software, automation and AI systems that make up your infrastructure." },
-      { index: "04", title: "Scale", description: "We improve the system continuously, using data and intelligence to guide what's next." },
+  trust: {
+    title: "Built to earn trust at scale.",
+    placeholders: [
+      { glyph: "01", label: "Case studies" },
+      { glyph: "02", label: "Testimonials" },
+      { glyph: "03", label: "Project metrics" },
     ],
+    trustedByLabel: "Trusted by teams building with Aster",
+    clientPlaceholders: ["Client 01", "Client 02", "Client 03", "Client 04", "Client 05"],
   },
   finalCta: {
     title: "Your business deserves more than a website. It deserves a system.",
-    description:
-      "Talk to Aster about the infrastructure your business actually needs to attract customers, automate operations, and scale.",
-    primaryCta: { label: "Start your transformation", href: "/contact" },
-    secondaryCta: { label: "Explore Solutions", href: "/products" },
+    description: "Build the digital infrastructure behind your next stage of growth.",
+    primaryCta: { label: "Find your growth system", href: "/diagnostic" },
+    secondaryCta: { label: "Talk to Aster", href: "/contact" },
   },
 };

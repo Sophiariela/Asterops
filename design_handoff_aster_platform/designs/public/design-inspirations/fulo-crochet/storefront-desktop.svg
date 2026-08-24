@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" role="img" aria-label="Fulô Crochet — premium commerce storefront design reference">
+  <defs>
+    <linearGradient id="heroGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F0DECC"></stop>
+      <stop offset="100%" stop-color="#C97A50"></stop>
+    </linearGradient>
+    <linearGradient id="tileGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#F4E9DB"></stop>
+      <stop offset="100%" stop-color="#E3CEB5"></stop>
+    </linearGradient>
+    <linearGradient id="tileGradB" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#EDE7DA"></stop>
+      <stop offset="100%" stop-color="#D6C7AE"></stop>
+    </linearGradient>
+  </defs>
+
+  <rect width="1440" height="900" fill="#F9F4ED"></rect>
+
+  
+  <rect x="0" y="0" width="1440" height="36" fill="#2F2A24"></rect>
+  <rect x="600" y="14" width="240" height="8" rx="4" fill="#F9F4ED" opacity="0.5"></rect>
+
+  
+  <rect x="0" y="36" width="1440" height="76" fill="#FFFFFF"></rect>
+  <rect x="0" y="111" width="1440" height="1" fill="#E7DBC9"></rect>
+  <circle cx="72" cy="74" r="12" fill="#C0653C"></circle>
+  <rect x="94" y="68" width="92" height="12" rx="6" fill="#2F2A24"></rect>
+  <g fill="#DCCEB9">
+    <rect x="560" y="69" width="70" height="10" rx="5"></rect>
+    <rect x="654" y="69" width="86" height="10" rx="5"></rect>
+    <rect x="764" y="69" width="62" height="10" rx="5"></rect>
+    <rect x="850" y="69" width="54" height="10" rx="5"></rect>
+  </g>
+  <circle cx="1300" cy="74" r="11" fill="#EFE3D2"></circle>
+  <rect x="1330" y="60" width="42" height="28" rx="14" fill="#C0653C"></rect>
+  <circle cx="1364" cy="56" r="9" fill="#8C9A7B"></circle>
+
+  
+  <rect x="0" y="112" width="1440" height="452" fill="url(#heroGrad)"></rect>
+  <rect x="880" y="112" width="560" height="452" fill="#E9D9C6" opacity="0.55"></rect>
+  <circle cx="1160" cy="338" r="132" fill="#F6EDE1" opacity="0.65"></circle>
+  <circle cx="1160" cy="338" r="86" fill="#C0653C" opacity="0.22"></circle>
+  <rect x="110" y="212" width="118" height="12" rx="6" fill="#FFFFFF" opacity="0.85"></rect>
+  <rect x="110" y="256" width="600" height="34" rx="8" fill="#2F2A24" opacity="0.88"></rect>
+  <rect x="110" y="306" width="470" height="34" rx="8" fill="#2F2A24" opacity="0.88"></rect>
+  <rect x="110" y="372" width="420" height="12" rx="6" fill="#2F2A24" opacity="0.4"></rect>
+  <rect x="110" y="398" width="330" height="12" rx="6" fill="#2F2A24" opacity="0.4"></rect>
+  <rect x="110" y="446" width="188" height="48" rx="24" fill="#2F2A24"></rect>
+  <rect x="150" y="464" width="108" height="12" rx="6" fill="#F9F4ED"></rect>
+  <rect x="318" y="446" width="164" height="48" rx="24" fill="none" stroke="#2F2A24" stroke-width="2" opacity="0.5"></rect>
+
+  
+  <rect x="0" y="564" width="1440" height="72" fill="#FFFFFF"></rect>
+  <rect x="0" y="635" width="1440" height="1" fill="#E7DBC9"></rect>
+  <g fill="#DCCEB9">
+    <rect x="150" y="595" width="140" height="10" rx="5"></rect>
+    <rect x="430" y="595" width="180" height="10" rx="5"></rect>
+    <rect x="750" y="595" width="150" height="10" rx="5"></rect>
+    <rect x="1040" y="595" width="200" height="10" rx="5"></rect>
+  </g>
+
+  
+  <rect x="110" y="686" width="96" height="10" rx="5" fill="#C0653C"></rect>
+  <rect x="110" y="714" width="320" height="20" rx="8" fill="#2F2A24" opacity="0.85"></rect>
+  <rect x="1216" y="714" width="114" height="14" rx="7" fill="#DCCEB9"></rect>
+
+  
+  <g>
+    <rect x="110" y="766" width="290" height="200" rx="12" fill="url(#tileGrad)"></rect>
+    <circle cx="255" cy="850" r="52" fill="#C0653C" opacity="0.2"></circle>
+    <rect x="126" y="782" width="66" height="22" rx="11" fill="#FFFFFF" opacity="0.9"></rect>
+  </g>
+  <g>
+    <rect x="428" y="766" width="290" height="200" rx="12" fill="url(#tileGradB)"></rect>
+    <circle cx="573" cy="850" r="52" fill="#8C9A7B" opacity="0.24"></circle>
+  </g>
+  <g>
+    <rect x="746" y="766" width="290" height="200" rx="12" fill="url(#tileGrad)"></rect>
+    <circle cx="891" cy="850" r="52" fill="#2F2A24" opacity="0.12"></circle>
+  </g>
+  <g>
+    <rect x="1064" y="766" width="290" height="200" rx="12" fill="url(#tileGradB)"></rect>
+    <circle cx="1209" cy="850" r="52" fill="#C0653C" opacity="0.18"></circle>
+  </g>
+</svg>

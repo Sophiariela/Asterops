@@ -1,0 +1,91 @@
+/* Aster theme layer — the repo's brand tokens (Sophiariela/Asterops:
+   src/config/theme.ts + src/app/globals.css) mapped onto Nocturne's variable
+   names. Loaded AFTER the design-system stylesheet so these values win.
+   Structure, layout and section rhythm stay Nocturne's; palette, type,
+   radii and the filled primary action come from the repo. */
+
+:root {
+  /* Ground — repo dark theme */
+  --color-bg: #0A0A0C;
+  --color-surface: #111214;
+  --color-text: #F5F6F8;
+  --color-divider: #26272D;
+
+  /* Accent — repo indigo #4F46E5 */
+  --color-accent: #4F46E5;
+  --color-accent-2: #4F46E5;
+
+  --color-neutral-100: #F5F6F8;
+  --color-neutral-200: #E3E4E9;
+  --color-neutral-300: #C6C8D0;
+  --color-neutral-400: #9A9CA6;
+  --color-neutral-500: #74767F;
+  --color-neutral-600: #565860;
+  --color-neutral-700: #3C3D44;
+  --color-neutral-800: #26272C;
+  --color-neutral-900: #17181B;
+
+  --color-accent-100: #EFEEFE;
+  --color-accent-200: #DEDCFC;
+  --color-accent-300: #C2BEF9;
+  --color-accent-400: #948DF1;
+  --color-accent-500: #4F46E5;
+  --color-accent-600: #4038C4;
+  --color-accent-700: #322C9B;
+  --color-accent-800: #232063;
+  --color-accent-900: #16143A;
+
+  --color-accent-2-100: #EFEEFE;
+  --color-accent-2-200: #DEDCFC;
+  --color-accent-2-300: #C2BEF9;
+  --color-accent-2-400: #948DF1;
+  --color-accent-2-500: #4F46E5;
+  --color-accent-2-600: #4038C4;
+  --color-accent-2-700: #322C9B;
+  --color-accent-2-800: #232063;
+  --color-accent-2-900: #16143A;
+
+  /* The one saturated band, re-hued to the repo indigo */
+  --color-section: #1E1B54;
+  --color-section-glow: #2E2A85;
+  --color-section-ghost: #3A3580;
+
+  /* Type — repo Geist pairing */
+  --font-heading: "Geist", system-ui, sans-serif;
+  --font-heading-weight: 500;
+  --font-body: "Geist", system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, monospace;
+
+  /* Radius — repo 0.625rem */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+
+  /* Elevation on a near-black ground */
+  --shadow-sm: 0 0 0 1px #1D1E22;
+  --shadow-md: 0 0 0 1px #2A2B31, 0 6px 18px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 0 0 1px #3C3D44, 0 16px 40px rgba(0, 0, 0, 0.7);
+}
+
+/* Repo conviction: the primary action is a filled accent, not an outline.
+   Secondary and ghost keep Nocturne's outlined restraint. */
+.btn-primary {
+  background: var(--color-accent);
+  color: #ffffff;
+  border-color: var(--color-accent);
+}
+.btn-primary:hover { background: color-mix(in srgb, var(--color-accent) 88%, black); }
+.btn-primary:active { background: color-mix(in srgb, var(--color-accent) 76%, black); }
+
+/* Repo badge: pill, mono, uppercase, wide tracking */
+.tag {
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.card-kicker {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}

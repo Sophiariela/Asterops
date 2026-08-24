@@ -10,7 +10,7 @@ import { buildMetadata } from "@/lib/seo";
 export const metadata: Metadata = buildMetadata({
   title: "Solutions",
   description:
-    "Aster Foundation, Aster Automation and Aster Intelligence — the three systems that make up the technology infrastructure behind modern businesses.",
+    "WebOS, CommerceOS, LaunchOS, GrowthOS and OperationsOS — the five systems that make up the technology infrastructure behind modern businesses.",
   path: "/products",
 });
 

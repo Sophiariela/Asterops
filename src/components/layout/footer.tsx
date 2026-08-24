@@ -22,7 +22,8 @@ export function Footer() {
           <div className="col-span-2 flex flex-col gap-4">
             <Logo />
             <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">
-              {siteConfig.tagline}
+              Intelligent digital systems for ambitious businesses — the technology infrastructure
+              behind modern companies.
             </p>
             <div className="mt-2 flex items-center gap-3">
               {socials.map((social) => {
@@ -73,7 +74,7 @@ export function Footer() {
           <p>
             &copy; {new Date().getFullYear()} {siteConfig.legalName}. All rights reserved.
           </p>
-          <p className="font-mono uppercase tracking-[0.2em]">{siteConfig.tagline}</p>
+          <p className="font-mono uppercase tracking-[0.2em]">Systems, not websites.</p>
         </div>
       </div>
     </footer>

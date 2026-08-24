@@ -4,14 +4,16 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   async redirects() {
     return [
-      { source: "/product/website-os", destination: "/product/aster-foundation", permanent: true },
-      { source: "/product/commerce-os", destination: "/product/aster-foundation", permanent: true },
-      { source: "/product/launch-os", destination: "/product/aster-foundation", permanent: true },
-      { source: "/product/growth-os", destination: "/product/aster-automation", permanent: true },
-      { source: "/product/operations-os", destination: "/product/aster-automation", permanent: true },
-      // The Fulô build is now presented as a Design Inspirations reference on the
+      // Aster now sells five operating systems instead of the three bundled
+      // products (Foundation/Automation/Intelligence). Old bundled slugs
+      // redirect forward to their closest new-model equivalent, shipped in
+      // the same deploy as the products.ts expansion so nothing 404s.
+      { source: "/product/aster-foundation", destination: "/products", permanent: true },
+      { source: "/product/aster-automation", destination: "/product/operations-os", permanent: true },
+      { source: "/product/aster-intelligence", destination: "/product/growth-os", permanent: true },
+      // The Fulô build is now presented as the CommerceOS showcase on the
       // homepage, not a standalone client case study page.
-      { source: "/case-studies/fulo", destination: "/#design-inspirations", permanent: true },
+      { source: "/case-studies/fulo", destination: "/#showcase", permanent: true },
     ];
   },
 };

@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/nocturne-ec67e50d-68d2-442b-b7af-66139a42fb24/styles.css"></link>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""></link>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet"></link>
+<link rel="stylesheet" href="aster-theme.css"></link>
+<script src="_ds/nocturne-ec67e50d-68d2-442b-b7af-66139a42fb24/_ds_bundle.js"></script>
+<style>html{scroll-behavior:smooth;}body{margin:0;}</style>
+</helmet>
+<div style="min-height:100vh;background:var(--color-bg);">
+
+<div style="position:sticky;top:0;z-index:50;height:56px;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:0 clamp(20px,5vw,72px);background:color-mix(in srgb, var(--color-bg) 82%, transparent);backdrop-filter:blur(12px);border-bottom:1px solid color-mix(in srgb, var(--color-divider) 60%, transparent);">
+  <span style="font-family:var(--font-mono);font-size:13px;font-weight:600;color:var(--color-text);">Aster · Platform Proposal</span>
+  <div style="display:flex;gap:22px;flex-wrap:wrap;">
+    <a href="#audit" style="font-family:var(--font-mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-neutral-400);text-decoration:none;" style-hover="color:var(--color-text);">Audit</a>
+    <a href="#core" style="font-family:var(--font-mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-neutral-400);text-decoration:none;" style-hover="color:var(--color-text);">Core</a>
+    <a href="#data" style="font-family:var(--font-mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-neutral-400);text-decoration:none;" style-hover="color:var(--color-text);">Data</a>
+    <a href="#commerceos" style="font-family:var(--font-mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-neutral-400);text-decoration:none;" style-hover="color:var(--color-text);">CommerceOS</a>
+    <a href="#roadmap" style="font-family:var(--font-mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-neutral-400);text-decoration:none;" style-hover="color:var(--color-text);">Roadmap</a>
+    <a href="#decisions" style="font-family:var(--font-mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-accent);text-decoration:none;">Decisions</a>
+  </div>
+</div>
+
+<section style="padding:96px clamp(20px,5vw,72px) 80px;">
+  <div style="max-width:1160px;margin:0 auto;">
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:28px;">
+      <span style="width:44px;height:1px;background:var(--color-accent);display:block;flex-shrink:0;"></span>
+      <span style="font-family:var(--font-mono);font-size:11.5px;font-weight:500;letter-spacing:0.25em;text-transform:uppercase;color:var(--color-accent);">Architecture proposal · for approval</span>
+    </div>
+    <h1 style="font-size:clamp(38px,5.4vw,68px);line-height:1.06;letter-spacing:-0.025em;text-wrap:pretty;max-width:22ch;margin:0 0 28px;">From studio to platform.</h1>
+    <p style="font-size:18px;line-height:1.65;color:var(--color-neutral-400);max-width:66ch;margin:0 0 44px;">An audit of <span style="font-family:var(--font-mono);font-size:16px;color:var(--color-accent-300);">Sophiariela/Asterops</span>, an architecture for Aster Core, a CommerceOS MVP, and the smallest version that can actually be sold. No code has been changed.</p>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;">
+      <div style="border:1px solid var(--color-divider);border-radius:var(--radius-md);background:var(--color-surface);padding:26px;">
+        <div style="font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.16em;text-transform:uppercase;color:var(--color-accent);margin-bottom:12px;">Verdict — reuse</div>
+        <p style="font-size:14px;line-height:1.6;margin:0;color:var(--color-neutral-300);">The marketing layer is in good shape and content-driven. Keep it. Roughly 70% of Phase 1 already exists.</p>
+      </div>
+      <div style="border:1px solid var(--color-divider);border-radius:var(--radius-md);background:var(--color-surface);padding:26px;">
+        <div style="font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.16em;text-transform:uppercase;color:var(--color-accent);margin-bottom:12px;">Verdict — gap</div>
+        <p style="font-size:14px;line-height:1.6;margin:0;color:var(--color-neutral-300);">There is no product layer at all: no auth, no database, no tenancy, no billing. Notion is the only place data persists.</p>
+      </div>
+      <div style="border:1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);border-radius:var(--radius-md);background:var(--color-surface);padding:26px;box-shadow:var(--shadow-md);">
+        <div style="font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.16em;text-transform:uppercase;color:var(--color-accent);margin-bottom:12px;">Verdict — blocker</div>
+        <p style="font-size:14px;line-height:1.6;margin:0;color:var(--color-text);">The repo sells three products. This brief sells five. That contradiction has to be resolved before anything is built — see <a href="#decisions" style="color:var(--color-accent-300);">Decisions</a>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="audit" style="padding:0 clamp(20px,5vw,72px) 88px;scroll-margin-top:64px;">
+  <div style="max-width:1160px;margin:0 auto;padding-top:88px;border-top:1px solid color-mix(in srgb, var(--color-divider) 60%, transparent);">
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;">
+      <span style="width:44px;height:1px;background:var(--color-accent);display:block;flex-shrink:0;"></span>
+      <span style="font-family:var(--font-mono);font-size:11.5px;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;color:var(--color-accent);">01 · Repository audit</span>
+    </div>
+    <h2 style="max-width:26ch;letter-spacing:-0.02em;margin:0 0 16px;">What exists today.</h2>
+    <p style="font-size:16px;line-height:1.65;color:var(--color-neutral-400);max-width:64ch;margin:0 0 44px;">A well-built Next.js marketing site with a typed content layer and one integration. It is a brochure with a lead form — not a platform, and it does not pretend to be one.</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:44px;">
+      <div style="border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:28px;">
+        <div style="font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.16em;text-transform:uppercase;color:var(--color-neutral-500);margin-bottom:20px;">Stack</div>
+        <div style="display:flex;flex-direction:column;gap:13px;">
+          <sc-for list="{{ stack }}" as="row" hint-placeholder-count="8">
+            <div style="display:flex;justify-content:space-between;gap:16px;font-size:13.5px;">
+              <span style="color:var(--color-neutral-400);flex-shrink:0;">{{ row.k }}</span>
+              <span style="font-family:var(--font-mono);font-size:12.5px;color:var(--color-text);text-align:right;">{{ row.v }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:28px;">
+        <div style="font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.16em;text-transform:uppercase;color:var(--color-neutral-500);margin-bottom:20px;">Routes shipped</div>
+        <div style="display:flex;flex-wrap:wrap;gap:7px;">
+          <sc-for list="{{ routes }}" as="r" hint-placeholder-count="10">
+            <span style="font-family:var(--font-mono);font-size:11.5px;color:var(--color-neutral-300);border:1px solid var(--color-divider);border-radius:999px;padding:5px 11px;">{{ r }}</span>
+          </sc-for>
+        </div>
+        <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--color-divider);">
+          <div style="font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.16em;text-transform:uppercase;color:var(--color-neutral-500);margin-bottom:12px;">Only write path in the codebase</div>
+          <p style="font-family:var(--font-mono);font-size:12.5px;line-height:1.7;margin:0;color:var(--color-accent-300);">contact-form → POST /api/contact<br></br>→ zod validate → createLeadInNotion()</p>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="font-size:20px;letter-spacing:-0.01em;margin:0 0 24px;">Reuse · rebuild · resolve</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;">
+      <div style="border:1px solid color-mix(in srgb, var(--color-accent) 40%, transparent);border-radius:var(--radius-md);background:var(--color-surface);padding:28px;">
+        <div style="font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.16em;text-transform:uppercase;color:var(--color-accent);margin-bottom:8px;">Keep as-is</div>
+        <p style="font-size:12.5px;line-height:1.55;color:var(--color-neutral-400);margin:0 0 20px;">Genuine assets. Do not touch these.</p>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <sc-for list="{{ keep }}" as="k" hint-placeholder-count="7">
+            <div style="display:flex;gap:10px;align-items:flex-start;font-size:13.5px;line-height:1.5;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:3px;color:var(--color-accent);"><path d="M20 6 9 17l-5-5"></path></svg>
+              <span>{{ k }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:28px;">
+        <div style="font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.16em;text-transform:uppercase;color:var(--color-neutral-500);margin-bottom:8px;">Absent — must be built</div>
+        <p style="font-size:12.5px;line-height:1.55;color:var(--color-neutral-500);margin:0 0 20px;">Nothing to migrate. Greenfield.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:7px;">
+          <sc-for list="{{ missing }}" as="m" hint-placeholder-count="10">
+            <span style="font-family:var(--font-mono);font-size:11px;letter-spacing:0.04em;color:var(--color-neutral-400);border:1px dashed var(--color-divider);border-radius:999px;padding:5px 11px;">{{ m }}</span>
+          </sc-for>
+        </div>
+      </div>
+      <div style="border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:28px;">
+        <div style="font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.16em;text-transform:uppercase;color:var(--color-neutral-500);margin-bottom:8px;">Contradicts the brief</div>
+        <p style="font-size:12.5px;line-height:1.55;color:var(--color-neutral-500);margin:0 0 20px;">Decide before building.</p>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <sc-for list="{{ conflicts }}" as="c" hint-placeholder-count="4">
+            <div>
+              <div style="font-family:var(--font-mono);font-size:11px;color:var(--color-accent-300);margin-bottom:4px;">{{ c.where }}</div>
+              <div style="font-size:13px;line-height:1.55;color:var(--color-neutral-300);">{{ c.what }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="position:relative;background:radial-gradient(75% 105% at 22% 42%, color-mix(in srgb, var(--color-section-glow) 70%, transparent), transparent 64%), var(--color-section);padding:104px clamp(20px,5vw,72px);overflow:hidden;">
+  <div style="max-width:1160px;margin:0 auto;position:relative;">
+    <div aria-hidden="true" style="position:absolute;right:0;top:-34px;font-family:var(--font-mono);font-weight:500;font-size:clamp(130px,18vw,250px);line-height:0.8;letter-spacing:-0.04em;color:var(--color-section-ghost);pointer-events:none;user-select:none;">02</div>
+    <div style="position:relative;max-width:700px;">
+      <span style="display:block;width:44px;height:1px;background:var(--color-accent-300);margin-bottom:24px;"></span>
+      <h2 style="font-size:clamp(30px,4.2vw,50px);letter-spacing:-0.025em;margin:0 0 20px;">Five systems must not become five codebases.</h2>
+      <p style="font-size:16px;line-height:1.65;color:color-mix(in srgb, var(--color-text) 78%, transparent);margin:0;">The whole architecture turns on one decision: an OS is a <strong style="font-weight:500;">manifest</strong> — a declared set of Core modules, a config schema, and a list of experiences. Not an application. Get that right and Phase 4 is configuration; get it wrong and it is four more rebuilds.</p>
+    </div>
+  </div>
+</section>
+
+<section id="core" style="padding:88px clamp(20px,5vw,72px);scroll-margin-top:64px;">
+  <div style="max-width:1160px;margin:0 auto;">
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;">
+      <span style="width:44px;height:1px;background:var(--color-accent);display:block;flex-shrink:0;"></span>
+      <span style="font-family:var(--font-mono);font-size:11.5px;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;color:var(--color-accent);">02 · Aster Core</span>
+    </div>
+    <h2 style="max-width:24ch;letter-spacing:-0.02em;margin:0 0 44px;">One platform, five manifests.</h2>
+
+    <div style="border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:32px;margin-bottom:32px;">
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;">
+          <sc-for list="{{ osLayer }}" as="os" hint-placeholder-count="5">
+            <div style="border:1px solid {{ os.border }};border-radius:var(--radius-sm);background:{{ os.bg }};padding:16px 12px;text-align:center;">
+              <div style="font-family:var(--font-mono);font-size:11.5px;font-weight:500;color:{{ os.color }};margin-bottom:5px;">{{ os.name }}</div>
+              <div style="font-family:var(--font-mono);font-size:9.5px;letter-spacing:0.08em;text-transform:uppercase;color:var(--color-neutral-500);">{{ os.status }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="flex:1;height:1px;background:var(--color-divider);"></div>
+          <span style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-neutral-500);">manifests declare · never implement</span>
+          <div style="flex:1;height:1px;background:var(--color-divider);"></div>
+        </div>
+        <div style="border:1px solid color-mix(in srgb, var(--color-accent) 40%, transparent);border-radius:var(--radius-sm);background:color-mix(in srgb, var(--color-accent) 7%, transparent);padding:22px;">
+          <div style="font-family:var(--font-mono);font-size:12px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:var(--color-accent);text-align:center;margin-bottom:18px;">Aster Core</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;">
+            <sc-for list="{{ coreModules }}" as="mod" hint-placeholder-count="14">
+              <div style="border:1px solid var(--color-divider);border-radius:var(--radius-sm);background:var(--color-bg);padding:11px 10px;text-align:center;font-family:var(--font-mono);font-size:10.5px;color:var(--color-neutral-300);">{{ mod }}</div>
+            </sc-for>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="flex:1;height:1px;background:var(--color-divider);"></div>
+          <span style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-neutral-500);">infrastructure</span>
+          <div style="flex:1;height:1px;background:var(--color-divider);"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;">
+          <sc-for list="{{ infra }}" as="i" hint-placeholder-count="5">
+            <div style="border:1px dashed var(--color-divider);border-radius:var(--radius-sm);padding:14px 12px;text-align:center;">
+              <div style="font-family:var(--font-mono);font-size:11px;color:var(--color-neutral-300);margin-bottom:4px;">{{ i.name }}</div>
+              <div style="font-size:10.5px;color:var(--color-neutral-500);">{{ i.role }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;">
+      <sc-for list="{{ principles }}" as="p" hint-placeholder-count="4">
+        <div style="border-left:2px solid var(--color-accent);padding:2px 0 2px 20px;">
+          <div style="font-family:var(--font-heading);font-weight:500;font-size:16px;letter-spacing:-0.01em;margin-bottom:8px;">{{ p.title }}</div>
+          <p style="font-size:13.5px;line-height:1.6;color:var(--color-neutral-400);margin:0;">{{ p.body }}</p>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</section>
+
+<section id="data" style="padding:0 clamp(20px,5vw,72px) 88px;scroll-margin-top:64px;">
+  <div style="max-width:1160px;margin:0 auto;padding-top:88px;border-top:1px solid color-mix(in srgb, var(--color-divider) 60%, transparent);">
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;">
+      <span style="width:44px;height:1px;background:var(--color-accent);display:block;flex-shrink:0;"></span>
+      <span style="font-family:var(--font-mono);font-size:11.5px;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;color:var(--color-accent);">03 · Data model</span>
+    </div>
+    <h2 style="max-width:24ch;letter-spacing:-0.02em;margin:0 0 16px;">Fourteen entities. Organization is the tenant.</h2>
+    <p style="font-size:16px;line-height:1.65;color:var(--color-neutral-400);max-width:64ch;margin:0 0 40px;">Every row that isn't platform catalog carries an <span style="font-family:var(--font-mono);font-size:14px;color:var(--color-accent-300);">organization_id</span>. Tenancy is enforced at the database, not in application code.</p>
+
+    <table class="table" style="margin-bottom:32px;">
+      <thead><tr><th>Entity</th><th>Key fields</th><th>Belongs to</th><th>Phase</th></tr></thead>
+      <tbody>
+        <sc-for list="{{ entities }}" as="e" hint-placeholder-count="14">
+          <tr>
+            <td style="font-family:var(--font-mono);font-size:12.5px;color:var(--color-text);white-space:nowrap;">{{ e.name }}</td>
+            <td style="font-size:13px;color:var(--color-neutral-400);">{{ e.fields }}</td>
+            <td style="font-family:var(--font-mono);font-size:11.5px;color:var(--color-neutral-400);white-space:nowrap;">{{ e.parent }}</td>
+            <td><span class="tag tag-neutral" style="font-size:10px;">{{ e.phase }}</span></td>
+          </tr>
+        </sc-for>
+      </tbody>
+    </table>
+
+    <div style="border:1px solid var(--color-divider);border-radius:var(--radius-md);background:var(--color-surface);padding:28px;">
+      <div style="font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.16em;text-transform:uppercase;color:var(--color-accent);margin-bottom:16px;">Notion during the transition</div>
+      <p style="font-size:14px;line-height:1.65;color:var(--color-neutral-300);max-width:78ch;margin:0;">Notion stays the CRM through Phase 2 — it is where the team already works, and <span style="font-family:var(--font-mono);font-size:12.5px;">Lead</span> is the only entity it holds. Aster Core writes leads to Postgres <em>and</em> mirrors them to Notion via the existing <span style="font-family:var(--font-mono);font-size:12.5px;">createLeadInNotion()</span> path, so nothing the team relies on breaks. The mirror is deleted when admin lead management ships in Phase 3 — not before, and it is one function to remove.</p>
+    </div>
+  </div>
+</section>
+
+<section id="commerceos" style="padding:0 clamp(20px,5vw,72px) 88px;scroll-margin-top:64px;">
+  <div style="max-width:1160px;margin:0 auto;padding-top:88px;border-top:1px solid color-mix(in srgb, var(--color-divider) 60%, transparent);">
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;">
+      <span style="width:44px;height:1px;background:var(--color-accent);display:block;flex-shrink:0;"></span>
+      <span style="font-family:var(--font-mono);font-size:11.5px;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;color:var(--color-accent);">04 · CommerceOS MVP</span>
+    </div>
+    <h2 style="max-width:24ch;letter-spacing:-0.02em;margin:0 0 16px;">The builder is one resumable draft.</h2>
+    <p style="font-size:16px;line-height:1.65;color:var(--color-neutral-400);max-width:66ch;margin:0 0 40px;">Eight steps, one <span style="font-family:var(--font-mono);font-size:14px;color:var(--color-accent-300);">Configuration</span> row in <span style="font-family:var(--font-mono);font-size:14px;color:var(--color-accent-300);">draft</span>. Each step validates its own slice with Zod against the system manifest's schema and saves on advance. Close the tab at step 5, come back to step 5.</p>
+
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:32px;">
+      <sc-for list="{{ builderSteps }}" as="s" hint-placeholder-count="8">
+        <div style="display:grid;grid-template-columns:52px 190px 1fr 130px;gap:20px;align-items:center;border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:18px 22px;background:var(--color-surface);">
+          <span style="font-family:var(--font-mono);font-weight:500;font-size:20px;letter-spacing:-0.02em;color:color-mix(in srgb, var(--color-accent) 42%, transparent);">{{ s.n }}</span>
+          <span style="font-family:var(--font-heading);font-weight:500;font-size:15px;">{{ s.title }}</span>
+          <span style="font-size:13px;line-height:1.55;color:var(--color-neutral-400);">{{ s.body }}</span>
+          <span style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:{{ s.tagColor }};border:1px solid {{ s.tagBorder }};border-radius:999px;padding:5px 10px;text-align:center;">{{ s.status }}</span>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;">
+      <div style="border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:26px;">
+        <div style="font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.16em;text-transform:uppercase;color:var(--color-accent);margin-bottom:16px;">Configuration lifecycle</div>
+        <div style="display:flex;flex-direction:column;gap:9px;">
+          <sc-for list="{{ lifecycle }}" as="l" hint-placeholder-count="6">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span style="width:6px;height:6px;border-radius:50%;background:var(--color-accent);flex-shrink:0;"></span>
+              <span style="font-family:var(--font-mono);font-size:12px;color:var(--color-text);">{{ l.state }}</span>
+              <span style="font-size:12px;color:var(--color-neutral-500);">— {{ l.note }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:26px;">
+        <div style="font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.16em;text-transform:uppercase;color:var(--color-accent);margin-bottom:16px;">Deliberately deferred</div>
+        <p style="font-size:13.5px;line-height:1.6;color:var(--color-neutral-400);margin:0 0 14px;">Designed in the UI, honestly labelled, not faked:</p>
+        <div style="display:flex;flex-wrap:wrap;gap:7px;">
+          <sc-for list="{{ deferred }}" as="d" hint-placeholder-count="6">
+            <span style="font-family:var(--font-mono);font-size:11px;color:var(--color-neutral-400);border:1px dashed var(--color-divider);border-radius:999px;padding:5px 11px;">{{ d }}</span>
+          </sc-for>
+        </div>
+      </div>
+      <div style="border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:26px;">
+        <div style="font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.16em;text-transform:uppercase;color:var(--color-accent);margin-bottom:16px;">Ask Aster — the constraint</div>
+        <p style="font-size:13.5px;line-height:1.6;color:var(--color-neutral-400);margin:0;">The assistant reads only <span style="font-family:var(--font-mono);font-size:12px;color:var(--color-accent-300);">AnalyticsEvent</span> and <span style="font-family:var(--font-mono);font-size:12px;color:var(--color-accent-300);">Order</span> rows for the caller's organization, through a fixed query surface. It cannot answer beyond that data, and when it has nothing it says so. Ships in Phase 3; the panel is designed in Phase 2 as an empty state that names the integrations it needs.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flow" style="padding:0 clamp(20px,5vw,72px) 88px;scroll-margin-top:64px;">
+  <div style="max-width:1160px;margin:0 auto;padding-top:88px;border-top:1px solid color-mix(in srgb, var(--color-divider) 60%, transparent);">
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;">
+      <span style="width:44px;height:1px;background:var(--color-accent);display:block;flex-shrink:0;"></span>
+      <span style="font-family:var(--font-mono);font-size:11.5px;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;color:var(--color-accent);">05 · UX flow &amp; diagnostic</span>
+    </div>
+    <h2 style="max-width:24ch;letter-spacing:-0.02em;margin:0 0 40px;">Seven stages, mapped to routes.</h2>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;margin-bottom:48px;">
+      <sc-for list="{{ stages }}" as="st" hint-placeholder-count="7">
+        <div style="border-top:2px solid {{ st.rule }};padding-top:16px;">
+          <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent);margin-bottom:8px;">{{ st.n }}</div>
+          <div style="font-family:var(--font-heading);font-weight:500;font-size:15px;margin-bottom:6px;">{{ st.name }}</div>
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--color-neutral-400);margin-bottom:8px;">{{ st.route }}</div>
+          <p style="font-size:12.5px;line-height:1.5;color:var(--color-neutral-500);margin:0;">{{ st.note }}</p>
+        </div>
+      </sc-for>
+    </div>
+
+    <h3 style="font-size:20px;letter-spacing:-0.01em;margin:0 0 12px;">The diagnostic is rules, not a guess.</h3>
+    <p style="font-size:15px;line-height:1.65;color:var(--color-neutral-400);max-width:68ch;margin:0 0 32px;">Nine business questions — never technical ones — score each system and pick a service tier. Deterministic, auditable, testable. AI can re-rank later; it does not decide now.</p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+      <div style="border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:28px;">
+        <div style="font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.16em;text-transform:uppercase;color:var(--color-neutral-500);margin-bottom:18px;">Inputs → weighted signals</div>
+        <div style="display:flex;flex-direction:column;gap:11px;">
+          <sc-for list="{{ diagnosticInputs }}" as="d" hint-placeholder-count="9">
+            <div style="display:flex;justify-content:space-between;gap:14px;font-size:13px;">
+              <span style="color:var(--color-neutral-300);">{{ d.q }}</span>
+              <span style="font-family:var(--font-mono);font-size:11px;color:var(--color-accent-300);white-space:nowrap;">{{ d.feeds }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="border:1px solid color-mix(in srgb, var(--color-accent) 40%, transparent);border-radius:var(--radius-md);background:var(--color-surface);padding:28px;">
+        <div style="font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.16em;text-transform:uppercase;color:var(--color-accent);margin-bottom:18px;">Tier routing rule</div>
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <sc-for list="{{ tiers }}" as="t" hint-placeholder-count="3">
+            <div>
+              <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:6px;">
+                <span style="font-family:var(--font-heading);font-weight:500;font-size:15px;">{{ t.name }}</span>
+                <span style="font-family:var(--font-mono);font-size:11px;color:var(--color-accent-300);">{{ t.when }}</span>
+              </div>
+              <p style="font-size:12.5px;line-height:1.55;color:var(--color-neutral-400);margin:0;">{{ t.body }}</p>
+            </div>
+          </sc-for>
+        </div>
+        <p style="font-size:12.5px;line-height:1.55;color:var(--color-neutral-500);margin:20px 0 0;padding-top:18px;border-top:1px solid var(--color-divider);">The visitor never picks a tier. They answer business questions; the engine routes them — self-serve checkout, a scoped call, or a studio conversation.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="roadmap" style="padding:0 clamp(20px,5vw,72px) 88px;scroll-margin-top:64px;">
+  <div style="max-width:1160px;margin:0 auto;padding-top:88px;border-top:1px solid color-mix(in srgb, var(--color-divider) 60%, transparent);">
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;">
+      <span style="width:44px;height:1px;background:var(--color-accent);display:block;flex-shrink:0;"></span>
+      <span style="font-family:var(--font-mono);font-size:11.5px;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;color:var(--color-accent);">06 · Roadmap</span>
+    </div>
+    <h2 style="max-width:26ch;letter-spacing:-0.02em;margin:0 0 16px;">Four phases, each with an exit condition.</h2>
+    <p style="font-size:16px;line-height:1.65;color:var(--color-neutral-400);max-width:64ch;margin:0 0 44px;">A phase ends when its exit condition is true — not when a date passes. Phase 4 only begins once one system has been sold self-serve and operated by a real customer.</p>
+
+    <div style="display:flex;flex-direction:column;gap:20px;">
+      <sc-for list="{{ phases }}" as="ph" hint-placeholder-count="4">
+        <div style="display:grid;grid-template-columns:130px 1fr;gap:32px;border:1px solid {{ ph.border }};border-radius:var(--radius-md);padding:30px;background:{{ ph.bg }};">
+          <div>
+            <div style="font-family:var(--font-mono);font-weight:500;font-size:32px;letter-spacing:-0.03em;color:color-mix(in srgb, var(--color-accent) 42%, transparent);line-height:1;margin-bottom:10px;">{{ ph.n }}</div>
+            <div style="font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.12em;text-transform:uppercase;color:{{ ph.labelColor }};">{{ ph.label }}</div>
+          </div>
+          <div>
+            <div style="font-family:var(--font-heading);font-weight:500;font-size:19px;letter-spacing:-0.015em;margin-bottom:16px;">{{ ph.title }}</div>
+            <div style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:20px;">
+              <sc-for list="{{ ph.items }}" as="it" hint-placeholder-count="6">
+                <span style="font-family:var(--font-mono);font-size:11px;color:var(--color-neutral-300);border:1px solid var(--color-divider);border-radius:999px;padding:5px 11px;">{{ it }}</span>
+              </sc-for>
+            </div>
+            <div style="padding-top:16px;border-top:1px solid var(--color-divider);">
+              <span style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-neutral-500);">Exit condition</span>
+              <p style="font-size:13.5px;line-height:1.6;color:var(--color-text);margin:7px 0 0;">{{ ph.exit }}</p>
+            </div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</section>
+
+<section style="padding:0 clamp(20px,5vw,72px) 88px;">
+  <div style="max-width:1160px;margin:0 auto;padding-top:88px;border-top:1px solid color-mix(in srgb, var(--color-divider) 60%, transparent);">
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;">
+      <span style="width:44px;height:1px;background:var(--color-accent);display:block;flex-shrink:0;"></span>
+      <span style="font-family:var(--font-mono);font-size:11.5px;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;color:var(--color-accent);">07 · Smallest sellable version</span>
+    </div>
+    <h2 style="max-width:28ch;letter-spacing:-0.02em;margin:0 0 16px;">Sell the system before automating the fulfilment.</h2>
+    <p style="font-size:16px;line-height:1.65;color:var(--color-neutral-400);max-width:70ch;margin:0 0 40px;">The eight-step builder is the wrong first build. It is months of configuration, provisioning and billing infrastructure before a single customer proves they will buy a system instead of a project. There is a version that takes weeks and produces real revenue.</p>
+
+    <div style="border:1px solid color-mix(in srgb, var(--color-accent) 45%, transparent);border-radius:var(--radius-lg);background:var(--color-surface);box-shadow:var(--shadow-md);padding:40px;margin-bottom:28px;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+        <span class="tag tag-accent" style="font-size:10px;">Recommended MVP</span>
+        <span style="font-family:var(--font-mono);font-size:11.5px;color:var(--color-neutral-400);">Concierge-provisioned self-serve</span>
+      </div>
+      <h3 style="font-size:clamp(22px,2.6vw,30px);letter-spacing:-0.02em;margin:0 0 28px;max-width:30ch;">Diagnostic → recommendation → paid configuration → Aster provisions by hand.</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:32px;">
+        <sc-for list="{{ mvpFlow }}" as="m" hint-placeholder-count="5">
+          <div style="border:1px solid var(--color-divider);border-radius:var(--radius-sm);background:var(--color-bg);padding:18px;">
+            <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-accent);margin-bottom:9px;">{{ m.n }}</div>
+            <div style="font-family:var(--font-heading);font-weight:500;font-size:14px;margin-bottom:6px;">{{ m.title }}</div>
+            <p style="font-size:12px;line-height:1.5;color:var(--color-neutral-400);margin:0;">{{ m.body }}</p>
+          </div>
+        </sc-for>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;padding-top:28px;border-top:1px solid var(--color-divider);">
+        <div>
+          <div style="font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent);margin-bottom:14px;">What this needs</div>
+          <div style="display:flex;flex-wrap:wrap;gap:7px;">
+            <span style="font-family:var(--font-mono);font-size:11px;color:var(--color-neutral-300);border:1px solid var(--color-divider);border-radius:999px;padding:5px 11px;">Diagnostic route</span>
+            <span style="font-family:var(--font-mono);font-size:11px;color:var(--color-neutral-300);border:1px solid var(--color-divider);border-radius:999px;padding:5px 11px;">Rules engine</span>
+            <span style="font-family:var(--font-mono);font-size:11px;color:var(--color-neutral-300);border:1px solid var(--color-divider);border-radius:999px;padding:5px 11px;">Stripe Checkout</span>
+            <span style="font-family:var(--font-mono);font-size:11px;color:var(--color-neutral-300);border:1px solid var(--color-divider);border-radius:999px;padding:5px 11px;">Notion (already built)</span>
+          </div>
+          <p style="font-size:12.5px;line-height:1.55;color:var(--color-neutral-500);margin:16px 0 0;">No auth. No database. No provisioning pipeline. Stripe Checkout is a hosted redirect — no billing system to build.</p>
+        </div>
+        <div>
+          <div style="font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-accent);margin-bottom:14px;">What it proves</div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <sc-for list="{{ mvpProves }}" as="pv" hint-placeholder-count="4">
+              <div style="display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.5;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:3px;color:var(--color-accent);"><path d="M20 6 9 17l-5-5"></path></svg>
+                <span style="color:var(--color-neutral-300);">{{ pv }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="border-left:2px solid var(--color-accent);padding:4px 0 4px 22px;max-width:76ch;">
+      <p style="font-size:15px;line-height:1.7;color:var(--color-neutral-300);margin:0;">The customer experience is already self-serve: they diagnose, they see a price, they pay online, they get a system. Only the provisioning is manual — and that is invisible to them. Automate it in Phase 3, once there is repeat volume proving which configuration choices customers actually make. Building the builder first means guessing those choices.</p>
+    </div>
+  </div>
+</section>
+
+<section id="decisions" style="padding:0 clamp(20px,5vw,72px) 112px;scroll-margin-top:64px;">
+  <div style="max-width:1160px;margin:0 auto;padding-top:88px;border-top:1px solid color-mix(in srgb, var(--color-divider) 60%, transparent);">
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;">
+      <span style="width:44px;height:1px;background:var(--color-accent);display:block;flex-shrink:0;"></span>
+      <span style="font-family:var(--font-mono);font-size:11.5px;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;color:var(--color-accent);">08 · Awaiting approval</span>
+    </div>
+    <h2 style="max-width:26ch;letter-spacing:-0.02em;margin:0 0 16px;">Five decisions block the first commit.</h2>
+    <p style="font-size:16px;line-height:1.65;color:var(--color-neutral-400);max-width:64ch;margin:0 0 44px;">Each has a recommendation. Confirm or overrule and I will start on Phase 1.</p>
+
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <sc-for list="{{ decisions }}" as="d" hint-placeholder-count="5">
+        <div style="border:1px solid var(--color-divider);border-radius:var(--radius-md);padding:28px;background:var(--color-surface);">
+          <div style="display:flex;align-items:baseline;gap:14px;margin-bottom:12px;flex-wrap:wrap;">
+            <span style="font-family:var(--font-mono);font-weight:500;font-size:13px;color:var(--color-accent);">{{ d.n }}</span>
+            <span style="font-family:var(--font-heading);font-weight:500;font-size:17px;letter-spacing:-0.01em;">{{ d.q }}</span>
+          </div>
+          <p style="font-size:13.5px;line-height:1.6;color:var(--color-neutral-400);margin:0 0 16px;max-width:82ch;">{{ d.context }}</p>
+          <div style="display:flex;gap:10px;align-items:flex-start;padding-top:14px;border-top:1px solid var(--color-divider);">
+            <span style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--color-accent);flex-shrink:0;margin-top:3px;">Recommend</span>
+            <span style="font-size:13.5px;line-height:1.6;color:var(--color-text);">{{ d.rec }}</span>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="margin-top:44px;border:1px dashed var(--color-divider);border-radius:var(--radius-md);padding:28px;">
+      <div style="font-family:var(--font-mono);font-size:10.5px;letter-spacing:0.16em;text-transform:uppercase;color:var(--color-neutral-500);margin-bottom:14px;">Also noted — Aster Labs</div>
+      <p style="font-size:13.5px;line-height:1.65;color:var(--color-neutral-400);margin:0;max-width:82ch;">Labs fits Phase 1 as a content-driven route, reusing the existing config-plus-types pattern with a <span style="font-family:var(--font-mono);font-size:12.5px;">LabEntry</span> type on the Problem / Observation / Friction / Opportunity / Recommendation structure. One hard constraint in the type itself: entries carry a required <span style="font-family:var(--font-mono);font-size:12.5px;">relationship</span> field whose only value for third-party subjects is <span style="font-family:var(--font-mono);font-size:12.5px;color:var(--color-accent-300);">"independent-analysis"</span>, rendered as a visible label on the page. Ready Set is not an Aster client and the data model should make it impossible to publish as one.</p>
+    </div>
+  </div>
+</section>
+
+<dc-import name="AsterFooter" hint-size="100%,320px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const accentBorder = 'color-mix(in srgb, var(--color-accent) 40%, transparent)';
+    return {
+      stack: [
+        {k:'Framework', v:'Next.js 15 · App Router'},
+        {k:'Runtime', v:'React 19 · TypeScript 5.7'},
+        {k:'Styling', v:'Tailwind 3.4 + CSS var tokens'},
+        {k:'Primitives', v:'Radix UI · CVA · lucide'},
+        {k:'Motion', v:'framer-motion'},
+        {k:'Validation', v:'Zod'},
+        {k:'Persistence', v:'Notion only'},
+        {k:'Auth / DB / Billing', v:'none'},
+      ],
+      routes: ['/', '/products', '/product/[slug]', '/case-studies/[slug]', '/about', '/contact', '/legal/privacy', '/legal/terms', 'POST /api/contact', 'sitemap · robots · OG'],
+      keep: [
+        'Design tokens — globals.css mirrored in config/theme.ts',
+        'UI primitives — button, card, badge, tabs, accordion, dialog',
+        'Reveal / RevealGroup motion wrappers',
+        'SEO layer — buildMetadata, JSON-LD, per-slug OG images',
+        'Content-as-config: config/*.ts + types/*.ts',
+        'Notion lead capture — the one working integration',
+        'Legal pages and the next.config redirect map',
+      ],
+      missing: ['Authentication', 'Database', 'Organizations', 'Multi-tenancy', 'Billing', 'Payments', 'Configuration store', 'Provisioning', 'Deployment', 'Analytics ingestion', 'AI runtime', 'Notifications', 'Permissions', 'Admin console'],
+      conflicts: [
+        {where:'config/products.ts', what:'Ships three products — Foundation, Automation, Intelligence. The brief specifies five OS systems.'},
+        {where:'next.config.ts', what:'All five OS slugs are permanent redirects into the three-product model. Reintroducing them reverses live SEO redirects.'},
+        {where:'notion-crm-setup.md', what:'The Product Interest select is hardcoded to the three product names. Renaming means a Notion schema migration.'},
+        {where:'README.md', what:'States plainly that Aster does not sell templates and Inspirations has no per-item page. The brief asks for /inspirations detail pages — compatible, but the rule must stay explicit.'},
+      ],
+      osLayer: [
+        {name:'WebOS', status:'Phase 4', bg:'transparent', border:'var(--color-divider)', color:'var(--color-neutral-400)'},
+        {name:'CommerceOS', status:'First', bg:'color-mix(in srgb, var(--color-accent) 10%, transparent)', border:accentBorder, color:'var(--color-accent)'},
+        {name:'LaunchOS', status:'Phase 4', bg:'transparent', border:'var(--color-divider)', color:'var(--color-neutral-400)'},
+        {name:'GrowthOS', status:'Phase 4', bg:'transparent', border:'var(--color-divider)', color:'var(--color-neutral-400)'},
+        {name:'OperationsOS', status:'Phase 4', bg:'transparent', border:'var(--color-divider)', color:'var(--color-neutral-400)'},
+      ],
+      coreModules: ['Identity', 'Organizations', 'Permissions', 'Catalog', 'Configuration', 'Billing', 'Payments', 'Provisioning', 'Integrations', 'Analytics', 'AI', 'Notifications', 'Support', 'Audit'],
+      infra: [
+        {name:'Postgres', role:'system of record'},
+        {name:'Job queue', role:'provisioning, sync'},
+        {name:'Object store', role:'brand + product assets'},
+        {name:'Stripe', role:'checkout, subscriptions'},
+        {name:'Vercel', role:'hosting, edge'},
+      ],
+      principles: [
+        {title:'A system is a manifest', body:'Each OS declares which Core modules it enables, a Zod config schema, and its experience list. Adding LaunchOS is adding a manifest — not a codebase.'},
+        {title:'Organization is the tenant', body:'Not User. A person can belong to several organizations, and an agency reselling Aster needs that on day one. Retrofitting it later is a rewrite.'},
+        {title:'Configuration is data, never code', body:'Every builder answer lands in one versioned Configuration row. Deploying is publishing a version; rolling back is pointing at the previous one.'},
+        {title:'No module owns a duplicate', body:'Payments exist once, in Core. CommerceOS consumes it. The moment a system implements its own billing, the platform thesis is dead.'},
+      ],
+      entities: [
+        {name:'User', fields:'email, name, auth identity', parent:'—', phase:'P2'},
+        {name:'Organization', fields:'name, slug, tier, billing customer', parent:'—', phase:'P2'},
+        {name:'Membership', fields:'role, permissions', parent:'User × Org', phase:'P2'},
+        {name:'Lead', fields:'contact, diagnostic result, source, status', parent:'—', phase:'P1'},
+        {name:'System', fields:'slug, manifest, enabled modules, config schema', parent:'platform catalog', phase:'P1'},
+        {name:'Experience', fields:'slug, system, design direction, preview assets', parent:'System', phase:'P1'},
+        {name:'Configuration', fields:'version, state, payload, published_at', parent:'Organization', phase:'P2'},
+        {name:'Instance', fields:'domain, status, deployed version', parent:'Configuration', phase:'P3'},
+        {name:'Product', fields:'title, price, inventory, variants, media', parent:'Instance', phase:'P2'},
+        {name:'Order', fields:'customer, line items, total, status', parent:'Instance', phase:'P3'},
+        {name:'Subscription', fields:'plan, period, stripe id, status', parent:'Organization', phase:'P2'},
+        {name:'Integration', fields:'provider, credentials ref, state', parent:'Organization', phase:'P3'},
+        {name:'AnalyticsEvent', fields:'type, payload, occurred_at', parent:'Instance', phase:'P3'},
+        {name:'AIConversation', fields:'messages, data scope, tokens', parent:'Organization', phase:'P3'},
+      ],
+      builderSteps: [
+        {n:'01', title:'Business', body:'What the business sells — products, digital, services, subscriptions. Sets which config branches apply.', status:'Real', tagColor:'var(--color-accent)', tagBorder:accentBorder},
+        {n:'02', title:'Category', body:'Sector. Seeds sensible defaults for copy, taxonomy and shipping — never a hard constraint.', status:'Real', tagColor:'var(--color-accent)', tagBorder:accentBorder},
+        {n:'03', title:'Experience', body:'Pick a design direction. Fulô Crochet ships first, labelled as a reference implementation, not a template.', status:'Real', tagColor:'var(--color-accent)', tagBorder:accentBorder},
+        {n:'04', title:'Brand', body:'Logo, palette, typography, imagery, copy. Writes brand tokens into the configuration payload.', status:'Real', tagColor:'var(--color-accent)', tagBorder:accentBorder},
+        {n:'05', title:'Products', body:'Catalog entry with media, price, inventory, variants. The first step that needs an object store.', status:'Real', tagColor:'var(--color-accent)', tagBorder:accentBorder},
+        {n:'06', title:'Commerce', body:'Payments, shipping, tax, currency, checkout, accounts. Stripe is real; tax engines are declared intent.', status:'Partial', tagColor:'var(--color-neutral-300)', tagBorder:'var(--color-divider)'},
+        {n:'07', title:'Integrations', body:'Stripe live. Everything else renders as a designed, explicitly labelled "coming soon" — never a fake toggle.', status:'Stripe only', tagColor:'var(--color-neutral-300)', tagBorder:'var(--color-divider)'},
+        {n:'08', title:'Review', body:'Preview, feature list, integrations, investment, deploy state. Ends at Launch CommerceOS.', status:'Real', tagColor:'var(--color-accent)', tagBorder:accentBorder},
+      ],
+      lifecycle: [
+        {state:'draft', note:'builder in progress, resumable'},
+        {state:'submitted', note:'review step passed'},
+        {state:'paid', note:'Stripe webhook confirmed'},
+        {state:'provisioning', note:'queued job or concierge'},
+        {state:'live', note:'instance serving'},
+        {state:'superseded', note:'newer version published'},
+      ],
+      deferred: ['Shopify sync', 'Google Analytics', 'CRM connectors', 'Email platforms', 'Social publishing', 'Automated tax'],
+      stages: [
+        {n:'01', name:'Discover', route:'/ · /systems', note:'Five systems, no "websites" language.', rule:'var(--color-accent)'},
+        {n:'02', name:'Diagnose', route:'/diagnostic', note:'Nine business questions. Rules engine.', rule:'var(--color-accent)'},
+        {n:'03', name:'Configure', route:'/build/[system]', note:'Eight-step resumable draft.', rule:'var(--color-accent)'},
+        {n:'04', name:'Purchase', route:'/checkout', note:'Stripe Checkout, hosted.', rule:'var(--color-accent)'},
+        {n:'05', name:'Deploy', route:'/app/deploy', note:'Publish a configuration version.', rule:'color-mix(in srgb, var(--color-accent) 45%, transparent)'},
+        {n:'06', name:'Operate', route:'/app', note:'Revenue, orders, customers, storefront.', rule:'color-mix(in srgb, var(--color-accent) 45%, transparent)'},
+        {n:'07', name:'Grow', route:'/app/insights', note:'Ask Aster, on connected data only.', rule:'color-mix(in srgb, var(--color-accent) 25%, transparent)'},
+      ],
+      diagnosticInputs: [
+        {q:'What does the business do?', feeds:'system fit'},
+        {q:'How long has it been running?', feeds:'stage'},
+        {q:'What is holding growth back right now?', feeds:'primary system'},
+        {q:'Where do customers find you today?', feeds:'WebOS'},
+        {q:'Do you sell online, and how?', feeds:'CommerceOS'},
+        {q:'How do you manage customers today?', feeds:'GrowthOS'},
+        {q:'What still runs on manual work?', feeds:'OperationsOS'},
+        {q:'Are you launching something new?', feeds:'LaunchOS'},
+        {q:'Do you have existing systems to connect?', feeds:'tier'},
+      ],
+      tiers: [
+        {name:'Self-serve', when:'no migration · no custom integration', body:'Standard configuration covers it. Route straight to the builder and checkout.'},
+        {name:'Aster Pro', when:'migration OR ≥2 integrations OR custom AI', body:'Configuration plus assisted implementation. Route to a scoped consultation with the diagnostic attached.'},
+        {name:'Aster Studio', when:'custom software OR enterprise constraints', body:'Beyond the manifest. Route to a studio conversation — and say plainly why self-serve does not fit.'},
+      ],
+      phases: [
+        {n:'01', label:'Now', title:'Website, systems, diagnostic — no accounts', items:['Five-system presentation', 'Diagnostic UX + rules engine', 'Notion CRM (existing)', '/inspirations + Fulô reference', 'CommerceOS product page', 'Aster Labs'], exit:'A visitor completes the diagnostic, gets a defensible recommendation, and becomes a qualified lead in Notion.', border:accentBorder, bg:'var(--color-surface)', labelColor:'var(--color-accent)'},
+        {n:'02', label:'Next', title:'Accounts, configuration, billing', items:['Auth + Organizations', 'Postgres + tenancy', 'CommerceOS builder', 'Stripe subscriptions', 'Customer dashboard shell'], exit:'A customer configures and pays for CommerceOS without a human touching the transaction.', border:'var(--color-divider)', bg:'transparent', labelColor:'var(--color-neutral-400)'},
+        {n:'03', label:'Then', title:'Automated provisioning, data, AI', items:['Provisioning pipeline', 'Instance + domain management', 'Analytics ingestion', 'Integration framework', 'Ask Aster', 'Admin console'], exit:'Deployment happens with no manual step, and Ask Aster answers from real connected data.', border:'var(--color-divider)', bg:'transparent', labelColor:'var(--color-neutral-400)'},
+        {n:'04', label:'Later', title:'Replicate the manifest', items:['WebOS', 'LaunchOS', 'GrowthOS', 'OperationsOS'], exit:'A new system ships as a manifest plus experiences — no new platform code.', border:'var(--color-divider)', bg:'transparent', labelColor:'var(--color-neutral-400)'},
+      ],
+      mvpFlow: [
+        {n:'Step 1', title:'Diagnostic', body:'Nine business questions on a public route. No account.'},
+        {n:'Step 2', title:'Recommendation', body:'Rules engine names the system, the tier, and the reasoning.'},
+        {n:'Step 3', title:'Priced offer', body:'A real number on screen for the recommended configuration.'},
+        {n:'Step 4', title:'Stripe Checkout', body:'Card payment for the configuration. Hosted — nothing to build.'},
+        {n:'Step 5', title:'Concierge build', body:'The brief lands in Notion. Aster provisions manually, invisibly.'},
+      ],
+      mvpProves: [
+        'That businesses will pay for a system, sight-unseen, without a sales call',
+        'Which systems the diagnostic actually routes people to',
+        'Which configuration choices repeat — the real spec for the builder',
+        'The price point, before any infrastructure is committed to it',
+      ],
+      decisions: [
+        {n:'D1', q:'Three products or five systems?', context:'config/products.ts ships Foundation / Automation / Intelligence and next.config.ts permanently redirects all five OS slugs into them. The brief names five. This is the naming spine of the whole platform — slugs, manifests, Notion select options, SEO redirects and every OG image depend on it.', rec:'Move to the five OS systems. Reverse the five redirects, map the three current slugs forward instead, and migrate the Notion Product Interest options. Do it now, while there is little traffic and few leads to migrate.'},
+        {n:'D2', q:'Who runs the storefront that CommerceOS deploys?', context:'A configured storefront needs a runtime. Either Aster builds and hosts it, or CommerceOS configures a headless commerce backend. The repo already contains a Shopify theme under commerceos-theme/, which suggests the second path was started.', rec:'Confirm the intent behind commerceos-theme/. If Shopify is the runtime, CommerceOS becomes a configuration and provisioning layer over it — dramatically less to build, and the Fulô reference already proves the pattern.'},
+        {n:'D3', q:'When does Notion stop being the CRM?', context:'Notion is the only persistence today and the team works in it. Keeping it forever blocks the admin console; cutting it early breaks a live workflow.', rec:'Dual-write from Phase 2, and retire the mirror when admin lead management ships in Phase 3. One function to delete, no migration.'},
+        {n:'D4', q:'Do storefronts launch on Aster subdomains or customer domains?', context:'Subdomains make automated provisioning simple. Custom domains mean DNS verification, certificate issuance and a support surface — and they are what a real business will insist on.', rec:'Subdomain at launch, custom domain as a post-launch step in the dashboard. It keeps the Phase 3 pipeline small without capping the product.'},
+        {n:'D5', q:'Builder first, or concierge first?', context:'Section 07 argues for concierge. It is the difference between weeks and months to first revenue — and between building the builder from evidence versus from assumptions.', rec:'Concierge first. Ship the diagnostic and paid checkout in Phase 1, sell to real customers, and let their repeated configuration choices specify the builder.'},
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>
