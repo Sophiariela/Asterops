@@ -1,4 +1,13 @@
-# ASTER
+# ASTER (Shopify theme)
+
+> **Relationship to this repo:** this directory is a standalone Shopify Liquid theme —
+> a separate deliverable from the Next.js app that makes up the rest of this repository
+> (`src/`). It is kept here, undeployed and unbuilt against the Next.js app, as the
+> concrete Shopify-side artifact for CommerceOS engagements that run on Shopify rather
+> than a fully custom storefront. It has its own install/preview flow (below) and does
+> not share code, config, or tooling with `src/`. Nothing in `src/` imports from or
+> depends on this directory, and nothing here should — keep the boundary explicit if
+> either side grows.
 
 A premium Shopify Online Store 2.0 theme built to flex across Fashion, Jewelry, Beauty, Handmade, and Luxury verticals through merchant-editable settings rather than hardcoded styling. Mobile-first, JSON-templated, fully schema-driven, ready to sell out of the box.
 

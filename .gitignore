@@ -28,5 +28,5 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# unrelated scratch project — not part of the ASTEROPS site
-/gemini-test/node_modules
+# vitest
+/coverage

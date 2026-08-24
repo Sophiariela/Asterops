@@ -7,8 +7,6 @@ export const siteConfig = {
     "Aster builds intelligent digital systems that help businesses attract customers, automate operations, and scale — the technology infrastructure behind modern companies, not just a website.",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://aster.studio",
   ogImage: "/opengraph-image",
-  locales: ["en", "pt", "es"] as const,
-  defaultLocale: "en" as const,
   keywords: [
     "digital systems studio",
     "AI automation",

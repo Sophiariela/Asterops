@@ -1,19 +1,45 @@
 # Aster
 
-Aster builds intelligent digital systems that help businesses attract customers, automate operations, and scale — the technology infrastructure behind modern companies, not just a website.
+Aster builds intelligent digital systems that help businesses attract customers, automate
+operations, and scale — the technology infrastructure behind modern companies, not just a
+website.
 
-This repository is the Aster marketing site: a Next.js 15 (App Router) application covering the product pages (Foundation / Automation / Intelligence), the Design Inspirations section, the case study library, and the lead-capture contact flow.
+## What Aster is today
+
+This repository is the Aster marketing site and lead-capture funnel — not yet the product
+platform the copy describes. It's honest to be precise about that: there is no auth, no
+per-account data model, and no billing here yet. What exists today is a config-driven Next.js
+site, a rules-based diagnostic that qualifies a visitor into a system + service tier, and a
+Notion-backed contact flow. The "five systems" are currently five marketing pages sharing one
+content model — see [Roadmap](#roadmap) for what turns each one into a real product surface.
+
+## Systems
+
+| System | Route | What it is |
+| --- | --- | --- |
+| WebOS | `/product/website-os` | Premium websites, brand experience, SEO foundation, lead capture. |
+| CommerceOS | `/product/commerce-os` | E-commerce, payments, catalog, customer journeys. |
+| LaunchOS | `/product/launch-os` | MVPs and startup platforms — idea to live product. |
+| GrowthOS | `/product/growth-os` | Analytics, CRM, dashboards, customer intelligence. |
+| OperationsOS | `/product/operations-os` | AI assistants, workflow automation, internal portals. |
+
+Defined in [`src/config/products.ts`](src/config/products.ts). `/diagnostic` recommends one or
+two of these plus a service tier (Self-serve / Aster Pro / Aster Studio) from nine business
+questions — see [`src/config/diagnostic.ts`](src/config/diagnostic.ts) and
+[`src/lib/diagnostic.ts`](src/lib/diagnostic.ts) for the scoring rules.
 
 ## Tech stack
 
 - **Framework** — Next.js 15 (App Router, React 19, TypeScript)
-- **Styling** — Tailwind CSS + `tailwindcss-animate`, tokens defined in `src/app/globals.css` and mirrored in `src/config/theme.ts`
-- **UI primitives** — Radix UI (accordion, dialog, navigation menu, tabs, etc.), `class-variance-authority`, `lucide-react` icons
+- **Styling** — Tailwind CSS + `tailwindcss-animate`, tokens in `src/app/globals.css`,
+  mirrored in `src/config/theme.ts` and `tailwind.config.ts`
+- **UI primitives** — Radix UI, `class-variance-authority`, `lucide-react` icons
 - **Motion** — Framer Motion (`src/components/shared/reveal.tsx`)
 - **Forms & validation** — Zod, submitted to a Notion database via `@notionhq/client`
-- **Theming** — `next-themes` (light/dark, see `src/components/shared/theme-toggle.tsx`)
+- **Theming** — `next-themes` (dark is primary; see `src/components/shared/theme-toggle.tsx`)
+- **Tests** — Vitest (`src/**/*.test.ts`)
 
-## Getting started
+## Local development
 
 ```bash
 npm install
@@ -24,10 +50,14 @@ npm run dev                  # http://localhost:3000
 Other scripts:
 
 ```bash
-npm run build   # production build
-npm run start   # serve the production build
-npm run lint    # eslint
+npm run build       # production build
+npm run start        # serve the production build
+npm run lint          # eslint
+npm test               # vitest run (unit tests, e.g. the diagnostic scoring engine)
+npm run test:watch      # vitest in watch mode
 ```
+
+CI (`.github/workflows/ci.yml`) runs typecheck, lint, tests and build on every push/PR to `main`.
 
 ## Environment variables
 
@@ -41,67 +71,66 @@ Full Notion setup walkthrough: [`docs/notion-crm-setup.md`](docs/notion-crm-setu
 
 ## Project structure
 
-```
-src/
-  app/                    Routes (App Router)
-    page.tsx              Homepage
-    products/              Solutions index
-    product/[slug]/        Individual product page (Foundation / Automation / Intelligence)
-    case-studies/[slug]/   Individual case study page
-    about/, contact/, legal/
-    api/contact/            Notion lead-capture endpoint
-    sitemap.ts, robots.ts, opengraph-image.tsx
+Routes live under `src/app`, following Next's file-based routing directly — see that folder
+for the current route tree rather than a tree copied here, which goes stale the moment a route
+changes. The rest:
 
-  components/
-    sections/               Homepage sections (hero, problems, industries, design inspirations, case studies, ...)
-    product/                 Product page building blocks (hero, features, pricing, FAQ, gallery, ...)
-    inspiration/               Design Inspirations card (visual reference + "Build Something Similar")
-    case-study/               Case study page building blocks (hero, challenge, solution,
-                               deliverables, gallery, technology, results, CTA)
-    layout/                   Header, footer, mobile nav
-    shared/                   Cross-page primitives (reveal/animation, lightbox, section heading, ...)
-    ui/                       Design-system primitives (button, badge, card, tabs, accordion, ...)
-
-  config/                   Content & data — the source of truth for copy and structured content
-    site.ts                  Global site metadata (name, url, description, keywords)
-    theme.ts                  Canonical design tokens (mirrors globals.css, used for OG image generation)
-    navigation.ts              Header/footer links
-    content.ts                  Homepage / about / contact copy
-    products.ts                  The three Aster products (Foundation, Automation, Intelligence)
-    inspirations.ts                Design Inspirations library (visual references, not products)
-    case-studies.ts               Case study library (currently empty)
-    contact.ts, socials.ts
-
-  types/                    Shared TypeScript types for the content model above
-  lib/                      seo.ts (metadata + JSON-LD builders), notion.ts, utils.ts
-```
+- **`src/components/`** — `sections/` (homepage blocks), `product/` (product-page building
+  blocks), `diagnostic/` (the two-state diagnostic UI), `portal/` (client portal concept),
+  `case-study/`, `inspiration/`, `layout/` (header, footer, nav), `shared/` (cross-page
+  primitives), `ui/` (design-system primitives).
+- **`src/config/`** — content and data, the source of truth for copy and structured content.
+  Pages render from typed arrays here, not hardcoded markup — adding a product, case study, or
+  design inspiration is a data entry, not a new page.
+- **`src/types/`** — shared TypeScript types for the content model above.
+- **`src/lib/`** — `seo.ts` (metadata + JSON-LD builders), `notion.ts`, `diagnostic.ts`
+  (scoring engine, covered by tests), `utils.ts`.
 
 ## Content model
 
-Pages are rendered from typed data in `src/config/`, not hardcoded per-page — adding a new product or case study means adding an entry to the config array, not writing new page markup.
+- **Products** (`src/config/products.ts`) — each entry drives `/product/[slug]` via
+  `getProductBySlug` / `getProductSlugs`, and (for the five current systems) the homepage
+  systems grid via its `homeCard` field.
+- **Case studies** (`src/config/case-studies.ts`) — currently empty; the rendering pipeline
+  (hero, challenge, solution, deliverables, gallery, technology, results, CTA) is built and
+  waiting for the first entry. Add a `CaseStudy` object (`src/types/case-study.ts`) with gallery
+  assets under `public/case-studies/<slug>/` to publish one.
+- **Design Inspirations** (`src/config/inspirations.ts`) — visual references, explicitly not
+  products or templates. Not currently linked from the homepage (the CommerceOS/Fulô showcase
+  replaced that section); the data and the `/contact?inspiration=<slug>` deep-link still work,
+  pending a dedicated `/design-inspirations/[slug]` detail route.
 
-- **Products** (`src/config/products.ts`) — each entry drives `/product/[slug]` via `getProductBySlug` / `getProductSlugs`.
-- **Case studies** (`src/config/case-studies.ts`) — each entry drives `/case-studies/[slug]` via `getCaseStudyBySlug` / `getCaseStudySlugs`. To add one, add a `CaseStudy` object (see `src/types/case-study.ts`) with its own gallery assets under `public/case-studies/<slug>/`, then link it from `homeContent.caseStudies.items` in `src/config/content.ts` if it should appear on the homepage.
-
-Both route trees follow the same pattern: `generateStaticParams` from the config's slug list, `generateMetadata` via `buildMetadata()` in `src/lib/seo.ts`, and a per-slug `opengraph-image.tsx`.
-
-## Design Inspirations
-
-**Aster does not sell templates.** Design Inspirations is a homepage section (`src/components/sections/design-inspirations.tsx`, mounted on `/`) that shows visual references — past design directions and craft quality — to demonstrate the standard Aster builds to. It is explicitly not a catalog of products: there is no pricing, no "buy" action, and no dedicated per-item page.
-
-**Adding a reference is a config entry.** Add a `DesignInspiration` object to `designInspirations` in `src/config/inspirations.ts` (type: `src/types/inspiration.ts`) and the card renders automatically — no new routes or components needed.
-
-Required fields: `slug`, `name`, `category`, `description`, `status`, `icon`.
-
-- `status: "live"` — set `image` (a representative visual, under `public/design-inspirations/<slug>/`) and `demoUrl` (a real, browsable experience). The card renders both a **View Experience** button (opens `demoUrl` in a new tab) and a **Build Something Similar** button.
-- `status: "concept"` — omit `image`/`demoUrl`. The card renders the `icon` as a placeholder mark and only the **Build Something Similar** button, since there's no live reference to view yet.
-
-Every card's **Build Something Similar** button routes through `inspirationContactHref(slug)` → `/contact?inspiration=<slug>`, which pre-frames the contact form's message with that reference — it never changes what's being sold, only the opening context of the conversation.
-
-The section always renders `designInspirationsContent.disclaimer` under the grid, stating plainly that these are references, not products. Keep that line intact when editing copy — it's the explicit counter to any "template marketplace" reading of the section.
+**Aster does not sell templates.** Design Inspirations and the CommerceOS showcase both exist
+to demonstrate craft, not to sell what's shown — keep that framing intact when editing copy.
 
 ## Notes
 
-- The Fulô Crochet build is presented as a Design Inspirations reference (`fulo-crochet` in `src/config/inspirations.ts`), not a template, product, or a standalone case study page. `/case-studies/fulo` permanently redirects to `/#design-inspirations` (`next.config.ts`).
-- Case studies for projects that aren't ready to be shown publicly should keep `isPublicLink: false` and must not link out to the live project.
-- Legacy product slugs (`website-os`, `commerce-os`, `launch-os`, `growth-os`, `operations-os`) redirect to their current equivalents in `next.config.ts`.
+- Legacy bundled-product slugs redirect to their current homes (`next.config.ts`):
+  `/product/aster-foundation` → `/products`, `/product/aster-automation` →
+  `/product/operations-os`, `/product/aster-intelligence` → `/product/growth-os`.
+  `/case-studies/fulo` → `/#showcase`.
+- `/portal` is an explicitly-labeled concept preview (static example data, no auth) — not a
+  committed feature yet.
+- `/design-system` is a public token reference sheet, generated from the same values as
+  `src/config/theme.ts` / `tailwind.config.ts`.
+- `commerceos-theme/` at the repo root is an unrelated, standalone Shopify Liquid theme — see
+  its own README for why it lives here and how it relates (or doesn't) to `src/`.
+- Case studies for projects that aren't ready to be shown publicly should keep
+  `isPublicLink: false` and must not link out to the live project.
+
+## Roadmap
+
+**Now** — marketing site + diagnostic funnel, five systems positioned, lead capture via Notion.
+
+**Next** — durable persistence for diagnostic completions (today: `sessionStorage` only, so a
+non-converting completion is invisible); populate real case studies or retire the unused
+rendering pipeline; expand CI coverage as real business logic grows.
+
+**Later** — real auth and a per-account data model once the client portal or a self-serve
+builder (e.g. the CommerceOS configurator the diagnostic's Self-serve tier currently points at
+`/contact` in place of) becomes a committed feature — that's the trigger for introducing
+system-specific product code (`src/systems/<system>/`, `dashboard/`, `crm/`), not before.
+
+**Not yet started** — AI/LLM integration. It's referenced throughout the product copy
+(GrowthOS, OperationsOS) but doesn't exist in this codebase yet; treat any "AI-powered" claim
+in marketing copy as roadmap, not shipped capability, until this changes.
