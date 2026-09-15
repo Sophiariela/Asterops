@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { LogOut, Clock, Rocket } from 'lucide-react';
 import { api } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
+import { formatBRL } from '../lib/currency';
 
 type DeploymentStage = 'PENDING' | 'IN_REVIEW' | 'DEPLOYING' | 'COMPLETED';
 
@@ -28,10 +29,6 @@ const STATUS_COLOR: Record<DeploymentStage, string> = {
   DEPLOYING: 'bg-ASTER-100 text-ASTER-700',
   COMPLETED: 'bg-emerald-100 text-emerald-700',
 };
-
-function formatPrice(cents: number) {
-  return (cents / 100).toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-}
 
 export default function Dashboard() {
   const { user, logout } = useAuth();
@@ -76,7 +73,7 @@ export default function Dashboard() {
                     <p className="text-xs font-bold text-slate-400 uppercase tracking-wide">Current plan</p>
                     <p className="font-display font-extrabold text-2xl text-ink-900 mt-1">{data.plan.name}</p>
                   </div>
-                  <p className="font-display font-extrabold text-xl text-ASTER-600">{formatPrice(data.plan.price)}</p>
+                  <p className="font-display font-extrabold text-xl text-ASTER-600">{formatBRL(data.plan.price)}</p>
                 </div>
                 <div className="mt-5 pt-5 border-t border-ASTER-100 flex items-center justify-between">
                   <p className="text-sm font-semibold text-slate-500">Deployment status</p>

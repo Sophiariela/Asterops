@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { LogOut, Users, Rocket, Clock3, DollarSign, Search } from 'lucide-react';
 import { api } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
+import { formatBRL } from '../lib/currency';
 
 type DeploymentStage = 'PENDING' | 'IN_REVIEW' | 'DEPLOYING' | 'COMPLETED';
 
@@ -38,10 +39,6 @@ type Customer = {
 };
 
 const STAGES: DeploymentStage[] = ['PENDING', 'IN_REVIEW', 'DEPLOYING', 'COMPLETED'];
-
-function formatPrice(cents: number) {
-  return (cents / 100).toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-}
 
 export default function Admin() {
   const { logout } = useAuth();
@@ -95,7 +92,7 @@ export default function Admin() {
             <Card icon={Users} label="Total customers" value={overview.totalCustomers} />
             <Card icon={Rocket} label="Active deployments" value={overview.activeDeployments} />
             <Card icon={Clock3} label="Pending deployments" value={overview.pendingDeployments} />
-            <Card icon={DollarSign} label="Revenue" value={formatPrice(overview.revenue)} />
+            <Card icon={DollarSign} label="Revenue" value={formatBRL(overview.revenue)} />
           </div>
         )}
 
@@ -107,7 +104,7 @@ export default function Admin() {
                 <li key={p.id} className="py-3 flex items-center justify-between text-sm">
                   <span className="font-semibold text-ink-900">{p.customer.name ?? p.customer.email}</span>
                   <span className="text-slate-500">{p.plan}</span>
-                  <span className="font-bold text-ASTER-600">{formatPrice(p.amount)}</span>
+                  <span className="font-bold text-ASTER-600">{formatBRL(p.amount)}</span>
                 </li>
               ))}
             </ul>
@@ -130,9 +127,9 @@ export default function Admin() {
             className="border-2 border-ASTER-100 rounded-full px-4 py-2.5 text-sm outline-none"
           >
             <option value="">All plans</option>
-            <option value="webos">WebOS</option>
-            <option value="launchos">LaunchOS</option>
-            <option value="commerceos">CommerceOS</option>
+            <option value="starter">Starter</option>
+            <option value="growth">Growth</option>
+            <option value="scale">Scale</option>
           </select>
           <select
             value={statusFilter}

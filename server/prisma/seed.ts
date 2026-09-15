@@ -3,42 +3,50 @@ import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
+const ARCHIVED_PLAN_SLUGS = ['webos', 'launchos', 'commerceos', 'growthos'];
+
 const PLANS = [
   {
-    name: 'WebOS',
-    slug: 'webos',
-    description: 'The operating system for businesses that need a premium website and brand presence.',
+    name: 'Starter',
+    slug: 'starter',
+    description: 'Para quem está começando a estruturar a operação digital.',
     features: [
-      'Custom-built website on our design system',
-      'Copy, SEO and analytics setup',
-      'Brand assets and style guide',
-      'Launch in 2-3 weeks',
+      'Até 3 usuários',
+      '1 sistema ASTER incluso (WebOS)',
+      'Até 1.000 visitas/mês',
+      'Suporte por chat',
+      'Integrações essenciais (analytics, e-mail)',
     ],
-    price: 199700,
+    price: 19700,
+    annualPrice: 196800,
   },
   {
-    name: 'LaunchOS',
-    slug: 'launchos',
-    description: 'The operating system for businesses launching a new product, offer or funnel.',
+    name: 'Growth',
+    slug: 'growth',
+    description: 'Para quem já vende e precisa escalar com automação.',
     features: [
-      'Everything in WebOS',
-      'Landing pages and lead capture flows',
-      'Automation and CRM setup',
-      'Paid traffic-ready tracking',
+      'Até 10 usuários',
+      '2 sistemas ASTER inclusos (LaunchOS + CommerceOS)',
+      'Até 10.000 visitas/mês',
+      'Suporte prioritário',
+      'Integrações ilimitadas + API',
     ],
-    price: 349700,
+    price: 69700,
+    annualPrice: 697200,
   },
   {
-    name: 'CommerceOS',
-    slug: 'commerceos',
-    description: 'The operating system for businesses that sell online at scale.',
+    name: 'Scale',
+    slug: 'scale',
+    description: 'Para operações de alto volume e múltiplos canais.',
     features: [
-      'Everything in LaunchOS',
-      'Full storefront build (Shopify-ready)',
-      'Catalog, checkout and conversion optimization',
-      'Ongoing performance monitoring',
+      'Usuários ilimitados',
+      'Todos os sistemas ASTER inclusos (WebOS, LaunchOS, CommerceOS, GrowthOS)',
+      'Visitas ilimitadas',
+      'Agentes de IA inclusos',
+      'Gerente de conta dedicado',
     ],
-    price: 599700,
+    price: 179700,
+    annualPrice: 1796400,
   },
 ];
 
@@ -50,6 +58,11 @@ async function main() {
       create: plan,
     });
   }
+
+  await prisma.plan.updateMany({
+    where: { slug: { in: ARCHIVED_PLAN_SLUGS } },
+    data: { status: 'ARCHIVED' },
+  });
 
   const adminEmail = process.env.SEED_ADMIN_EMAIL ?? 'admin@asterops.com';
   const adminPassword = process.env.SEED_ADMIN_PASSWORD ?? 'change-me-now';

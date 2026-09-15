@@ -11,7 +11,10 @@ const stripe = stripeKey ? new Stripe(stripeKey) : null;
 
 checkoutRouter.use(authenticate, requireRole('CUSTOMER'));
 
-const createOrderSchema = z.object({ planSlug: z.string().min(1) });
+const createOrderSchema = z.object({
+  planSlug: z.string().min(1),
+  billing: z.enum(['monthly', 'annual']).default('monthly'),
+});
 
 // Creates a pending order + payment record, and — when Stripe keys are
 // configured — a real Checkout Session. Without keys, the frontend falls
@@ -27,13 +30,15 @@ checkoutRouter.post('/', async (req, res) => {
     return res.status(404).json({ error: 'Plan not found.' });
   }
 
+  const amount = parsed.data.billing === 'annual' ? plan.annualPrice ?? plan.price * 12 : plan.price;
+
   const order = await prisma.order.create({
     data: {
       customerId: req.user!.userId,
       planId: plan.id,
-      amount: plan.price,
+      amount,
       status: 'PENDING',
-      payment: { create: { amount: plan.price, provider: 'stripe', status: 'PENDING' } },
+      payment: { create: { amount, provider: 'stripe', status: 'PENDING' } },
     },
     include: { plan: true, payment: true },
   });
@@ -41,13 +46,14 @@ checkoutRouter.post('/', async (req, res) => {
   if (stripe) {
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
-      payment_method_types: ['card'],
+      payment_method_types: ['card', 'boleto'],
+      payment_method_options: { card: { installments: { enabled: true } } },
       line_items: [
         {
           price_data: {
-            currency: 'usd',
-            product_data: { name: `ASTER — ${plan.name}` },
-            unit_amount: plan.price,
+            currency: 'brl',
+            product_data: { name: `ASTER — ${plan.name} (${parsed.data.billing === 'annual' ? 'anual' : 'mensal'})` },
+            unit_amount: amount,
           },
           quantity: 1,
         },
