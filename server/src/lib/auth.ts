@@ -1,0 +1,38 @@
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+
+const JWT_SECRET = process.env.JWT_SECRET ?? 'dev-only-insecure-secret';
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN ?? '7d';
+
+export const SESSION_COOKIE = 'aster_session';
+
+export type SessionPayload = {
+  userId: string;
+  role: 'CUSTOMER' | 'ADMIN';
+};
+
+export function hashPassword(password: string) {
+  return bcrypt.hash(password, 10);
+}
+
+export function verifyPassword(password: string, hash: string) {
+  return bcrypt.compare(password, hash);
+}
+
+export function signSession(payload: SessionPayload) {
+  return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN } as jwt.SignOptions);
+}
+
+export function verifySession(token: string): SessionPayload {
+  return jwt.verify(token, JWT_SECRET) as SessionPayload;
+}
+
+export function sessionCookieOptions() {
+  return {
+    httpOnly: true,
+    sameSite: 'lax' as const,
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    path: '/',
+  };
+}

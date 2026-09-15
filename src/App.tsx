@@ -1,37 +1,38 @@
-import { useState } from 'react';
-import Navbar from './components/Navbar';
-import Hero from './components/Hero';
-import LisSection from './components/LisSection';
-import Ecosystem from './components/Ecosystem';
-import Segments from './components/Segments';
-import Cases from './components/Cases';
-import Pricing from './components/Pricing';
-import Faq from './components/Faq';
-import PromptSection from './components/PromptSection';
-import Footer from './components/Footer';
-import SignupModal from './components/SignupModal';
-import FinalCta from './components/FinalCta';
+import { Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
+import Home from './pages/Home';
+import Login from './pages/auth/Login';
+import Register from './pages/auth/Register';
+import ForgotPassword from './pages/auth/ForgotPassword';
+import ResetPassword from './pages/auth/ResetPassword';
+import Plans from './pages/Plans';
+import Checkout from './pages/Checkout';
+import Onboarding from './pages/Onboarding';
+import Dashboard from './pages/Dashboard';
+import Admin from './pages/Admin';
 
 export default function App() {
-  const [modalOpen, setModalOpen] = useState(false);
-  const openCta = () => setModalOpen(true);
-
   return (
-    <div className="min-h-screen bg-white">
-      <Navbar onCta={openCta} />
-      <main>
-        <Hero onCta={openCta} />
-        <LisSection onCta={openCta} />
-        <Ecosystem onCta={openCta} />
-        <Segments onCta={openCta} />
-        <Cases onCta={openCta} />
-        <Pricing onCta={openCta} />
-        <Faq />
-        <PromptSection />
-        <FinalCta onCta={openCta} />
-      </main>
-      <Footer />
-      <SignupModal open={modalOpen} onClose={() => setModalOpen(false)} />
-    </div>
+    <AuthProvider>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/plans" element={<Plans />} />
+
+        <Route element={<ProtectedRoute roles={['CUSTOMER']} />}>
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/onboarding" element={<Onboarding />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+        </Route>
+
+        <Route element={<ProtectedRoute roles={['ADMIN']} />}>
+          <Route path="/admin" element={<Admin />} />
+        </Route>
+      </Routes>
+    </AuthProvider>
   );
 }

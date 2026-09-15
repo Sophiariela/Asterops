@@ -1,73 +1,47 @@
-# React + TypeScript + Vite
+# ASTER
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Marketing site + Phase 1 software business platform: authentication, plans, checkout, onboarding, customer dashboard, and admin panel.
 
-Currently, two official plugins are available:
+## Structure
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- `/` — Vite + React + TypeScript frontend (marketing homepage is untouched; app routes live under `src/pages`)
+- `/server` — Express + Prisma (PostgreSQL) API
 
-## React Compiler
+## Frontend routes
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+| Route | Access | Purpose |
+|---|---|---|
+| `/` | public | Marketing homepage |
+| `/login`, `/register`, `/forgot-password`, `/reset-password` | public | Authentication |
+| `/plans` | public | Plan selection (WebOS / LaunchOS / CommerceOS) |
+| `/checkout` | customer | Checkout flow (Stripe-ready, simulated in dev) |
+| `/onboarding` | customer | Deployment intake form |
+| `/dashboard` | customer | Plan, deployment status, submitted info, activity |
+| `/admin` | admin | Customers, payments, onboarding forms, deployment status |
 
-## Expanding the ESLint configuration
+## Setup
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### 1. Backend
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+cd server
+cp .env.example .env      # then set DATABASE_URL to a real PostgreSQL instance
+npm install
+npm run prisma:migrate    # creates tables
+npm run prisma:seed       # seeds plans + an admin account (SEED_ADMIN_EMAIL/PASSWORD)
+npm run dev                # http://localhost:4000
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Without `STRIPE_SECRET_KEY` set, checkout falls back to a "simulate payment" step so the full flow (plan → checkout → onboarding → dashboard) works without real Stripe keys. Set `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET` to switch to real Stripe Checkout Sessions + webhooks.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### 2. Frontend
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+cp .env.example .env      # VITE_API_URL, defaults to http://localhost:4000/api
+npm install
+npm run dev                # http://localhost:5173
 ```
+
+## Database
+
+PostgreSQL via Prisma (`server/prisma/schema.prisma`): `User`, `Plan`, `Order`, `Payment`, `OnboardingSubmission`, `DeploymentStatus`, `PasswordResetToken`.
