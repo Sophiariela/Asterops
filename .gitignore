@@ -26,3 +26,4 @@ uploads/
 *.sw?
 .vite-source-tags.js
 .vercel
+.neon
