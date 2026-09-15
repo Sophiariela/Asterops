@@ -8,6 +8,7 @@ import ForgotPassword from './pages/auth/ForgotPassword';
 import ResetPassword from './pages/auth/ResetPassword';
 import Plans from './pages/Plans';
 import Checkout from './pages/Checkout';
+import CheckoutSuccess from './pages/checkout/Success';
 import Onboarding from './pages/Onboarding';
 import Dashboard from './pages/Dashboard';
 import Admin from './pages/Admin';
@@ -31,6 +32,7 @@ export default function App() {
 
         <Route element={<ProtectedRoute roles={['CUSTOMER']} />}>
           <Route path="/checkout" element={<Checkout />} />
+          <Route path="/checkout/success" element={<CheckoutSuccess />} />
           <Route path="/onboarding" element={<Onboarding />} />
           <Route path="/dashboard" element={<Dashboard />} />
         </Route>

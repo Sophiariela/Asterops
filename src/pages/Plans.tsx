@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Check, ArrowRight, ArrowLeft } from 'lucide-react';
+import { Check, ArrowRight, ArrowLeft, AlertCircle } from 'lucide-react';
 import { api } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
 import { formatBRL } from '../lib/currency';
@@ -24,6 +24,7 @@ export default function Plans() {
   const [searchParams] = useSearchParams();
   const productParam = searchParams.get('product');
   const highlightedTier = findTierForProduct(productParam)?.slug;
+  const wasCancelled = searchParams.get('cancelled') === '1';
 
   const [backendPlans, setBackendPlans] = useState<BackendPlan[] | null>(null);
   const [error, setError] = useState('');
@@ -56,6 +57,12 @@ export default function Plans() {
         <Link to="/" className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-400 hover:text-ASTER-600 transition-colors mb-8">
           <ArrowLeft size={16} /> Voltar para a home
         </Link>
+
+        {wasCancelled && (
+          <div className="max-w-2xl mx-auto mb-8 flex items-center gap-2.5 bg-amber-50 border border-amber-200 text-amber-700 rounded-2xl px-5 py-3.5 text-sm font-semibold">
+            <AlertCircle size={18} className="shrink-0" /> Seu pagamento não foi concluído.
+          </div>
+        )}
 
         <div className="text-center max-w-2xl mx-auto">
           <h1 className="font-display font-extrabold text-3xl sm:text-5xl text-ink-900 leading-tight">

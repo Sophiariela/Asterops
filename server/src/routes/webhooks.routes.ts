@@ -1,12 +1,11 @@
 import { Router } from 'express';
 import Stripe from 'stripe';
 import { prisma } from '../lib/prisma.js';
+import { stripe } from '../lib/stripeSync.js';
 
 export const webhooksRouter = Router();
 
-const stripeKey = process.env.STRIPE_SECRET_KEY;
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-const stripe = stripeKey ? new Stripe(stripeKey) : null;
 
 // Mounted with express.raw() in index.ts — Stripe signature verification
 // requires the untouched request body.
@@ -27,7 +26,7 @@ webhooksRouter.post('/stripe', async (req, res) => {
     const session = event.data.object as Stripe.Checkout.Session;
     const orderId = session.metadata?.orderId;
     if (orderId) {
-      await prisma.order.update({
+      const order = await prisma.order.update({
         where: { id: orderId },
         data: {
           status: 'PAID',
@@ -35,6 +34,14 @@ webhooksRouter.post('/stripe', async (req, res) => {
           deployment: { create: { status: 'PENDING' } },
         },
       });
+
+      const customerId = typeof session.customer === 'string' ? session.customer : session.customer?.id;
+      if (customerId) {
+        await prisma.user.update({
+          where: { id: order.customerId },
+          data: { stripeCustomerId: customerId },
+        });
+      }
     }
   }
 

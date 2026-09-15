@@ -1,7 +1,9 @@
-import { useState, type ChangeEvent, type FormEvent } from 'react';
+import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle2, UploadCloud } from 'lucide-react';
 import { api, ApiError } from '../lib/api';
+
+type DashboardOrderStatus = { order: { status: string } | null };
 
 const initialForm = {
   companyName: '',
@@ -22,6 +24,20 @@ export default function Onboarding() {
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
+  const [checkingAccess, setCheckingAccess] = useState(true);
+
+  useEffect(() => {
+    api
+      .get<DashboardOrderStatus>('/dashboard')
+      .then((data) => {
+        if (data.order?.status !== 'PAID') {
+          navigate('/plans', { replace: true });
+          return;
+        }
+        setCheckingAccess(false);
+      })
+      .catch(() => navigate('/plans', { replace: true }));
+  }, [navigate]);
 
   const update = (field: keyof typeof form) => (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
     setForm((f) => ({ ...f, [field]: e.target.value }));
@@ -44,6 +60,10 @@ export default function Onboarding() {
       setSubmitting(false);
     }
   };
+
+  if (checkingAccess) {
+    return <div className="min-h-screen flex items-center justify-center text-slate-400">Loading…</div>;
+  }
 
   if (done) {
     return (

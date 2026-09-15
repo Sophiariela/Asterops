@@ -8,6 +8,17 @@ export const onboardingRouter = Router();
 
 onboardingRouter.use(authenticate, requireRole('CUSTOMER'));
 
+// Onboarding only unlocks once a purchase has actually gone through.
+onboardingRouter.use(async (req, res, next) => {
+  const paidOrder = await prisma.order.findFirst({
+    where: { customerId: req.user!.userId, status: 'PAID' },
+  });
+  if (!paidOrder) {
+    return res.status(403).json({ error: 'Complete a purchase before starting onboarding.' });
+  }
+  next();
+});
+
 const submissionSchema = z.object({
   companyName: z.string().min(1),
   businessType: z.string().min(1),

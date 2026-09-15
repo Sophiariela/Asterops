@@ -1,13 +1,10 @@
 import { Router } from 'express';
-import Stripe from 'stripe';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma.js';
 import { authenticate, requireRole } from '../middleware/auth.js';
+import { stripe } from '../lib/stripeSync.js';
 
 export const checkoutRouter = Router();
-
-const stripeKey = process.env.STRIPE_SECRET_KEY;
-const stripe = stripeKey ? new Stripe(stripeKey) : null;
 
 checkoutRouter.use(authenticate, requireRole('CUSTOMER'));
 
@@ -17,24 +14,34 @@ const createOrderSchema = z.object({
 });
 
 // Creates a pending order + payment record, and — when Stripe keys are
-// configured — a real Checkout Session. Without keys, the frontend falls
-// back to the /simulate-pay dev endpoint so the flow stays testable.
+// configured — a real Checkout Session against the plan's pre-created
+// Stripe Price (falls back to inline price_data if a plan hasn't been
+// synced to Stripe yet). Without keys, the frontend falls back to the
+// /simulate-pay dev endpoint so the flow stays testable.
 checkoutRouter.post('/', async (req, res) => {
   const parsed = createOrderSchema.safeParse(req.body);
   if (!parsed.success) {
     return res.status(400).json({ error: 'A planSlug is required.' });
   }
 
-  const plan = await prisma.plan.findUnique({ where: { slug: parsed.data.planSlug } });
+  const [plan, user] = await Promise.all([
+    prisma.plan.findUnique({ where: { slug: parsed.data.planSlug } }),
+    prisma.user.findUnique({ where: { id: req.user!.userId } }),
+  ]);
   if (!plan || plan.status !== 'ACTIVE') {
     return res.status(404).json({ error: 'Plan not found.' });
   }
+  if (!user) {
+    return res.status(401).json({ error: 'Not authenticated.' });
+  }
 
-  const amount = parsed.data.billing === 'annual' ? plan.annualPrice ?? plan.price * 12 : plan.price;
+  const isAnnual = parsed.data.billing === 'annual';
+  const amount = isAnnual ? plan.annualPrice ?? plan.price * 12 : plan.price;
+  const stripePriceId = isAnnual ? plan.stripeAnnualPriceId : plan.stripeMonthlyPriceId;
 
   const order = await prisma.order.create({
     data: {
-      customerId: req.user!.userId,
+      customerId: user.id,
       planId: plan.id,
       amount,
       status: 'PENDING',
@@ -49,18 +56,23 @@ checkoutRouter.post('/', async (req, res) => {
       payment_method_types: ['card', 'boleto'],
       payment_method_options: { card: { installments: { enabled: true } } },
       line_items: [
-        {
-          price_data: {
-            currency: 'brl',
-            product_data: { name: `ASTER — ${plan.name} (${parsed.data.billing === 'annual' ? 'anual' : 'mensal'})` },
-            unit_amount: amount,
-          },
-          quantity: 1,
-        },
+        stripePriceId
+          ? { price: stripePriceId, quantity: 1 }
+          : {
+              price_data: {
+                currency: 'brl',
+                product_data: { name: `ASTER — ${plan.name} (${isAnnual ? 'anual' : 'mensal'})` },
+                unit_amount: amount,
+              },
+              quantity: 1,
+            },
       ],
+      ...(user.stripeCustomerId
+        ? { customer: user.stripeCustomerId }
+        : { customer_email: user.email, customer_creation: 'always' as const }),
       metadata: { orderId: order.id },
-      success_url: `${process.env.FRONTEND_URL}/onboarding?order=${order.id}`,
-      cancel_url: `${process.env.FRONTEND_URL}/checkout?plan=${plan.slug}&cancelled=1`,
+      success_url: `${process.env.FRONTEND_URL}/checkout/success?order=${order.id}`,
+      cancel_url: `${process.env.FRONTEND_URL}/plans?cancelled=1`,
     });
 
     await prisma.payment.update({

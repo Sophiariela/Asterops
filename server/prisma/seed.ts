@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
+import { ensureStripeProduct } from '../src/lib/stripeSync.js';
 
 const prisma = new PrismaClient();
 
@@ -52,11 +53,17 @@ const PLANS = [
 
 async function main() {
   for (const plan of PLANS) {
-    await prisma.plan.upsert({
+    const saved = await prisma.plan.upsert({
       where: { slug: plan.slug },
       update: plan,
       create: plan,
     });
+
+    const stripeIds = await ensureStripeProduct(saved);
+    if (stripeIds) {
+      await prisma.plan.update({ where: { id: saved.id }, data: stripeIds });
+      console.log(`  Stripe product synced for ${saved.name} (${stripeIds.stripeProductId})`);
+    }
   }
 
   await prisma.plan.updateMany({
