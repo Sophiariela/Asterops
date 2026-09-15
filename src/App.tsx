@@ -11,6 +11,9 @@ import Checkout from './pages/Checkout';
 import Onboarding from './pages/Onboarding';
 import Dashboard from './pages/Dashboard';
 import Admin from './pages/Admin';
+import ProductPage from './pages/products/ProductPage';
+import SolutionPage from './pages/solutions/SolutionPage';
+import EcosystemPage from './pages/Ecosystem';
 
 export default function App() {
   return (
@@ -22,6 +25,9 @@ export default function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/plans" element={<Plans />} />
+        <Route path="/products/:slug" element={<ProductPage />} />
+        <Route path="/solutions/:slug" element={<SolutionPage />} />
+        <Route path="/ecosystem" element={<EcosystemPage />} />
 
         <Route element={<ProtectedRoute roles={['CUSTOMER']} />}>
           <Route path="/checkout" element={<Checkout />} />
