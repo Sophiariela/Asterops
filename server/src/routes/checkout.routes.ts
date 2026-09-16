@@ -53,6 +53,9 @@ checkoutRouter.post('/', async (req, res) => {
   if (stripe) {
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
+      // Pix isn't included: for Brazil-based Stripe accounts, Pix is invite-only
+      // (not self-serve in Dashboard settings or via the Accounts API) — add it
+      // back here once Stripe grants access. https://docs.stripe.com/payments/pix
       payment_method_types: ['card', 'boleto'],
       payment_method_options: { card: { installments: { enabled: true } } },
       line_items: [
