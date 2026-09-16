@@ -4,7 +4,11 @@ services:
     runtime: node
     plan: free
     rootDir: server
-    buildCommand: npm install && npm run build
+    # Pre-Deploy Command is a paid-plan feature, so on the free plan
+    # migrations run as the last build step instead — safe to re-run on
+    # every deploy since `prisma migrate deploy` no-ops once a migration
+    # has already been applied.
+    buildCommand: npm install && npx prisma migrate deploy && npm run build
     startCommand: npm run start
     healthCheckPath: /api/health
     autoDeployTrigger: commit
