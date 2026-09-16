@@ -51,7 +51,7 @@ export const PLAN_TIERS: PlanTier[] = [
       'Agentes de IA inclusos',
       'Gerente de conta dedicado',
     ],
-    includedProducts: ['webos', 'launchos', 'commerceos', 'growthos', 'agents'],
+    includedProducts: ['webos', 'launchos', 'commerceos', 'growthos', 'luna-ai'],
     cta: 'Assinar Scale',
   },
 ];

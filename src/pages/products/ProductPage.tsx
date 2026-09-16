@@ -22,9 +22,9 @@ export default function ProductPage() {
           <div className="w-14 h-14 rounded-2xl bg-ASTER-600 text-white flex items-center justify-center">
             <Icon size={26} />
           </div>
-          <h1 className="font-display font-extrabold text-4xl sm:text-5xl text-ink-900 mt-6">{product.name}</h1>
-          <p className="text-ASTER-600 font-semibold text-lg mt-2">{product.tagline}</p>
-          <p className="text-slate-500 text-base sm:text-lg mt-4 max-w-2xl">{product.description}</p>
+          <p className="text-xs font-bold text-ASTER-600 uppercase tracking-wide mt-6">{product.name}</p>
+          <h1 className="font-display font-extrabold text-4xl sm:text-5xl text-ink-900 mt-2">{product.tagline}</h1>
+          <p className="text-slate-500 text-base sm:text-lg mt-4 max-w-2xl">{product.subheadline}</p>
         </div>
       </section>
 
@@ -32,9 +32,9 @@ export default function ProductPage() {
         <div className="max-w-4xl mx-auto">
           <h2 className="font-display font-extrabold text-2xl text-ink-900">What&apos;s included</h2>
           <ul className="mt-6 grid sm:grid-cols-2 gap-4">
-            {product.features.map((feature) => (
-              <li key={feature} className="flex items-start gap-3 bg-ASTER-50/60 rounded-2xl p-4 text-sm text-slate-600">
-                <Check size={18} className="text-ASTER-600 shrink-0 mt-0.5" /> {feature}
+            {product.included.map((item) => (
+              <li key={item} className="flex items-start gap-3 bg-ASTER-50/60 rounded-2xl p-4 text-sm text-slate-600">
+                <Check size={18} className="text-ASTER-600 shrink-0 mt-0.5" /> {item}
               </li>
             ))}
           </ul>
@@ -43,14 +43,13 @@ export default function ProductPage() {
 
       <section className="px-4 py-14 border-t border-ASTER-100 bg-slate-50">
         <div className="max-w-4xl mx-auto">
-          <h2 className="font-display font-extrabold text-2xl text-ink-900">Why it works</h2>
-          <ul className="mt-6 space-y-4">
-            {product.benefits.map((benefit) => (
-              <li key={benefit} className="flex items-start gap-3 text-slate-600">
-                <Sparkles size={18} className="text-ASTER-600 shrink-0 mt-0.5" /> {benefit}
-              </li>
-            ))}
-          </ul>
+          <h2 className="font-display font-extrabold text-2xl text-ink-900">Outcome</h2>
+          <div className="mt-6 flex items-start gap-4">
+            <span className="w-11 h-11 rounded-2xl bg-ASTER-600 text-white flex items-center justify-center shrink-0">
+              <Sparkles size={20} />
+            </span>
+            <p className="font-display font-semibold text-xl sm:text-2xl text-ink-900 leading-relaxed">{product.outcome}</p>
+          </div>
         </div>
       </section>
 

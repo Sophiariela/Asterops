@@ -1,14 +1,16 @@
 import { Layers, Cpu, Store, Globe2, Sparkles, type LucideIcon } from 'lucide-react';
 
-export type ProductSlug = 'webos' | 'launchos' | 'commerceos' | 'growthos' | 'agents';
+export type ProductSlug = 'webos' | 'launchos' | 'commerceos' | 'growthos' | 'luna-ai';
 
 export type Product = {
   slug: ProductSlug;
   name: string;
+  /** Short, punchy headline — used as the page H1 and reused as the nav/ecosystem descriptor. */
   tagline: string;
-  description: string;
-  features: string[];
-  benefits: string[];
+  /** One-paragraph explanation of what the product is and why it exists. */
+  subheadline: string;
+  included: string[];
+  outcome: string;
   icon: LucideIcon;
 };
 
@@ -16,94 +18,91 @@ export const PRODUCTS: Product[] = [
   {
     slug: 'webos',
     name: 'WebOS',
-    tagline: 'The operating system for your web presence',
-    description:
-      'WebOS gives your business a premium, high-performance website built on the ASTER design system — launched in weeks, not months.',
-    features: [
-      'Custom-built website on our design system',
-      'Copy, SEO and analytics setup',
-      'Brand assets and style guide',
-      'Launch in 2-3 weeks',
+    tagline: "Your company's digital foundation.",
+    subheadline:
+      'More than a website. WebOS gives your business a professional digital presence built to attract customers, generate opportunities and connect with the entire ASTER ecosystem.',
+    included: [
+      'Professional website',
+      'Content management',
+      'SEO foundation',
+      'Analytics integration',
+      'Landing pages',
+      'Brand structure',
+      'Forms and lead capture',
+      'Ecosystem-ready architecture',
     ],
-    benefits: [
-      'A site that converts, not just exists',
-      'One system to maintain instead of five vendors',
-      'Built to plug into LaunchOS and CommerceOS later',
-    ],
+    outcome: 'A digital presence that grows with your business instead of needing to be rebuilt every year.',
     icon: Layers,
   },
   {
     slug: 'launchos',
     name: 'LaunchOS',
-    tagline: 'The operating system for product and offer launches',
-    description:
-      'LaunchOS turns a new product, offer or campaign into a working funnel — pages, automation and tracking, deployed as one system.',
-    features: [
-      'Everything in WebOS',
-      'Landing pages and lead capture flows',
-      'Automation and CRM setup',
-      'Paid traffic-ready tracking',
+    tagline: 'Launch products, offers and campaigns with speed.',
+    subheadline:
+      'LaunchOS centralizes landing pages, lead capture, automation and campaign tracking so your team can execute launches without assembling multiple tools.',
+    included: [
+      'Landing pages',
+      'Lead capture',
+      'Campaign tracking',
+      'Forms',
+      'Automations',
+      'CRM integrations',
+      'Conversion analytics',
     ],
-    benefits: [
-      'Launch in days, not quarters',
-      "No stitching five tools together by hand",
-      'Every lead tracked from click to close',
-    ],
+    outcome: 'Move from idea to launch faster while maintaining visibility into results.',
     icon: Cpu,
   },
   {
     slug: 'commerceos',
     name: 'CommerceOS',
-    tagline: 'The operating system for scaling online sales',
-    description: 'CommerceOS is the full storefront and checkout system for businesses ready to sell online at scale.',
-    features: [
-      'Everything in LaunchOS',
-      'Full storefront build (Shopify-ready)',
-      'Catalog, checkout and conversion optimization',
-      'Ongoing performance monitoring',
+    tagline: 'Run your online sales from a single system.',
+    subheadline:
+      'CommerceOS connects your store, orders, inventory and integrations into one operational environment designed for growth.',
+    included: [
+      'Ecommerce storefront',
+      'Order management',
+      'Inventory management',
+      'Payment integrations',
+      'Marketplace integrations',
+      'Customer management',
+      'Operational reporting',
     ],
-    benefits: [
-      'A storefront built to convert, not just list products',
-      'Continuous optimization instead of a one-time build',
-      'Room to grow into GrowthOS without a rebuild',
-    ],
+    outcome: 'Sell across channels without increasing operational complexity.',
     icon: Store,
   },
   {
     slug: 'growthos',
     name: 'GrowthOS',
-    tagline: 'The operating system for sustained growth',
-    description:
-      'GrowthOS layers retention, lifecycle and multi-channel growth systems on top of what WebOS, LaunchOS and CommerceOS already built.',
-    features: [
-      'Everything in CommerceOS',
-      'Lifecycle and retention automation',
-      'Multi-channel growth reporting',
-      'Dedicated growth strategist',
+    tagline: 'Turn operational data into business growth.',
+    subheadline:
+      'GrowthOS brings together analytics, automations and performance visibility so decision-making becomes faster and more predictable.',
+    included: [
+      'Business dashboards',
+      'KPI tracking',
+      'Reports',
+      'Operational analytics',
+      'Automations',
+      'Growth monitoring',
+      'Performance insights',
     ],
-    benefits: [
-      'Growth that compounds instead of resetting every campaign',
-      'One dashboard for every channel',
-      'A strategist accountable to your numbers',
-    ],
+    outcome: 'Spend less time collecting information and more time acting on it.',
     icon: Globe2,
   },
   {
-    slug: 'agents',
-    name: 'AI Agents',
-    tagline: 'Autonomous agents that run your operation',
-    description: 'AI Agents connect to your ASTER systems and handle the operational work — support, ops, follow-ups — end to end.',
-    features: [
-      'Connects to every ASTER OS product',
-      'Handles support, ops and follow-up tasks',
-      'Learns from your operation over time',
-      'Human handoff whenever it matters',
+    slug: 'luna-ai',
+    name: 'Luna AI',
+    tagline: 'AI that works inside your operation.',
+    subheadline:
+      'Luna AI connects with ASTER systems to automate tasks, support decision-making and reduce repetitive work across your business.',
+    included: [
+      'Operational assistants',
+      'Workflow automations',
+      'Internal knowledge access',
+      'Reporting assistance',
+      'Customer support workflows',
+      'Task execution support',
     ],
-    benefits: [
-      'Operational work that runs while you sleep',
-      'Fewer repetitive tasks for your team',
-      'Consistent execution, every time',
-    ],
+    outcome: 'More output with fewer manual processes.',
     icon: Sparkles,
   },
 ];

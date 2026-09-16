@@ -1,6 +1,7 @@
 import { Navigate, Link, useParams } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import { getSolution } from '../../data/solutions';
+import { getProduct } from '../../data/products';
 
 export default function SolutionPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -9,6 +10,8 @@ export default function SolutionPage() {
   if (!solution) {
     return <Navigate to="/plans" replace />;
   }
+
+  const poweredByProducts = solution.poweredBy.map((s) => getProduct(s)).filter(Boolean);
 
   return (
     <div className="min-h-screen bg-white">
@@ -34,6 +37,36 @@ export default function SolutionPage() {
               </li>
             ))}
           </ul>
+        </div>
+      </section>
+
+      <section className="px-4 py-14 border-t border-ASTER-100 bg-slate-50">
+        <div className="max-w-4xl mx-auto">
+          <p className="text-xs font-bold text-ASTER-600 uppercase tracking-wide">Powered by</p>
+          <h2 className="font-display font-extrabold text-2xl text-ink-900 mt-2">
+            {solution.name} is not a separate product — it&apos;s a use case built on ASTER systems
+          </h2>
+          <div className="mt-6 grid sm:grid-cols-2 gap-4">
+            {poweredByProducts.map((product) => {
+              if (!product) return null;
+              const Icon = product.icon;
+              return (
+                <Link
+                  key={product.slug}
+                  to={`/products/${product.slug}`}
+                  className="flex items-start gap-4 bg-white rounded-2xl p-4 border border-ASTER-100 hover:border-ASTER-300 hover:-translate-y-0.5 transition-all"
+                >
+                  <span className="w-11 h-11 rounded-2xl bg-ASTER-50 text-ASTER-600 flex items-center justify-center shrink-0">
+                    <Icon size={20} />
+                  </span>
+                  <span>
+                    <span className="block font-display font-semibold text-[15px] text-ink-900">{product.name}</span>
+                    <span className="block text-[13px] text-slate-500 mt-0.5">{product.tagline}</span>
+                  </span>
+                </Link>
+              );
+            })}
+          </div>
         </div>
       </section>
 

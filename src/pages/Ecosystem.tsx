@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, ChevronDown } from 'lucide-react';
 import { getProduct } from '../data/products';
 
-const FLOW = ['webos', 'commerceos', 'growthos', 'agents'] as const;
+const FLOW = ['webos', 'commerceos', 'growthos', 'luna-ai'] as const;
 
 export default function EcosystemPage() {
   return (

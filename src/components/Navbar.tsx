@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronDown, Menu, X, ArrowRight, Truck } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { PRODUCTS } from '../data/products';
+import { PRODUCTS, getProduct } from '../data/products';
 import { SOLUTIONS } from '../data/solutions';
 
 export default function Navbar({ onCta }: { onCta: () => void }) {
@@ -52,8 +52,8 @@ export default function Navbar({ onCta }: { onCta: () => void }) {
             >
               Soluções <ChevronDown size={16} className={`transition-transform ${open === 'solucoes' ? 'rotate-180' : ''}`} />
             </button>
-            <Link to="/products/agents" onClick={closeAll} className="px-4 py-2.5 rounded-full hover:bg-ASTER-50 transition-colors flex items-center gap-1.5">
-              Agentes de IA <span className="text-[10px] font-bold bg-volt-400 text-ink-950 px-1.5 py-0.5 rounded-md">NOVO</span>
+            <Link to="/products/luna-ai" onClick={closeAll} className="px-4 py-2.5 rounded-full hover:bg-ASTER-50 transition-colors flex items-center gap-1.5">
+              Luna AI <span className="text-[10px] font-bold bg-volt-400 text-ink-950 px-1.5 py-0.5 rounded-md">NOVO</span>
             </Link>
             <Link to="/plans" onClick={closeAll} className="px-4 py-2.5 rounded-full hover:bg-ASTER-50 transition-colors">Planos</Link>
             <Link to="/ecosystem" onClick={closeAll} className="px-4 py-2.5 rounded-full hover:bg-ASTER-50 transition-colors">Ecossistema</Link>
@@ -87,7 +87,11 @@ export default function Navbar({ onCta }: { onCta: () => void }) {
               className="absolute left-0 right-0 top-full hidden lg:block"
             >
               <div className="max-w-5xl mx-auto px-6">
-                <div className="bg-white rounded-3xl card-shadow border border-ASTER-100 p-4 grid grid-cols-2 gap-1">
+                <div className="bg-white rounded-3xl card-shadow border border-ASTER-100 p-4">
+                  <p className="px-4 pt-1 pb-2 text-[11px] font-bold text-ASTER-600 uppercase tracking-wide">
+                    ASTER Systems — the software you run
+                  </p>
+                  <div className="grid grid-cols-2 gap-1">
                   {PRODUCTS.map((p) => (
                     <Link key={p.slug} to={`/products/${p.slug}`} onClick={closeAll} className="flex items-start gap-4 p-4 rounded-2xl hover:bg-ASTER-50 transition-colors group">
                       <span className="w-11 h-11 rounded-2xl bg-ASTER-50 group-hover:bg-ASTER-600 text-ASTER-600 group-hover:text-white flex items-center justify-center shrink-0 transition-colors">
@@ -99,6 +103,7 @@ export default function Navbar({ onCta }: { onCta: () => void }) {
                       </span>
                     </Link>
                   ))}
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -112,13 +117,21 @@ export default function Navbar({ onCta }: { onCta: () => void }) {
               className="absolute left-0 right-0 top-full hidden lg:block"
             >
               <div className="max-w-4xl mx-auto px-6">
-                <div className="bg-white rounded-3xl card-shadow border border-ASTER-100 p-4 grid grid-cols-2 gap-1">
-                  {SOLUTIONS.map((s) => (
-                    <Link key={s.slug} to={`/solutions/${s.slug}`} onClick={closeAll} className="flex flex-col gap-0.5 p-4 rounded-2xl hover:bg-ASTER-50 transition-colors">
-                      <span className="font-display font-semibold text-[15px] text-ink-900">{s.name}</span>
-                      <span className="text-[13px] text-slate-500">{s.tagline}</span>
-                    </Link>
-                  ))}
+                <div className="bg-white rounded-3xl card-shadow border border-ASTER-100 p-4">
+                  <p className="px-4 pt-1 pb-2 text-[11px] font-bold text-ASTER-600 uppercase tracking-wide">
+                    Business Solutions — powered by ASTER systems
+                  </p>
+                  <div className="grid grid-cols-2 gap-1">
+                    {SOLUTIONS.map((s) => (
+                      <Link key={s.slug} to={`/solutions/${s.slug}`} onClick={closeAll} className="flex flex-col gap-0.5 p-4 rounded-2xl hover:bg-ASTER-50 transition-colors">
+                        <span className="font-display font-semibold text-[15px] text-ink-900">{s.name}</span>
+                        <span className="text-[13px] text-slate-500">{s.tagline}</span>
+                        <span className="text-[11px] text-slate-400 mt-1">
+                          Powered by {s.poweredBy.map((slug) => getProduct(slug)?.name).filter(Boolean).join(', ')}
+                        </span>
+                      </Link>
+                    ))}
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -166,8 +179,8 @@ export default function Navbar({ onCta }: { onCta: () => void }) {
                   </div>
                 )}
 
-                <Link to="/products/agents" onClick={closeAll} className="block py-3 px-3 font-semibold text-[#2c1a63] border-b border-ASTER-50">
-                  Agentes de IA
+                <Link to="/products/luna-ai" onClick={closeAll} className="block py-3 px-3 font-semibold text-[#2c1a63] border-b border-ASTER-50">
+                  Luna AI
                 </Link>
                 <Link to="/plans" onClick={closeAll} className="block py-3 px-3 font-semibold text-[#2c1a63] border-b border-ASTER-50">
                   Planos
