@@ -2,7 +2,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import multer from 'multer';
 
-export const UPLOAD_ROOT = path.resolve(process.cwd(), 'uploads');
+// UPLOAD_DIR points at a mounted persistent disk in production (Render's
+// filesystem is otherwise ephemeral and wipes /uploads on every deploy).
+export const UPLOAD_ROOT = process.env.UPLOAD_DIR ?? path.resolve(process.cwd(), 'uploads');
 fs.mkdirSync(UPLOAD_ROOT, { recursive: true });
 
 const storage = multer.diskStorage({

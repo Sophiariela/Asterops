@@ -16,6 +16,11 @@ const app = express();
 const PORT = process.env.PORT ?? 4000;
 const FRONTEND_URL = process.env.FRONTEND_URL ?? 'http://localhost:5173';
 
+// Render terminates TLS at a proxy in front of this app — without this,
+// Express sees plain HTTP and req.secure is always false, which breaks
+// the Secure session cookie required for cross-site auth in production.
+app.set('trust proxy', 1);
+
 app.use(cors({ origin: FRONTEND_URL, credentials: true }));
 
 // Stripe webhook needs the raw body for signature verification, so it's

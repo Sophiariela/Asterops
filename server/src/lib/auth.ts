@@ -28,10 +28,15 @@ export function verifySession(token: string): SessionPayload {
 }
 
 export function sessionCookieOptions() {
+  const isProduction = process.env.NODE_ENV === 'production';
+  // Render (API) and the frontend host are different origins in production,
+  // so the cookie must be sent cross-site — that requires SameSite=None,
+  // which browsers only honor when Secure is also set.
+  const sameSite: 'none' | 'lax' = isProduction ? 'none' : 'lax';
   return {
     httpOnly: true,
-    sameSite: 'lax' as const,
-    secure: process.env.NODE_ENV === 'production',
+    sameSite,
+    secure: isProduction,
     maxAge: 7 * 24 * 60 * 60 * 1000,
     path: '/',
   };
