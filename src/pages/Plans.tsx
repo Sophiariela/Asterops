@@ -97,6 +97,7 @@ export default function Plans() {
               const annualTotal = backendPlan?.annualPrice ?? (backendPlan ? backendPlan.price * 12 : 0);
               const annualMonthlyEquivalent = Math.round(annualTotal / 12);
               const price = backendPlan ? (annual ? annualMonthlyEquivalent : backendPlan.price) : 0;
+              const annualSavingsPct = backendPlan ? Math.round((1 - annualMonthlyEquivalent / backendPlan.price) * 100) : 0;
 
               return (
                 <div
@@ -125,12 +126,11 @@ export default function Plans() {
                   </div>
                   {annual ? (
                     <div className="mt-1.5 space-y-0.5">
-                      <p className="text-xs font-semibold text-slate-400">ou</p>
-                      <p className="text-xs font-bold text-ASTER-600">12x de {formatBRL(annualMonthlyEquivalent)} sem juros</p>
-                      <p className="text-[11px] text-slate-400">Faturamento anual com desconto</p>
+                      <p className="text-xs font-medium text-slate-400">Cobrado anualmente · {formatBRL(annualTotal)}/ano</p>
+                      <p className="text-xs font-bold text-ASTER-600">Economize {annualSavingsPct}% no plano anual</p>
                     </div>
                   ) : (
-                    <p className="text-xs font-medium mt-1.5 text-slate-400">no plano mensal · cancele quando quiser</p>
+                    <p className="text-xs font-medium mt-1.5 text-slate-400">Cobrança mensal · cancele quando quiser</p>
                   )}
 
                   <ul className="mt-6 space-y-3 flex-1">
