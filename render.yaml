@@ -8,7 +8,15 @@ services:
     # migrations run as the last build step instead — safe to re-run on
     # every deploy since `prisma migrate deploy` no-ops once a migration
     # has already been applied.
-    buildCommand: npm install && npx prisma migrate deploy && npm run build
+    #
+    # --include=dev is required here: NODE_ENV=production is set below (for
+    # the runtime process), but Render applies service envVars during the
+    # build step too. npm derives its `omit` config from NODE_ENV, so plain
+    # `npm install` silently skips devDependencies (typescript, @types/*,
+    # tsx) whenever NODE_ENV=production is present — breaking `tsc` with
+    # "implicit any" / "could not find declaration file" errors even though
+    # the build succeeds locally where NODE_ENV isn't set.
+    buildCommand: npm install --include=dev && npx prisma migrate deploy && npm run build
     startCommand: npm run start
     healthCheckPath: /api/health
     autoDeployTrigger: commit
