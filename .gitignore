@@ -27,3 +27,6 @@ uploads/
 .vite-source-tags.js
 .vercel
 .neon
+
+.vercel
+.env*
