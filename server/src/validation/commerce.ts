@@ -19,6 +19,7 @@ export const createProductSchema = z.object({
   description: z.string().max(4000).optional(),
   price: z.number().int().nonnegative(),
   compareAtPrice: z.number().int().nonnegative().nullable().optional(),
+  costPrice: z.number().int().nonnegative().nullable().optional(),
   categoryId: z.string().min(1).nullable().optional(),
   status: z.enum(productStatusValues).optional(),
   stockQuantity: z.number().int().nonnegative().optional(),

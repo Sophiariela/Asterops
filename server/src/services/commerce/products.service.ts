@@ -9,6 +9,7 @@ type CreateProductInput = {
   description?: string;
   price: number;
   compareAtPrice?: number | null;
+  costPrice?: number | null;
   categoryId?: string | null;
   status?: ProductStatus;
   stockQuantity?: number;
@@ -63,6 +64,7 @@ export async function createProduct(ownerId: string, data: CreateProductInput) {
         description: data.description,
         price: data.price,
         compareAtPrice: data.compareAtPrice ?? undefined,
+        costPrice: data.costPrice ?? undefined,
         categoryId: data.categoryId ?? undefined,
         status: data.status ?? 'ACTIVE',
         stockQuantity,

@@ -206,6 +206,7 @@ model Product {
   description    String?
   price          Int
   compareAtPrice Int?
+  costPrice      Int?
   status         ProductStatus        @default(ACTIVE)
   stockQuantity  Int                  @default(0)
   reorderPoint   Int                  @default(0)

@@ -15,6 +15,7 @@ import { productsRouter } from './routes/commerce/products.routes.js';
 import { inventoryRouter } from './routes/commerce/inventory.routes.js';
 import { customersRouter } from './routes/commerce/customers.routes.js';
 import { ordersRouter } from './routes/commerce/orders.routes.js';
+import { analyticsRouter } from './routes/commerce/analytics.routes.js';
 import { CommerceError } from './lib/commerceError.js';
 import { UPLOAD_ROOT } from './middleware/upload.js';
 
@@ -53,6 +54,7 @@ app.use('/api/commerce/products', productsRouter);
 app.use('/api/commerce/inventory', inventoryRouter);
 app.use('/api/commerce/customers', customersRouter);
 app.use('/api/commerce/orders', ordersRouter);
+app.use('/api/commerce/analytics', analyticsRouter);
 
 app.use('/api/commerce', (err: Error, _req: express.Request, res: express.Response, next: express.NextFunction) => {
   if (err instanceof CommerceError) {
