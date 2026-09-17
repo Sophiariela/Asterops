@@ -63,7 +63,11 @@ export async function generateSite(
         })),
       },
     },
-    include: { pages: { orderBy: { order: 'asc' } } },
+    include: {
+      pages: { orderBy: { order: 'asc' } },
+      testimonials: { orderBy: { createdAt: 'desc' } },
+      trustElements: { orderBy: { createdAt: 'desc' } },
+    },
   });
 }
 
