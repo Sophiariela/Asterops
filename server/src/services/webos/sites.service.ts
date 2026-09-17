@@ -1,7 +1,8 @@
 import type { SitePlaybook } from '@prisma/client';
 import { prisma } from '../../lib/prisma.js';
 import { CommerceError } from '../../lib/commerceError.js';
-import { PLAYBOOKS, type GeneratorInput } from './playbooks.js';
+import { getPublishedTemplateByKey, getPublishedTemplateById } from './templates.service.js';
+import { buildPagesFromTemplate, type GeneratorInput } from './templateEngine.js';
 
 export async function listSites(ownerId: string) {
   return prisma.site.findMany({
@@ -26,18 +27,16 @@ export async function getSite(ownerId: string, id: string) {
 
 export async function generateSite(
   ownerId: string,
-  input: GeneratorInput & { playbook: SitePlaybook },
+  input: GeneratorInput & { playbook?: SitePlaybook; templateId?: string },
 ) {
-  const playbook = PLAYBOOKS[input.playbook];
-  if (!playbook) throw new CommerceError(400, 'Unknown playbook.');
+  const template = input.templateId
+    ? await getPublishedTemplateById(input.templateId)
+    : input.playbook
+      ? await getPublishedTemplateByKey(input.playbook)
+      : null;
+  if (!template) throw new CommerceError(400, 'Template not found or not published.');
 
-  const pageTemplates = playbook.pages(input);
-
-  // Pages that don't capture a lead themselves get a real internal link to
-  // whichever page does — a structural fact about the site's navigation,
-  // not a claim about how visitors actually move through it (no traffic
-  // data exists for that).
-  const primaryCapturePage = pageTemplates.find((p) => p.hasLeadForm);
+  const pageTemplates = buildPagesFromTemplate(template, input);
 
   return prisma.site.create({
     data: {
@@ -45,7 +44,9 @@ export async function generateSite(
       businessName: input.businessName,
       industry: input.industry,
       targetAudience: input.targetAudience,
-      playbook: input.playbook,
+      playbook: template.key,
+      templateId: template.id,
+      templateVersion: template.version,
       status: 'DRAFT',
       pages: {
         create: pageTemplates.map((p, i) => ({
@@ -54,10 +55,10 @@ export async function generateSite(
           heroHeadline: p.heroHeadline,
           heroSubheadline: p.heroSubheadline,
           ctaLabel: p.ctaLabel,
-          ctaHref: !p.hasLeadForm && primaryCapturePage && primaryCapturePage.slug !== p.slug
-            ? `/${primaryCapturePage.slug}`
-            : undefined,
+          ctaHref: p.ctaHref,
           hasLeadForm: p.hasLeadForm,
+          seoTitle: p.seoTitle,
+          seoDescription: p.seoDescription,
           sections: p.sections,
           order: i,
         })),

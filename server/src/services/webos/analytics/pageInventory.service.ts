@@ -30,6 +30,21 @@ const PURPOSE_BY_SLUG: Record<string, string> = {
   offers: 'Present ways to work together',
   reservations: 'Convert intent into a booking',
   contact: 'Capture a direct inquiry',
+  results: 'Prove results with evidence',
+  gallery: 'Showcase past work',
+  reviews: 'Build trust with direct customer proof',
+  newsletter: 'Convert intent into a subscriber',
+  integrations: "Show it fits the visitor's existing stack",
+  documentation: 'Support technical evaluation',
+  portfolio: 'Showcase past work as proof',
+  process: 'Set expectations for how an engagement runs',
+  'book-a-call': 'Convert intent into a scheduled call',
+  cart: 'Recover carts before checkout drop-off',
+  checkout: 'Complete the sale with minimal friction',
+  faq: 'Answer objections that block a purchase',
+  collections: 'Help shoppers browse by category',
+  product: 'Convert product-page visitors into buyers',
+  expertise: 'Build trust in credentials and experience',
 };
 
 export async function getPageInventory(ownerId: string, siteId: string): Promise<PageInventoryItem[]> {

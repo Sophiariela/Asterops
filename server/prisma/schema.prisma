@@ -73,6 +73,19 @@ enum SitePlaybook {
   RESTAURANT
   FITNESS
   CREATOR
+  PERSONAL_BRAND
+  PROFESSIONAL_SERVICES
+}
+
+enum TemplateStatus {
+  DRAFT
+  PUBLISHED
+}
+
+enum TemplateComplexity {
+  SIMPLE
+  STANDARD
+  ADVANCED
 }
 
 enum TrustElementType {
@@ -329,22 +342,93 @@ model StockMovement {
 // ---------------------------------------------------------------------
 
 model Site {
-  id             String        @id @default(cuid())
-  owner          User          @relation("SiteOwner", fields: [ownerId], references: [id])
-  ownerId        String
-  businessName   String
-  industry       String
-  targetAudience String
-  playbook       SitePlaybook
-  status         SiteStatus    @default(DRAFT)
-  pages          Page[]
-  testimonials   Testimonial[]
-  leads          Lead[]
-  trustElements  TrustElement[]
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
+  id              String         @id @default(cuid())
+  owner           User           @relation("SiteOwner", fields: [ownerId], references: [id])
+  ownerId         String
+  businessName    String
+  industry        String
+  targetAudience  String
+  playbook        SitePlaybook
+  template        Template?      @relation(fields: [templateId], references: [id], onDelete: SetNull)
+  templateId      String?
+  templateVersion Int?
+  status          SiteStatus     @default(DRAFT)
+  pages           Page[]
+  testimonials    Testimonial[]
+  leads           Lead[]
+  trustElements   TrustElement[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
 
   @@index([ownerId])
+  @@index([templateId])
+}
+
+// ---------------------------------------------------------------------
+// WebOS Template Library — the recipe layer that Site/Page (above) is
+// generated from. Deliberately reuses Site/Page as the "generated
+// website" storage instead of separate GeneratedWebsite/GeneratedPage
+// tables, since Site/Page already carry every downstream feature
+// (blueprint analytics, leads, trust, Luna) a duplicate model would
+// have to reimplement from scratch. Site.templateId/templateVersion
+// is the generated-website's provenance link back to the template
+// (and version) it came from.
+// ---------------------------------------------------------------------
+
+model Template {
+  id                 String              @id @default(cuid())
+  key                SitePlaybook
+  name               String
+  industry           String
+  primaryGoal        String
+  complexity         TemplateComplexity
+  description        String
+  recommendedUseCase String
+  isEcommerce        Boolean             @default(false)
+  status             TemplateStatus      @default(DRAFT)
+  version            Int                 @default(1)
+  parentTemplate     Template?           @relation("TemplateVersions", fields: [parentTemplateId], references: [id], onDelete: SetNull)
+  parentTemplateId   String?
+  versions           Template[]          @relation("TemplateVersions")
+  pages              TemplatePage[]
+  sites              Site[]
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+
+  @@index([key])
+  @@index([status])
+}
+
+model TemplatePage {
+  id                     String            @id @default(cuid())
+  template               Template          @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  templateId             String
+  slug                   String
+  name                   String
+  order                  Int
+  purpose                String
+  heroHeadlinePattern    String
+  heroSubheadlinePattern String
+  ctaLabel               String
+  hasLeadForm            Boolean           @default(false)
+  seoTitlePattern        String?
+  seoDescriptionPattern  String?
+  sections               TemplateSection[]
+
+  @@unique([templateId, slug])
+  @@index([templateId])
+}
+
+model TemplateSection {
+  id             String       @id @default(cuid())
+  page           TemplatePage @relation(fields: [templatePageId], references: [id], onDelete: Cascade)
+  templatePageId String
+  type           String
+  heading        String
+  bodyPattern    String
+  order          Int
+
+  @@index([templatePageId])
 }
 
 model Page {

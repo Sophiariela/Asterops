@@ -13,6 +13,7 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:seed": "tsx prisma/seed.ts",
+    "prisma:seed:templates": "tsx prisma/seed-templates.ts",
     "postinstall": "prisma generate"
   },
   "dependencies": {

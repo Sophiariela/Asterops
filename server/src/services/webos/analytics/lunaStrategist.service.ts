@@ -7,6 +7,7 @@ import { getConversionPaths } from './conversionPaths.service.js';
 import { getTrustMap } from './trustMap.service.js';
 import { getLeadCaptureMap } from './leadCaptureMap.service.js';
 import { getDeploymentReadiness } from './deploymentReadiness.service.js';
+import { listPublishedTemplates } from '../templates.service.js';
 
 const PAGE_SYSTEM_PROMPT = `You are Luna, ASTER's website strategist, embedded in WebOS.
 You are given the real content of one page from a merchant's site — its headline, subheadline,
@@ -31,6 +32,18 @@ visitor or conversion-rate statistic that isn't in the data given.
 
 Write 3 to 5 short strategic recommendations a business owner can act on, grounded ONLY in the
 structure given. Each is one sentence, plain language, no markdown, no preamble, starting with "- ".`;
+
+const TEMPLATE_RECOMMEND_SYSTEM_PROMPT = `You are Luna, ASTER's website strategist.
+You are given a real list of published website templates (name, industry, primary goal, recommended
+use case) and a business's real industry, target audience, and description.
+
+Pick exactly one template from the list given that best fits this business. Never invent or reference
+a template that isn't in the list.
+
+Respond in exactly two lines, each starting with "- ":
+- The recommended template's exact name from the list, then one sentence on why it fits.
+- One sentence suggesting a structural adjustment worth considering for this specific business (e.g. an
+  extra page, a different call-to-action, dropping a page that doesn't fit).`;
 
 async function callLuna(systemPrompt: string, snapshot: unknown): Promise<string[]> {
   if (!anthropic) {
@@ -113,4 +126,31 @@ export async function reviewBlueprint(ownerId: string, siteId: string): Promise<
 
   const review = await callLuna(BLUEPRINT_SYSTEM_PROMPT, snapshot);
   return { review };
+}
+
+export async function recommendTemplate(input: {
+  industry: string;
+  targetAudience: string;
+  description: string;
+}): Promise<{ review: string[]; recommendedTemplateId: string | null }> {
+  const templates = await listPublishedTemplates({});
+  const snapshot = {
+    business: input,
+    templates: templates.map((t) => ({
+      name: t.name,
+      industry: t.industry,
+      primaryGoal: t.primaryGoal,
+      recommendedUseCase: t.recommendedUseCase,
+    })),
+  };
+
+  const review = await callLuna(TEMPLATE_RECOMMEND_SYSTEM_PROMPT, snapshot);
+
+  // Luna is instructed to name a real template, but the match is verified
+  // here rather than trusted — if her first line doesn't contain a name
+  // from the real list, no template id is linked rather than guessing one.
+  const firstLine = (review[0] ?? '').toLowerCase();
+  const matched = templates.find((t) => firstLine.includes(t.name.toLowerCase()));
+
+  return { review, recommendedTemplateId: matched?.id ?? null };
 }

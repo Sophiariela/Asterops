@@ -2,13 +2,13 @@ import { Router } from 'express';
 import { authenticate, requireRole } from '../../middleware/auth.js';
 import { generateSiteSchema } from '../../validation/webos.js';
 import * as sitesService from '../../services/webos/sites.service.js';
-import { listPlaybooks } from '../../services/webos/playbooks.js';
+import { listPublishedSummariesForLegacyPicker } from '../../services/webos/templates.service.js';
 
 export const sitesRouter = Router();
 sitesRouter.use(authenticate, requireRole('CUSTOMER'));
 
-sitesRouter.get('/playbooks', (_req, res) => {
-  res.json({ playbooks: listPlaybooks() });
+sitesRouter.get('/playbooks', async (_req, res) => {
+  res.json({ playbooks: await listPublishedSummariesForLegacyPicker() });
 });
 
 sitesRouter.get('/', async (req, res) => {

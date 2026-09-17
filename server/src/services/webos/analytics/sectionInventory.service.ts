@@ -11,6 +11,13 @@ export type PageSectionInventory = {
 const SECTION_LABEL: Record<string, string> = {
   benefits: 'Benefits',
   'trust-placeholder': 'Social proof',
+  'program-overview': 'Program overview',
+  'featured-products': 'Featured products',
+  'menu-highlights': 'Menu highlights',
+  transformations: 'Transformations',
+  expertise: 'Expertise',
+  results: 'Results',
+  offers: 'Offers',
 };
 
 // Which section types a page of this kind is expected to have. Pages not

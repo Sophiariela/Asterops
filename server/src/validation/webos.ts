@@ -1,8 +1,12 @@
 import { z } from 'zod';
 
-export const playbookValues = ['LOCAL_BUSINESS', 'SAAS', 'ECOMMERCE', 'CONSULTANT', 'AGENCY', 'RESTAURANT', 'FITNESS', 'CREATOR'] as const;
+export const playbookValues = [
+  'LOCAL_BUSINESS', 'SAAS', 'ECOMMERCE', 'CONSULTANT', 'AGENCY', 'RESTAURANT', 'FITNESS', 'CREATOR',
+  'PERSONAL_BRAND', 'PROFESSIONAL_SERVICES',
+] as const;
 export const trustElementTypeValues = ['CASE_STUDY', 'CLIENT_LOGO', 'CERTIFICATION'] as const;
 export const leadStatusValues = ['NEW', 'QUALIFIED', 'CONVERTED', 'LOST'] as const;
+export const templateComplexityValues = ['SIMPLE', 'STANDARD', 'ADVANCED'] as const;
 
 export const generateSiteSchema = z.object({
   businessName: z.string().min(1).max(120),
@@ -10,6 +14,67 @@ export const generateSiteSchema = z.object({
   services: z.array(z.string().min(1).max(80)).min(1).max(10),
   targetAudience: z.string().min(1).max(160),
   playbook: z.enum(playbookValues),
+});
+
+export const generateFromTemplateSchema = z.object({
+  templateId: z.string().min(1),
+  businessName: z.string().min(1).max(120),
+  industry: z.string().min(1).max(120),
+  services: z.array(z.string().min(1).max(80)).min(1).max(10),
+  targetAudience: z.string().min(1).max(160),
+});
+
+export const templateFiltersSchema = z.object({
+  industry: z.string().max(120).optional(),
+  goal: z.string().max(120).optional(),
+  complexity: z.enum(templateComplexityValues).optional(),
+  ecommerce: z.enum(['true', 'false']).optional(),
+  minScore: z.coerce.number().min(0).max(100).optional(),
+  q: z.string().max(120).optional(),
+});
+
+export const recommendTemplateSchema = z.object({
+  industry: z.string().min(1).max(160),
+  targetAudience: z.string().min(1).max(200),
+  description: z.string().min(1).max(600),
+});
+
+const templateSectionInputSchema = z.object({
+  type: z.string().min(1).max(40),
+  heading: z.string().min(1).max(160),
+  bodyPattern: z.string().min(1).max(2000),
+});
+
+const templatePageInputSchema = z.object({
+  slug: z.string().min(1).max(60),
+  name: z.string().min(1).max(80),
+  purpose: z.string().min(1).max(200),
+  heroHeadlinePattern: z.string().min(1).max(220),
+  heroSubheadlinePattern: z.string().min(1).max(300),
+  ctaLabel: z.string().min(1).max(60),
+  hasLeadForm: z.boolean(),
+  seoTitlePattern: z.string().max(200).optional(),
+  seoDescriptionPattern: z.string().max(320).optional(),
+  sections: z.array(templateSectionInputSchema).max(10),
+});
+
+export const createTemplateSchema = z.object({
+  key: z.enum(playbookValues),
+  name: z.string().min(1).max(100),
+  industry: z.string().min(1).max(120),
+  primaryGoal: z.string().min(1).max(80),
+  complexity: z.enum(templateComplexityValues),
+  description: z.string().min(1).max(300),
+  recommendedUseCase: z.string().min(1).max(300),
+  isEcommerce: z.boolean().optional(),
+  pages: z.array(templatePageInputSchema).min(1).max(12),
+});
+
+export const updateTemplateMetaSchema = z.object({
+  name: z.string().min(1).max(100).optional(),
+  description: z.string().min(1).max(300).optional(),
+  recommendedUseCase: z.string().min(1).max(300).optional(),
+  isEcommerce: z.boolean().optional(),
 });
 
 export const updatePageSchema = z.object({

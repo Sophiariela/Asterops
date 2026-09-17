@@ -22,6 +22,9 @@ import { testimonialsRouter } from './routes/webos/testimonials.routes.js';
 import { trustElementsRouter } from './routes/webos/trustElements.routes.js';
 import { leadsRouter, publicLeadsRouter } from './routes/webos/leads.routes.js';
 import { webosAnalyticsRouter } from './routes/webos/analytics.routes.js';
+import { templatesRouter } from './routes/webos/templates.routes.js';
+import { generatedSitesRouter } from './routes/webos/generatedSites.routes.js';
+import { adminTemplatesRouter } from './routes/webos/adminTemplates.routes.js';
 import { CommerceError } from './lib/commerceError.js';
 import { UPLOAD_ROOT } from './middleware/upload.js';
 
@@ -77,6 +80,9 @@ app.use('/api/webos/sites/:siteId/leads', leadsRouter);
 app.use('/api/webos/sites/:siteId/analytics', webosAnalyticsRouter);
 app.use('/api/webos/sites', sitesRouter);
 app.use('/api/webos/pages', pagesRouter);
+app.use('/api/webos/templates', templatesRouter);
+app.use('/api/webos/generated-sites', generatedSitesRouter);
+app.use('/api/webos/admin/templates', adminTemplatesRouter);
 
 app.use('/api/webos', (err: Error, _req: express.Request, res: express.Response, next: express.NextFunction) => {
   if (err instanceof CommerceError) {
