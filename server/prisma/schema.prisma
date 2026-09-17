@@ -37,6 +37,33 @@ enum DeploymentStage {
   COMPLETED
 }
 
+enum ProductStatus {
+  ACTIVE
+  DRAFT
+  ARCHIVED
+}
+
+enum CommerceOrderStatus {
+  PENDING
+  PROCESSING
+  FULFILLED
+  CANCELLED
+  REFUNDED
+}
+
+enum CommerceOrderChannel {
+  ONLINE
+  POS
+  MANUAL
+}
+
+enum StockMovementReason {
+  RESTOCK
+  SALE
+  ADJUSTMENT
+  RETURN
+}
+
 model User {
   id                  String                @id @default(cuid())
   email               String                @unique
@@ -49,6 +76,13 @@ model User {
   orders              Order[]
   onboarding          OnboardingSubmission?
   passwordResetTokens PasswordResetToken[]
+
+  // CommerceOS — this User is the tenant/owner of everything below.
+  categories          Category[]         @relation("CategoryOwner")
+  products            Product[]          @relation("ProductOwner")
+  commerceCustomers   CommerceCustomer[] @relation("CommerceCustomerOwner")
+  commerceOrders      CommerceOrder[]    @relation("CommerceOrderOwner")
+  stockMovements      StockMovement[]    @relation("StockMovementOwner")
 }
 
 model Plan {
@@ -133,4 +167,119 @@ model PasswordResetToken {
   createdAt DateTime  @default(now())
 
   @@index([userId])
+}
+
+// ---------------------------------------------------------------------
+// CommerceOS — Phase 1 (Products, Categories, Inventory, Orders, Customers)
+//
+// Scoped to a User (the ASTER account holder) via `ownerId`, since there is
+// no Organization/multi-tenant model yet. "CommerceOrder"/"CommerceCustomer"
+// are prefixed to avoid colliding with the existing platform-billing
+// `Order` model above, which represents an ASTER plan purchase, not a
+// tenant's own sale.
+// ---------------------------------------------------------------------
+
+model Category {
+  id          String    @id @default(cuid())
+  owner       User      @relation("CategoryOwner", fields: [ownerId], references: [id])
+  ownerId     String
+  name        String
+  slug        String
+  description String?
+  products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([ownerId, slug])
+  @@index([ownerId])
+}
+
+model Product {
+  id             String               @id @default(cuid())
+  owner          User                 @relation("ProductOwner", fields: [ownerId], references: [id])
+  ownerId        String
+  category       Category?            @relation(fields: [categoryId], references: [id])
+  categoryId     String?
+  name           String
+  slug           String
+  sku            String
+  description    String?
+  price          Int
+  compareAtPrice Int?
+  status         ProductStatus        @default(ACTIVE)
+  stockQuantity  Int                  @default(0)
+  reorderPoint   Int                  @default(0)
+  imageUrl       String?
+  orderItems     CommerceOrderItem[]
+  stockMovements StockMovement[]
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+
+  @@unique([ownerId, sku])
+  @@unique([ownerId, slug])
+  @@index([ownerId])
+  @@index([categoryId])
+}
+
+model CommerceCustomer {
+  id        String          @id @default(cuid())
+  owner     User            @relation("CommerceCustomerOwner", fields: [ownerId], references: [id])
+  ownerId   String
+  name      String
+  email     String?
+  phone     String?
+  notes     String?
+  orders    CommerceOrder[]
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  @@index([ownerId])
+}
+
+model CommerceOrder {
+  id         String               @id @default(cuid())
+  owner      User                 @relation("CommerceOrderOwner", fields: [ownerId], references: [id])
+  ownerId    String
+  customer   CommerceCustomer     @relation(fields: [customerId], references: [id])
+  customerId String
+  status     CommerceOrderStatus  @default(PENDING)
+  channel    CommerceOrderChannel @default(MANUAL)
+  subtotal   Int
+  total      Int
+  notes      String?
+  items      CommerceOrderItem[]
+  createdAt  DateTime             @default(now())
+  updatedAt  DateTime             @updatedAt
+
+  @@index([ownerId])
+  @@index([customerId])
+}
+
+model CommerceOrderItem {
+  id        String        @id @default(cuid())
+  order     CommerceOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId   String
+  product   Product       @relation(fields: [productId], references: [id])
+  productId String
+  quantity  Int
+  unitPrice Int
+  createdAt DateTime      @default(now())
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+model StockMovement {
+  id        String               @id @default(cuid())
+  owner     User                 @relation("StockMovementOwner", fields: [ownerId], references: [id])
+  ownerId   String
+  product   Product              @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId String
+  change    Int
+  reason    StockMovementReason
+  note      String?
+  createdAt DateTime             @default(now())
+
+  @@index([ownerId])
+  @@index([productId])
 }

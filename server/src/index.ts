@@ -10,6 +10,12 @@ import { onboardingRouter } from './routes/onboarding.routes.js';
 import { dashboardRouter } from './routes/dashboard.routes.js';
 import { adminRouter } from './routes/admin.routes.js';
 import { webhooksRouter } from './routes/webhooks.routes.js';
+import { categoriesRouter } from './routes/commerce/categories.routes.js';
+import { productsRouter } from './routes/commerce/products.routes.js';
+import { inventoryRouter } from './routes/commerce/inventory.routes.js';
+import { customersRouter } from './routes/commerce/customers.routes.js';
+import { ordersRouter } from './routes/commerce/orders.routes.js';
+import { CommerceError } from './lib/commerceError.js';
 import { UPLOAD_ROOT } from './middleware/upload.js';
 
 const app = express();
@@ -40,6 +46,20 @@ app.use('/api/checkout', checkoutRouter);
 app.use('/api/onboarding', onboardingRouter);
 app.use('/api/dashboard', dashboardRouter);
 app.use('/api/admin', adminRouter);
+
+// CommerceOS
+app.use('/api/commerce/categories', categoriesRouter);
+app.use('/api/commerce/products', productsRouter);
+app.use('/api/commerce/inventory', inventoryRouter);
+app.use('/api/commerce/customers', customersRouter);
+app.use('/api/commerce/orders', ordersRouter);
+
+app.use('/api/commerce', (err: Error, _req: express.Request, res: express.Response, next: express.NextFunction) => {
+  if (err instanceof CommerceError) {
+    return res.status(err.status).json({ error: err.message });
+  }
+  next(err);
+});
 
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error(err);
