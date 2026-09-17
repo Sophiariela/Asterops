@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
@@ -15,6 +15,14 @@ import Admin from './pages/Admin';
 import ProductPage from './pages/products/ProductPage';
 import SolutionPage from './pages/solutions/SolutionPage';
 import EcosystemPage from './pages/Ecosystem';
+import CommerceLayout from './pages/commerce/CommerceLayout';
+import ProductsPage from './pages/commerce/ProductsPage';
+import CategoriesPage from './pages/commerce/CategoriesPage';
+import InventoryPage from './pages/commerce/InventoryPage';
+import OrdersPage from './pages/commerce/OrdersPage';
+import OrderDetailPage from './pages/commerce/OrderDetailPage';
+import CustomersPage from './pages/commerce/CustomersPage';
+import CustomerDetailPage from './pages/commerce/CustomerDetailPage';
 
 export default function App() {
   return (
@@ -35,6 +43,17 @@ export default function App() {
           <Route path="/checkout/success" element={<CheckoutSuccess />} />
           <Route path="/onboarding" element={<Onboarding />} />
           <Route path="/dashboard" element={<Dashboard />} />
+
+          <Route path="/commerce" element={<CommerceLayout />}>
+            <Route index element={<Navigate to="/commerce/products" replace />} />
+            <Route path="products" element={<ProductsPage />} />
+            <Route path="categories" element={<CategoriesPage />} />
+            <Route path="inventory" element={<InventoryPage />} />
+            <Route path="orders" element={<OrdersPage />} />
+            <Route path="orders/:id" element={<OrderDetailPage />} />
+            <Route path="customers" element={<CustomersPage />} />
+            <Route path="customers/:id" element={<CustomerDetailPage />} />
+          </Route>
         </Route>
 
         <Route element={<ProtectedRoute roles={['ADMIN']} />}>

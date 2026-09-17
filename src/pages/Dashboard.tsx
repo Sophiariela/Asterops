@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { LogOut, Clock, Rocket } from 'lucide-react';
+import { LogOut, Clock, Rocket, Store, ArrowRight } from 'lucide-react';
 import { api } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
 import { formatBRL } from '../lib/currency';
@@ -53,6 +53,22 @@ export default function Dashboard() {
         <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-ink-900">
           Welcome back{user?.name ? `, ${user.name}` : ''}
         </h1>
+
+        <Link
+          to="/commerce"
+          className="mt-6 flex items-center justify-between gap-4 bg-ink-950 text-white rounded-[28px] card-shadow p-6 hover:-translate-y-0.5 transition-transform"
+        >
+          <div className="flex items-center gap-4">
+            <span className="w-12 h-12 rounded-2xl bg-ASTER-600 flex items-center justify-center shrink-0">
+              <Store size={22} />
+            </span>
+            <div>
+              <p className="font-display font-bold text-lg">CommerceOS</p>
+              <p className="text-white/60 text-sm">Products, inventory, orders and customers — run your sales from here.</p>
+            </div>
+          </div>
+          <ArrowRight size={20} className="text-white/60 shrink-0" />
+        </Link>
 
         {!data ? (
           <p className="text-slate-400 mt-6">Loading your dashboard…</p>
