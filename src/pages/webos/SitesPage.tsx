@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Plus, Globe2, ArrowRight } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Plus, Globe2, ArrowRight, LayoutTemplate } from 'lucide-react';
 import { api, ApiError } from '../../lib/api';
 import type { Playbook, PlaybookKey, Site } from '../../lib/webos/types';
 import { computeBlueprint } from '../../lib/webos/blueprint';
@@ -73,12 +73,20 @@ export default function SitesPage() {
           <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-ink-900">WebOS</h1>
           <p className="text-slate-500 mt-2 text-sm">Your business acquisition infrastructure — generate a site, then let WebOS help it attract, convert and build trust.</p>
         </div>
-        <button
-          onClick={openCreate}
-          className="flex items-center gap-2 bg-ASTER-600 hover:bg-ASTER-700 text-white font-bold px-5 py-2.5 rounded-full transition-all whitespace-nowrap"
-        >
-          <Plus size={16} /> Generate a site
-        </button>
+        <div className="flex items-center gap-3">
+          <Link
+            to="/webos/templates"
+            className="flex items-center gap-2 text-ASTER-600 hover:text-ASTER-700 font-bold text-sm px-4 py-2.5 rounded-full border-2 border-ASTER-100 hover:border-ASTER-300 transition-colors whitespace-nowrap"
+          >
+            <LayoutTemplate size={16} /> Browse Template Library
+          </Link>
+          <button
+            onClick={openCreate}
+            className="flex items-center gap-2 bg-ASTER-600 hover:bg-ASTER-700 text-white font-bold px-5 py-2.5 rounded-full transition-all whitespace-nowrap"
+          >
+            <Plus size={16} /> Generate a site
+          </button>
+        </div>
       </div>
 
       {sites && sites.length === 0 && (

@@ -1,9 +1,11 @@
-import { Link, Outlet } from 'react-router-dom';
+import { Link, Outlet, useLocation } from 'react-router-dom';
 import { LogOut } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 export default function WebOSLayout() {
   const { logout } = useAuth();
+  const { pathname } = useLocation();
+  const onTemplates = pathname.startsWith('/webos/templates');
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -14,6 +16,14 @@ export default function WebOSLayout() {
           </Link>
           <span className="text-slate-300">/</span>
           <span className="font-display font-bold text-ink-900">WebOS</span>
+          <nav className="flex items-center gap-1 ml-4">
+            <Link to="/webos" className={`text-sm font-semibold px-3 py-1.5 rounded-full transition-colors ${!onTemplates ? 'bg-ASTER-50 text-ASTER-600' : 'text-slate-400 hover:text-ink-900'}`}>
+              My sites
+            </Link>
+            <Link to="/webos/templates" className={`text-sm font-semibold px-3 py-1.5 rounded-full transition-colors ${onTemplates ? 'bg-ASTER-50 text-ASTER-600' : 'text-slate-400 hover:text-ink-900'}`}>
+              Template Library
+            </Link>
+          </nav>
         </div>
         <button onClick={logout} className="flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-rose-500 transition-colors">
           <LogOut size={16} /> Log out

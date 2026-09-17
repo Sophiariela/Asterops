@@ -29,6 +29,7 @@ import CustomerDetailPage from './pages/commerce/CustomerDetailPage';
 import WebOSLayout from './pages/webos/WebOSLayout';
 import SitesPage from './pages/webos/SitesPage';
 import SiteDetailPage from './pages/webos/SiteDetailPage';
+import TemplateLibraryPage from './pages/webos/TemplateLibraryPage';
 
 export default function App() {
   return (
@@ -66,6 +67,7 @@ export default function App() {
 
           <Route path="/webos" element={<WebOSLayout />}>
             <Route index element={<SitesPage />} />
+            <Route path="templates" element={<TemplateLibraryPage />} />
             <Route path=":id" element={<SiteDetailPage />} />
           </Route>
         </Route>

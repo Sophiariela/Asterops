@@ -126,3 +126,44 @@ export type LeadCaptureMap = { coverage: number; points: LeadCapturePoint[] };
 
 export type ReadinessCheck = { label: string; passed: boolean };
 export type DeploymentReadiness = { readiness: number; checks: ReadinessCheck[]; missing: string[]; tasksRemaining: number };
+
+export type TemplateComplexity = 'SIMPLE' | 'STANDARD' | 'ADVANCED';
+export type TemplateStatus = 'DRAFT' | 'PUBLISHED';
+
+export type ScoreFactor = { key: string; label: string; weight: number; achieved: number; detail: string };
+
+export type TemplateSummary = {
+  id: string;
+  key: PlaybookKey;
+  name: string;
+  industry: string;
+  primaryGoal: string;
+  complexity: TemplateComplexity;
+  description: string;
+  recommendedUseCase: string;
+  isEcommerce: boolean;
+  status: TemplateStatus;
+  version: number;
+  parentTemplateId: string | null;
+  pageCount: number;
+  leadGenerationScore: number;
+  scoreFactors: ScoreFactor[];
+};
+
+export type TemplateSectionDef = { id: string; type: string; heading: string; bodyPattern: string; order: number };
+export type TemplatePageDef = {
+  id: string;
+  slug: string;
+  name: string;
+  order: number;
+  purpose: string;
+  heroHeadlinePattern: string;
+  heroSubheadlinePattern: string;
+  ctaLabel: string;
+  hasLeadForm: boolean;
+  seoTitlePattern: string | null;
+  seoDescriptionPattern: string | null;
+  sections: TemplateSectionDef[];
+};
+
+export type TemplateDetail = TemplateSummary & { pages: TemplatePageDef[] };

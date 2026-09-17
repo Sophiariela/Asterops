@@ -1,9 +1,11 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
-import { LogOut, Users, Rocket, Clock3, DollarSign, Search } from 'lucide-react';
-import { api } from '../lib/api';
+import { LogOut, Users, Rocket, Clock3, DollarSign, Search, Copy, Pencil } from 'lucide-react';
+import { api, ApiError } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
 import { formatBRL } from '../lib/currency';
+import Modal from '../components/commerce/Modal';
+import type { TemplateSummary } from '../lib/webos/types';
 
 type DeploymentStage = 'PENDING' | 'IN_REVIEW' | 'DEPLOYING' | 'COMPLETED';
 
@@ -47,6 +49,51 @@ export default function Admin() {
   const [search, setSearch] = useState('');
   const [planFilter, setPlanFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+
+  const [templates, setTemplates] = useState<TemplateSummary[] | null>(null);
+  const [editingTemplate, setEditingTemplate] = useState<TemplateSummary | null>(null);
+  const [editForm, setEditForm] = useState({ name: '', description: '', recommendedUseCase: '', isEcommerce: false });
+  const [editError, setEditError] = useState('');
+  const [editSaving, setEditSaving] = useState(false);
+
+  const loadTemplates = useCallback(() => {
+    api.get<{ templates: TemplateSummary[] }>('/webos/admin/templates').then((data) => setTemplates(data.templates)).catch(() => setTemplates([]));
+  }, []);
+  useEffect(loadTemplates, [loadTemplates]);
+
+  const cloneTemplate = async (id: string) => {
+    await api.post(`/webos/admin/templates/${id}/clone`);
+    loadTemplates();
+  };
+  const publishTemplate = async (id: string) => {
+    await api.post(`/webos/admin/templates/${id}/publish`);
+    loadTemplates();
+  };
+  const unpublishTemplate = async (id: string) => {
+    await api.post(`/webos/admin/templates/${id}/unpublish`);
+    loadTemplates();
+  };
+
+  const openEditTemplate = (t: TemplateSummary) => {
+    setEditingTemplate(t);
+    setEditForm({ name: t.name, description: t.description, recommendedUseCase: t.recommendedUseCase, isEcommerce: t.isEcommerce });
+    setEditError('');
+  };
+  const saveTemplateMeta = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!editingTemplate) return;
+    setEditError('');
+    setEditSaving(true);
+    try {
+      await api.patch(`/webos/admin/templates/${editingTemplate.id}`, editForm);
+      setEditingTemplate(null);
+      loadTemplates();
+    } catch (err) {
+      setEditError(err instanceof ApiError ? err.message : 'Could not save this template.');
+    } finally {
+      setEditSaving(false);
+    }
+  };
 
   useEffect(() => {
     api.get<Overview>('/admin/overview').then(setOverview).catch(() => setOverview(null));
@@ -197,7 +244,82 @@ export default function Admin() {
             </tbody>
           </table>
         </div>
+
+        <h2 className="font-display font-extrabold text-xl text-ink-900 mt-12">Website templates</h2>
+        <p className="text-slate-500 text-sm mt-1">Clone a template to draft a new version, edit its metadata, then publish it — publishing replaces whichever version of that template is currently live.</p>
+
+        <div className="mt-6 bg-white rounded-[28px] card-shadow border border-ASTER-100 overflow-hidden">
+          <table className="w-full text-sm">
+            <thead className="bg-slate-50 text-slate-400 text-left">
+              <tr>
+                <th className="px-6 py-3 font-semibold">Template</th>
+                <th className="px-6 py-3 font-semibold">Key</th>
+                <th className="px-6 py-3 font-semibold">Version</th>
+                <th className="px-6 py-3 font-semibold">Status</th>
+                <th className="px-6 py-3 font-semibold">Lead-gen score</th>
+                <th className="px-6 py-3 font-semibold">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-ASTER-100">
+              {templates?.map((t) => (
+                <tr key={t.id}>
+                  <td className="px-6 py-4">
+                    <p className="font-semibold text-ink-900">{t.name}</p>
+                    <p className="text-slate-400 text-xs">{t.pageCount} pages · {t.industry}</p>
+                  </td>
+                  <td className="px-6 py-4 text-slate-500 text-xs">{t.key}</td>
+                  <td className="px-6 py-4 text-slate-600">v{t.version}</td>
+                  <td className="px-6 py-4">
+                    <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${t.status === 'PUBLISHED' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>{t.status}</span>
+                  </td>
+                  <td className="px-6 py-4 font-bold text-ink-900">{t.leadGenerationScore}</td>
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-2">
+                      <button onClick={() => openEditTemplate(t)} className="p-1.5 text-slate-400 hover:text-ASTER-600 transition-colors" aria-label="Edit"><Pencil size={14} /></button>
+                      <button onClick={() => cloneTemplate(t.id)} className="p-1.5 text-slate-400 hover:text-ASTER-600 transition-colors" aria-label="Clone"><Copy size={14} /></button>
+                      {t.status === 'PUBLISHED' ? (
+                        <button onClick={() => unpublishTemplate(t.id)} className="text-xs font-bold text-slate-500 hover:text-rose-500 transition-colors">Unpublish</button>
+                      ) : (
+                        <button onClick={() => publishTemplate(t.id)} className="text-xs font-bold text-ASTER-600 hover:text-ASTER-700 transition-colors">Publish</button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {templates && templates.length === 0 && (
+                <tr><td colSpan={6} className="px-6 py-10 text-center text-slate-400">No templates yet.</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </main>
+
+      {editingTemplate && (
+        <Modal title={`Edit template — ${editingTemplate.name}`} onClose={() => setEditingTemplate(null)}>
+          <form onSubmit={saveTemplateMeta} className="space-y-4">
+            <div>
+              <label className="text-[13px] font-bold text-ink-900 block mb-1.5">Name</label>
+              <input value={editForm.name} onChange={(e) => setEditForm((f) => ({ ...f, name: e.target.value }))} className="w-full border-2 border-ASTER-100 focus:border-ASTER-600 rounded-2xl px-4 py-3 text-[15px] outline-none transition-colors" />
+            </div>
+            <div>
+              <label className="text-[13px] font-bold text-ink-900 block mb-1.5">Description</label>
+              <textarea value={editForm.description} onChange={(e) => setEditForm((f) => ({ ...f, description: e.target.value }))} rows={2} className="w-full border-2 border-ASTER-100 focus:border-ASTER-600 rounded-2xl px-4 py-3 text-[15px] outline-none transition-colors resize-none" />
+            </div>
+            <div>
+              <label className="text-[13px] font-bold text-ink-900 block mb-1.5">Recommended use case</label>
+              <textarea value={editForm.recommendedUseCase} onChange={(e) => setEditForm((f) => ({ ...f, recommendedUseCase: e.target.value }))} rows={2} className="w-full border-2 border-ASTER-100 focus:border-ASTER-600 rounded-2xl px-4 py-3 text-[15px] outline-none transition-colors resize-none" />
+            </div>
+            <label className="flex items-center gap-2 text-sm font-semibold text-slate-600">
+              <input type="checkbox" checked={editForm.isEcommerce} onChange={(e) => setEditForm((f) => ({ ...f, isEcommerce: e.target.checked }))} className="accent-ASTER-600" />
+              Ecommerce template
+            </label>
+            {editError && <p className="text-rose-500 text-sm font-semibold">{editError}</p>}
+            <button type="submit" disabled={editSaving} className="w-full bg-ASTER-600 hover:bg-ASTER-700 disabled:opacity-60 text-white font-bold py-3.5 rounded-full transition-all">
+              {editSaving ? 'Saving…' : 'Save changes'}
+            </button>
+          </form>
+        </Modal>
+      )}
     </div>
   );
 }
