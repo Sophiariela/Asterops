@@ -16,6 +16,11 @@ import { inventoryRouter } from './routes/commerce/inventory.routes.js';
 import { customersRouter } from './routes/commerce/customers.routes.js';
 import { ordersRouter } from './routes/commerce/orders.routes.js';
 import { analyticsRouter } from './routes/commerce/analytics.routes.js';
+import { sitesRouter } from './routes/webos/sites.routes.js';
+import { pagesRouter } from './routes/webos/pages.routes.js';
+import { testimonialsRouter } from './routes/webos/testimonials.routes.js';
+import { leadsRouter, publicLeadsRouter } from './routes/webos/leads.routes.js';
+import { webosAnalyticsRouter } from './routes/webos/analytics.routes.js';
 import { CommerceError } from './lib/commerceError.js';
 import { UPLOAD_ROOT } from './middleware/upload.js';
 
@@ -57,6 +62,21 @@ app.use('/api/commerce/orders', ordersRouter);
 app.use('/api/commerce/analytics', analyticsRouter);
 
 app.use('/api/commerce', (err: Error, _req: express.Request, res: express.Response, next: express.NextFunction) => {
+  if (err instanceof CommerceError) {
+    return res.status(err.status).json({ error: err.message });
+  }
+  next(err);
+});
+
+// WebOS
+app.use('/api/webos/public/leads', publicLeadsRouter);
+app.use('/api/webos/sites/:siteId/testimonials', testimonialsRouter);
+app.use('/api/webos/sites/:siteId/leads', leadsRouter);
+app.use('/api/webos/sites/:siteId/analytics', webosAnalyticsRouter);
+app.use('/api/webos/sites', sitesRouter);
+app.use('/api/webos/pages', pagesRouter);
+
+app.use('/api/webos', (err: Error, _req: express.Request, res: express.Response, next: express.NextFunction) => {
   if (err instanceof CommerceError) {
     return res.status(err.status).json({ error: err.message });
   }

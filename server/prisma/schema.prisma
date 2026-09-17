@@ -64,6 +64,28 @@ enum StockMovementReason {
   RETURN
 }
 
+enum SitePlaybook {
+  LOCAL_BUSINESS
+  SAAS
+  ECOMMERCE
+  CONSULTANT
+  AGENCY
+  RESTAURANT
+  FITNESS
+}
+
+enum SiteStatus {
+  DRAFT
+  PUBLISHED
+}
+
+enum LeadStatus {
+  NEW
+  QUALIFIED
+  CONVERTED
+  LOST
+}
+
 model User {
   id                  String                @id @default(cuid())
   email               String                @unique
@@ -83,6 +105,9 @@ model User {
   commerceCustomers   CommerceCustomer[] @relation("CommerceCustomerOwner")
   commerceOrders      CommerceOrder[]    @relation("CommerceOrderOwner")
   stockMovements      StockMovement[]    @relation("StockMovementOwner")
+
+  // WebOS — this User is the tenant/owner of everything below.
+  sites               Site[]             @relation("SiteOwner")
 }
 
 model Plan {
@@ -283,4 +308,85 @@ model StockMovement {
 
   @@index([ownerId])
   @@index([productId])
+}
+
+// ---------------------------------------------------------------------
+// WebOS — Site Generator, Pages, Trust Engine, Leads
+//
+// There is no live public hosting yet: a Site's Pages are dashboard-
+// managed content, not a served URL. Health Score, Conversion Audit and
+// the Trust Engine all evaluate this content directly, so they're real
+// from day one. Anything that needs actual visitor traffic (page views,
+// bounce rate, a "Visitors" funnel stage) has no data source until public
+// rendering exists — that's a separate, later piece of work.
+// ---------------------------------------------------------------------
+
+model Site {
+  id             String        @id @default(cuid())
+  owner          User          @relation("SiteOwner", fields: [ownerId], references: [id])
+  ownerId        String
+  businessName   String
+  industry       String
+  targetAudience String
+  playbook       SitePlaybook
+  status         SiteStatus    @default(DRAFT)
+  pages          Page[]
+  testimonials   Testimonial[]
+  leads          Lead[]
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@index([ownerId])
+}
+
+model Page {
+  id              String   @id @default(cuid())
+  site            Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  siteId          String
+  slug            String
+  name            String
+  heroHeadline    String
+  heroSubheadline String
+  ctaLabel        String
+  ctaHref         String?
+  sections        Json
+  seoTitle        String?
+  seoDescription  String?
+  hasLeadForm     Boolean  @default(false)
+  order           Int      @default(0)
+  leads           Lead[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([siteId, slug])
+  @@index([siteId])
+}
+
+model Testimonial {
+  id         String   @id @default(cuid())
+  site       Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  siteId     String
+  authorName String
+  authorRole String?
+  quote      String
+  rating     Int?
+  createdAt  DateTime @default(now())
+
+  @@index([siteId])
+}
+
+model Lead {
+  id        String     @id @default(cuid())
+  site      Site       @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  siteId    String
+  page      Page?      @relation(fields: [pageId], references: [id])
+  pageId    String?
+  name      String?
+  email     String
+  message   String?
+  source    String?
+  status    LeadStatus @default(NEW)
+  createdAt DateTime   @default(now())
+
+  @@index([siteId])
 }

@@ -1,6 +1,7 @@
-import Anthropic from '@anthropic-ai/sdk';
+import type Anthropic from '@anthropic-ai/sdk';
 import { anthropic } from '../../../lib/anthropic.js';
 import { CommerceError } from '../../../lib/commerceError.js';
+import { translateAnthropicError } from '../../../lib/anthropicErrors.js';
 import { prisma } from '../../../lib/prisma.js';
 import { getBusinessPulse } from './pulse.service.js';
 import { getProductHealthScores } from './productHealth.service.js';
@@ -94,19 +95,7 @@ export async function getLunaInsights(ownerId: string): Promise<{ insights: stri
       messages: [{ role: 'user', content: JSON.stringify(snapshot) }],
     });
   } catch (err) {
-    if (err instanceof Anthropic.AuthenticationError) {
-      throw new CommerceError(503, 'Luna AI is configured with an invalid API key.');
-    }
-    if (err instanceof Anthropic.BadRequestError && /credit balance/i.test(err.message)) {
-      throw new CommerceError(402, 'Luna AI is configured correctly, but the Anthropic account is out of API credit. Add credit at console.anthropic.com → Plans & Billing.');
-    }
-    if (err instanceof Anthropic.RateLimitError) {
-      throw new CommerceError(429, 'Luna AI is rate-limited right now — try again shortly.');
-    }
-    if (err instanceof Anthropic.APIError) {
-      throw new CommerceError(502, 'Luna AI could not complete this request.');
-    }
-    throw err;
+    translateAnthropicError(err);
   }
 
   const text = response.content
