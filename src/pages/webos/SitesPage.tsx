@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Plus, Globe2, ArrowRight } from 'lucide-react';
 import { api, ApiError } from '../../lib/api';
 import type { Playbook, PlaybookKey, Site } from '../../lib/webos/types';
+import { computeBlueprint } from '../../lib/webos/blueprint';
+import BlueprintCard from '../../components/webos/BlueprintCard';
 
 type FormState = {
   businessName: string;
@@ -22,6 +24,7 @@ export default function SitesPage() {
   const [form, setForm] = useState<FormState>(emptyForm);
   const [error, setError] = useState('');
   const [generating, setGenerating] = useState(false);
+  const [generatedSite, setGeneratedSite] = useState<Site | null>(null);
 
   const load = () => {
     api.get<{ sites: Site[] }>('/webos/sites').then((data) => setSites(data.sites)).catch(() => setSites([]));
@@ -35,6 +38,7 @@ export default function SitesPage() {
   const openCreate = () => {
     setForm(emptyForm);
     setError('');
+    setGeneratedSite(null);
     setShowForm(true);
   };
 
@@ -54,7 +58,7 @@ export default function SitesPage() {
         playbook: form.playbook,
         services: form.services.split(',').map((s) => s.trim()).filter(Boolean),
       });
-      navigate(`/webos/${data.site.id}`);
+      setGeneratedSite(data.site);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Could not generate this site.');
     } finally {
@@ -111,6 +115,20 @@ export default function SitesPage() {
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-950/40" onClick={() => setShowForm(false)}>
           <div className="bg-white rounded-[28px] card-shadow border border-ASTER-100 w-full max-w-lg max-h-[85vh] overflow-y-auto p-7" onClick={(e) => e.stopPropagation()}>
+            {generatedSite ? (
+              <div>
+                <h2 className="font-display font-extrabold text-xl text-ink-900 mb-1">Website Blueprint</h2>
+                <p className="text-slate-500 text-sm mb-5">{generatedSite.businessName} is scaffolded and ready to build on.</p>
+                <BlueprintCard blueprint={computeBlueprint(generatedSite)} />
+                <button
+                  onClick={() => navigate(`/webos/${generatedSite.id}`)}
+                  className="w-full mt-5 bg-ASTER-600 hover:bg-ASTER-700 text-white font-bold py-3.5 rounded-full transition-all flex items-center justify-center gap-2"
+                >
+                  Continue to site <ArrowRight size={16} />
+                </button>
+              </div>
+            ) : (
+              <>
             <h2 className="font-display font-extrabold text-xl text-ink-900 mb-5">Generate a site</h2>
             <form onSubmit={onSubmit} className="space-y-4">
               <div>
@@ -150,6 +168,8 @@ export default function SitesPage() {
                 {generating ? 'Generating…' : 'Generate site'}
               </button>
             </form>
+            </>
+            )}
           </div>
         </div>
       )}

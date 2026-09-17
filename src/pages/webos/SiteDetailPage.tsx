@@ -3,6 +3,8 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Sparkles, Pencil, Trash2, Plus, PlayCircle } from 'lucide-react';
 import { api, ApiError } from '../../lib/api';
 import Modal from '../../components/commerce/Modal';
+import BlueprintCard from '../../components/webos/BlueprintCard';
+import { computeBlueprint } from '../../lib/webos/blueprint';
 import type {
   Site, Page, Testimonial, WebsiteHealth, ConversionAudit, TrustGap, RecommendedAction, Lead, LeadStatus,
 } from '../../lib/webos/types';
@@ -185,6 +187,11 @@ export default function SiteDetailPage() {
       {site.status === 'DRAFT' && (
         <p className="text-xs text-slate-400 mt-2">This flags the site as ready — WebOS doesn't yet serve pages to a live public URL.</p>
       )}
+
+      {/* Blueprint */}
+      <div className="mt-8">
+        <BlueprintCard blueprint={computeBlueprint(site)} title="Website Blueprint" />
+      </div>
 
       {/* Health Score */}
       <div className="mt-8 grid lg:grid-cols-[220px_1fr] gap-6">
