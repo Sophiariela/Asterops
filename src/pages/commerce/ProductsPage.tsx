@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Plus, Search, Pencil, Trash2 } from 'lucide-react';
 import { api, ApiError } from '../../lib/api';
 import { formatBRL } from '../../lib/currency';
-import type { Category, Product, ProductStatus } from '../../lib/commerce/types';
+import type { Category, Product, ProductHealth, ProductStatus } from '../../lib/commerce/types';
 import Modal from '../../components/commerce/Modal';
 
 type FormState = {
@@ -12,6 +12,7 @@ type FormState = {
   description: string;
   price: string;
   compareAtPrice: string;
+  costPrice: string;
   categoryId: string;
   status: ProductStatus;
   stockQuantity: string;
@@ -24,11 +25,18 @@ const emptyForm: FormState = {
   description: '',
   price: '',
   compareAtPrice: '',
+  costPrice: '',
   categoryId: '',
   status: 'ACTIVE',
   stockQuantity: '0',
   reorderPoint: '0',
 };
+
+function healthColor(score: number) {
+  if (score >= 70) return 'text-emerald-600 bg-emerald-50';
+  if (score >= 45) return 'text-amber-600 bg-amber-50';
+  return 'text-rose-600 bg-rose-50';
+}
 
 const STATUS_STYLE: Record<ProductStatus, string> = {
   ACTIVE: 'bg-emerald-100 text-emerald-700',
@@ -38,6 +46,7 @@ const STATUS_STYLE: Record<ProductStatus, string> = {
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[] | null>(null);
+  const [health, setHealth] = useState<Record<string, ProductHealth>>({});
   const [categories, setCategories] = useState<Category[]>([]);
   const [search, setSearch] = useState('');
   const [editing, setEditing] = useState<Product | null>(null);
@@ -45,6 +54,7 @@ export default function ProductsPage() {
   const [form, setForm] = useState<FormState>(emptyForm);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
+  const [healthDetail, setHealthDetail] = useState<ProductHealth | null>(null);
 
   const load = useCallback(() => {
     const params = new URLSearchParams();
@@ -57,6 +67,10 @@ export default function ProductsPage() {
 
   useEffect(() => {
     api.get<{ categories: Category[] }>('/commerce/categories').then((data) => setCategories(data.categories)).catch(() => {});
+    api
+      .get<{ products: ProductHealth[] }>('/commerce/analytics/product-health')
+      .then((data) => setHealth(Object.fromEntries(data.products.map((h) => [h.productId, h]))))
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -79,6 +93,7 @@ export default function ProductsPage() {
       description: product.description ?? '',
       price: String(product.price / 100),
       compareAtPrice: product.compareAtPrice ? String(product.compareAtPrice / 100) : '',
+      costPrice: product.costPrice ? String(product.costPrice / 100) : '',
       categoryId: product.categoryId ?? '',
       status: product.status,
       stockQuantity: String(product.stockQuantity),
@@ -99,6 +114,7 @@ export default function ProductsPage() {
         description: form.description || undefined,
         price: Math.round(parseFloat(form.price || '0') * 100),
         compareAtPrice: form.compareAtPrice ? Math.round(parseFloat(form.compareAtPrice) * 100) : null,
+        costPrice: form.costPrice ? Math.round(parseFloat(form.costPrice) * 100) : null,
         categoryId: form.categoryId || null,
         status: form.status,
         reorderPoint: Number(form.reorderPoint || 0),
@@ -160,6 +176,7 @@ export default function ProductsPage() {
               <th className="px-6 py-3 font-semibold">Price</th>
               <th className="px-6 py-3 font-semibold">Stock</th>
               <th className="px-6 py-3 font-semibold">Status</th>
+              <th className="px-6 py-3 font-semibold">Health</th>
               <th className="px-6 py-3 font-semibold"></th>
             </tr>
           </thead>
@@ -181,6 +198,18 @@ export default function ProductsPage() {
                   <span className={`text-xs font-bold px-3 py-1.5 rounded-full ${STATUS_STYLE[p.status]}`}>{p.status}</span>
                 </td>
                 <td className="px-6 py-4">
+                  {health[p.id] ? (
+                    <button
+                      onClick={() => setHealthDetail(health[p.id])}
+                      className={`text-xs font-bold px-2.5 py-1 rounded-full tabular-nums ${healthColor(health[p.id].score)}`}
+                    >
+                      {health[p.id].score}
+                    </button>
+                  ) : (
+                    <span className="text-slate-300 text-xs">—</span>
+                  )}
+                </td>
+                <td className="px-6 py-4">
                   <div className="flex items-center gap-1 justify-end">
                     <button onClick={() => openEdit(p)} className="p-2 rounded-full text-slate-400 hover:text-ASTER-600 hover:bg-ASTER-50 transition-colors" aria-label={`Edit ${p.name}`}>
                       <Pencil size={15} />
@@ -194,7 +223,7 @@ export default function ProductsPage() {
             ))}
             {products && products.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-6 py-10 text-center text-slate-400">
+                <td colSpan={7} className="px-6 py-10 text-center text-slate-400">
                   No products yet. <button onClick={openCreate} className="text-ASTER-600 font-bold">Add your first one</button>.
                 </td>
               </tr>
@@ -219,6 +248,13 @@ export default function ProductsPage() {
               <Field label="Price (R$)" required type="number" step="0.01" value={form.price} onChange={(v) => setForm((f) => ({ ...f, price: v }))} />
               <Field label="Compare-at price (R$)" type="number" step="0.01" value={form.compareAtPrice} onChange={(v) => setForm((f) => ({ ...f, compareAtPrice: v }))} />
             </div>
+            <Field
+              label="Cost price (R$) — optional, used to track profit margin"
+              type="number"
+              step="0.01"
+              value={form.costPrice}
+              onChange={(v) => setForm((f) => ({ ...f, costPrice: v }))}
+            />
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
                 <label className="text-[13px] font-bold text-ink-900 block mb-1.5">Category</label>
@@ -266,6 +302,39 @@ export default function ProductsPage() {
               {saving ? 'Saving…' : editing ? 'Save changes' : 'Create product'}
             </button>
           </form>
+        </Modal>
+      )}
+
+      {healthDetail && (
+        <Modal title={`Health Score — ${healthDetail.name}`} onClose={() => setHealthDetail(null)}>
+          <div className={`text-center font-display font-extrabold text-4xl mb-5 ${healthColor(healthDetail.score).split(' ')[0]}`}>
+            {healthDetail.score}<span className="text-lg text-slate-300">/100</span>
+          </div>
+          <div className="space-y-3">
+            {healthDetail.factors.map((f) => (
+              <div key={f.key} className="flex items-start justify-between gap-3 text-sm border-b border-ASTER-100 pb-3 last:border-0">
+                <div>
+                  <p className="font-semibold text-ink-900">{f.label}</p>
+                  <p className="text-slate-500 text-xs mt-0.5">{f.detail}</p>
+                </div>
+                <span className={`text-xs font-bold whitespace-nowrap ${f.available ? 'text-ink-900' : 'text-slate-300'}`}>
+                  {f.available ? f.score : 'N/A'}
+                </span>
+              </div>
+            ))}
+          </div>
+          {healthDetail.badges.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-5">
+              {healthDetail.badges.map((b, i) => (
+                <span
+                  key={i}
+                  className={`text-xs font-bold px-3 py-1.5 rounded-full ${b.tone === 'good' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}`}
+                >
+                  {b.tone === 'good' ? '✓' : '⚠'} {b.label}
+                </span>
+              ))}
+            </div>
+          )}
         </Modal>
       )}
     </div>

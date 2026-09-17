@@ -1,9 +1,15 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, UserPlus, ShoppingBag, RefreshCcw } from 'lucide-react';
 import { api } from '../../lib/api';
 import { formatBRL } from '../../lib/currency';
-import type { CommerceCustomer, OrderStatus } from '../../lib/commerce/types';
+import type { CommerceCustomer, OrderStatus, TimelineEvent } from '../../lib/commerce/types';
+
+const EVENT_ICON: Record<string, typeof UserPlus> = {
+  CUSTOMER_CREATED: UserPlus,
+  ORDER_PLACED: ShoppingBag,
+  ORDER_STATUS_CHANGED: RefreshCcw,
+};
 
 const STATUS_STYLE: Record<OrderStatus, string> = {
   PENDING: 'bg-amber-100 text-amber-700',
@@ -17,6 +23,7 @@ export default function CustomerDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [customer, setCustomer] = useState<CommerceCustomer | null>(null);
+  const [timeline, setTimeline] = useState<TimelineEvent[]>([]);
 
   useEffect(() => {
     if (!id) return;
@@ -24,6 +31,10 @@ export default function CustomerDetailPage() {
       .get<{ customer: CommerceCustomer }>(`/commerce/customers/${id}`)
       .then((data) => setCustomer(data.customer))
       .catch(() => navigate('/commerce/customers', { replace: true }));
+    api
+      .get<{ events: TimelineEvent[] }>(`/commerce/analytics/customers/${id}/timeline`)
+      .then((data) => setTimeline(data.events))
+      .catch(() => setTimeline([]));
   }, [id, navigate]);
 
   if (!customer) {
@@ -64,6 +75,34 @@ export default function CustomerDetailPage() {
           <p className="text-sm text-slate-600">{customer.notes}</p>
         </div>
       )}
+
+      <p className="text-xs font-bold text-slate-400 uppercase tracking-wide mt-10 mb-4">Customer journey</p>
+      <div className="bg-white rounded-[28px] card-shadow border border-ASTER-100 p-6">
+        {timeline.length === 0 ? (
+          <p className="text-sm text-slate-400">No timeline events yet.</p>
+        ) : (
+          <ol className="space-y-5">
+            {timeline.map((event, i) => {
+              const Icon = EVENT_ICON[event.type] ?? ShoppingBag;
+              return (
+                <li key={i} className="flex items-start gap-3.5">
+                  <span className="w-8 h-8 rounded-full bg-ASTER-50 text-ASTER-600 flex items-center justify-center shrink-0">
+                    <Icon size={15} />
+                  </span>
+                  <div>
+                    <p className="text-sm font-semibold text-ink-900">{event.label}</p>
+                    {event.detail && <p className="text-xs text-slate-500 mt-0.5">{event.detail}</p>}
+                    <p className="text-xs text-slate-400 mt-0.5">{new Date(event.at).toLocaleString()}</p>
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
+        )}
+        <p className="text-xs text-slate-400 mt-6 pt-4 border-t border-ASTER-100">
+          Site visits, campaign interactions and abandoned carts will appear here once those are tracked.
+        </p>
+      </div>
 
       <p className="text-xs font-bold text-slate-400 uppercase tracking-wide mt-10 mb-4">Order history</p>
       <div className="bg-white rounded-[28px] card-shadow border border-ASTER-100 overflow-hidden">

@@ -3,11 +3,14 @@ import { LogOut } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 const TABS = [
+  { to: '/commerce/pulse', label: 'Pulse' },
   { to: '/commerce/products', label: 'Products' },
   { to: '/commerce/categories', label: 'Categories' },
   { to: '/commerce/inventory', label: 'Inventory' },
   { to: '/commerce/orders', label: 'Orders' },
   { to: '/commerce/customers', label: 'Customers' },
+  { to: '/commerce/opportunities', label: 'Opportunities' },
+  { to: '/commerce/audit', label: 'Audit' },
 ];
 
 export default function CommerceLayout() {

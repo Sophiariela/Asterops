@@ -16,6 +16,9 @@ import ProductPage from './pages/products/ProductPage';
 import SolutionPage from './pages/solutions/SolutionPage';
 import EcosystemPage from './pages/Ecosystem';
 import CommerceLayout from './pages/commerce/CommerceLayout';
+import PulsePage from './pages/commerce/PulsePage';
+import OpportunitiesPage from './pages/commerce/OpportunitiesPage';
+import AuditPage from './pages/commerce/AuditPage';
 import ProductsPage from './pages/commerce/ProductsPage';
 import CategoriesPage from './pages/commerce/CategoriesPage';
 import InventoryPage from './pages/commerce/InventoryPage';
@@ -45,7 +48,8 @@ export default function App() {
           <Route path="/dashboard" element={<Dashboard />} />
 
           <Route path="/commerce" element={<CommerceLayout />}>
-            <Route index element={<Navigate to="/commerce/products" replace />} />
+            <Route index element={<Navigate to="/commerce/pulse" replace />} />
+            <Route path="pulse" element={<PulsePage />} />
             <Route path="products" element={<ProductsPage />} />
             <Route path="categories" element={<CategoriesPage />} />
             <Route path="inventory" element={<InventoryPage />} />
@@ -53,6 +57,8 @@ export default function App() {
             <Route path="orders/:id" element={<OrderDetailPage />} />
             <Route path="customers" element={<CustomersPage />} />
             <Route path="customers/:id" element={<CustomerDetailPage />} />
+            <Route path="opportunities" element={<OpportunitiesPage />} />
+            <Route path="audit" element={<AuditPage />} />
           </Route>
         </Route>
 
