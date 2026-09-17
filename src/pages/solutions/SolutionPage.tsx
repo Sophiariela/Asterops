@@ -2,6 +2,7 @@ import { Navigate, Link, useParams } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import { getSolution } from '../../data/solutions';
 import { getProduct } from '../../data/products';
+import Footer from '../../components/Footer';
 
 export default function SolutionPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -82,6 +83,8 @@ export default function SolutionPage() {
           </Link>
         </div>
       </section>
+
+      <Footer />
     </div>
   );
 }

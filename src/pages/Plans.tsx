@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { formatBRL } from '../lib/currency';
 import { PLAN_TIERS, ENTERPRISE_TIER, findTierForProduct } from '../data/plans';
 import PaymentMethods from '../components/PaymentMethods';
+import Footer from '../components/Footer';
 
 type BackendPlan = {
   id: string;
@@ -52,7 +53,8 @@ export default function Plans() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-ASTER-50/60 via-white to-white py-16 sm:py-24 px-4">
+    <div className="min-h-screen bg-gradient-to-b from-ASTER-50/60 via-white to-white">
+      <div className="py-16 sm:py-24 px-4">
       <div className="max-w-6xl mx-auto">
         <Link to="/" className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-400 hover:text-ASTER-600 transition-colors mb-8">
           <ArrowLeft size={16} /> Voltar para a home
@@ -182,6 +184,9 @@ export default function Plans() {
           <PaymentMethods />
         </div>
       </div>
+      </div>
+
+      <Footer />
     </div>
   );
 }

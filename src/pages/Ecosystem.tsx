@@ -1,12 +1,14 @@
 import { Link } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, ChevronDown } from 'lucide-react';
 import { getProduct } from '../data/products';
+import Footer from '../components/Footer';
 
 const FLOW = ['webos', 'commerceos', 'growthos', 'luna-ai'] as const;
 
 export default function EcosystemPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-ASTER-50/60 via-white to-white py-16 sm:py-24 px-4">
+    <div className="min-h-screen bg-gradient-to-b from-ASTER-50/60 via-white to-white">
+      <div className="py-16 sm:py-24 px-4">
       <div className="max-w-2xl mx-auto text-center">
         <Link to="/" className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-400 hover:text-ASTER-600 transition-colors mb-8">
           <ArrowLeft size={16} /> Back to home
@@ -50,6 +52,9 @@ export default function EcosystemPage() {
           Choose your starting point <ArrowRight size={18} />
         </Link>
       </div>
+      </div>
+
+      <Footer />
     </div>
   );
 }
