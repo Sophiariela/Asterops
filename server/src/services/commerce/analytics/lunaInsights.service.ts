@@ -1,3 +1,4 @@
+import Anthropic from '@anthropic-ai/sdk';
 import { anthropic } from '../../../lib/anthropic.js';
 import { CommerceError } from '../../../lib/commerceError.js';
 import { prisma } from '../../../lib/prisma.js';
@@ -83,13 +84,30 @@ export async function getLunaInsights(ownerId: string): Promise<{ insights: stri
     return { insights: ["There isn't enough store activity yet for Luna to find a pattern — add products and a few orders first."] };
   }
 
-  const response = await anthropic.messages.create({
-    model: 'claude-opus-5',
-    max_tokens: 1024,
-    output_config: { effort: 'medium' },
-    system: SYSTEM_PROMPT,
-    messages: [{ role: 'user', content: JSON.stringify(snapshot) }],
-  });
+  let response: Anthropic.Message;
+  try {
+    response = await anthropic.messages.create({
+      model: 'claude-opus-5',
+      max_tokens: 1024,
+      output_config: { effort: 'medium' },
+      system: SYSTEM_PROMPT,
+      messages: [{ role: 'user', content: JSON.stringify(snapshot) }],
+    });
+  } catch (err) {
+    if (err instanceof Anthropic.AuthenticationError) {
+      throw new CommerceError(503, 'Luna AI is configured with an invalid API key.');
+    }
+    if (err instanceof Anthropic.BadRequestError && /credit balance/i.test(err.message)) {
+      throw new CommerceError(402, 'Luna AI is configured correctly, but the Anthropic account is out of API credit. Add credit at console.anthropic.com → Plans & Billing.');
+    }
+    if (err instanceof Anthropic.RateLimitError) {
+      throw new CommerceError(429, 'Luna AI is rate-limited right now — try again shortly.');
+    }
+    if (err instanceof Anthropic.APIError) {
+      throw new CommerceError(502, 'Luna AI could not complete this request.');
+    }
+    throw err;
+  }
 
   const text = response.content
     .filter((block): block is Extract<typeof block, { type: 'text' }> => block.type === 'text')
