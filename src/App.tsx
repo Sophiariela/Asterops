@@ -26,6 +26,9 @@ import OrdersPage from './pages/commerce/OrdersPage';
 import OrderDetailPage from './pages/commerce/OrderDetailPage';
 import CustomersPage from './pages/commerce/CustomersPage';
 import CustomerDetailPage from './pages/commerce/CustomerDetailPage';
+import WebOSLayout from './pages/webos/WebOSLayout';
+import SitesPage from './pages/webos/SitesPage';
+import SiteDetailPage from './pages/webos/SiteDetailPage';
 
 export default function App() {
   return (
@@ -59,6 +62,11 @@ export default function App() {
             <Route path="customers/:id" element={<CustomerDetailPage />} />
             <Route path="opportunities" element={<OpportunitiesPage />} />
             <Route path="audit" element={<AuditPage />} />
+          </Route>
+
+          <Route path="/webos" element={<WebOSLayout />}>
+            <Route index element={<SitesPage />} />
+            <Route path=":id" element={<SiteDetailPage />} />
           </Route>
         </Route>
 

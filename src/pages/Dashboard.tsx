@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { LogOut, Clock, Rocket, Store, ArrowRight } from 'lucide-react';
+import { LogOut, Clock, Rocket, Store, Globe2, ArrowRight } from 'lucide-react';
 import { api } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
 import { formatBRL } from '../lib/currency';
@@ -54,21 +54,39 @@ export default function Dashboard() {
           Welcome back{user?.name ? `, ${user.name}` : ''}
         </h1>
 
-        <Link
-          to="/commerce"
-          className="mt-6 flex items-center justify-between gap-4 bg-ink-950 text-white rounded-[28px] card-shadow p-6 hover:-translate-y-0.5 transition-transform"
-        >
-          <div className="flex items-center gap-4">
-            <span className="w-12 h-12 rounded-2xl bg-ASTER-600 flex items-center justify-center shrink-0">
-              <Store size={22} />
-            </span>
-            <div>
-              <p className="font-display font-bold text-lg">CommerceOS</p>
-              <p className="text-white/60 text-sm">Products, inventory, orders and customers — run your sales from here.</p>
+        <div className="mt-6 grid sm:grid-cols-2 gap-4">
+          <Link
+            to="/commerce"
+            className="flex items-center justify-between gap-4 bg-ink-950 text-white rounded-[28px] card-shadow p-6 hover:-translate-y-0.5 transition-transform"
+          >
+            <div className="flex items-center gap-4">
+              <span className="w-12 h-12 rounded-2xl bg-ASTER-600 flex items-center justify-center shrink-0">
+                <Store size={22} />
+              </span>
+              <div>
+                <p className="font-display font-bold text-lg">CommerceOS</p>
+                <p className="text-white/60 text-sm">Products, inventory, orders and customers.</p>
+              </div>
             </div>
-          </div>
-          <ArrowRight size={20} className="text-white/60 shrink-0" />
-        </Link>
+            <ArrowRight size={20} className="text-white/60 shrink-0" />
+          </Link>
+
+          <Link
+            to="/webos"
+            className="flex items-center justify-between gap-4 bg-ink-950 text-white rounded-[28px] card-shadow p-6 hover:-translate-y-0.5 transition-transform"
+          >
+            <div className="flex items-center gap-4">
+              <span className="w-12 h-12 rounded-2xl bg-ASTER-600 flex items-center justify-center shrink-0">
+                <Globe2 size={22} />
+              </span>
+              <div>
+                <p className="font-display font-bold text-lg">WebOS</p>
+                <p className="text-white/60 text-sm">Generate a site, then grow it — health score, leads, trust.</p>
+              </div>
+            </div>
+            <ArrowRight size={20} className="text-white/60 shrink-0" />
+          </Link>
+        </div>
 
         {!data ? (
           <p className="text-slate-400 mt-6">Loading your dashboard…</p>
