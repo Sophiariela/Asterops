@@ -19,6 +19,7 @@ import { analyticsRouter } from './routes/commerce/analytics.routes.js';
 import { sitesRouter } from './routes/webos/sites.routes.js';
 import { pagesRouter } from './routes/webos/pages.routes.js';
 import { testimonialsRouter } from './routes/webos/testimonials.routes.js';
+import { trustElementsRouter } from './routes/webos/trustElements.routes.js';
 import { leadsRouter, publicLeadsRouter } from './routes/webos/leads.routes.js';
 import { webosAnalyticsRouter } from './routes/webos/analytics.routes.js';
 import { CommerceError } from './lib/commerceError.js';
@@ -71,6 +72,7 @@ app.use('/api/commerce', (err: Error, _req: express.Request, res: express.Respon
 // WebOS
 app.use('/api/webos/public/leads', publicLeadsRouter);
 app.use('/api/webos/sites/:siteId/testimonials', testimonialsRouter);
+app.use('/api/webos/sites/:siteId/trust-elements', trustElementsRouter);
 app.use('/api/webos/sites/:siteId/leads', leadsRouter);
 app.use('/api/webos/sites/:siteId/analytics', webosAnalyticsRouter);
 app.use('/api/webos/sites', sitesRouter);

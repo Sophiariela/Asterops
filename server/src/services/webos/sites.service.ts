@@ -14,7 +14,11 @@ export async function listSites(ownerId: string) {
 export async function getSite(ownerId: string, id: string) {
   const site = await prisma.site.findFirst({
     where: { id, ownerId },
-    include: { pages: { orderBy: { order: 'asc' } }, testimonials: { orderBy: { createdAt: 'desc' } } },
+    include: {
+      pages: { orderBy: { order: 'asc' } },
+      testimonials: { orderBy: { createdAt: 'desc' } },
+      trustElements: { orderBy: { createdAt: 'desc' } },
+    },
   });
   if (!site) throw new CommerceError(404, 'Site not found.');
   return site;
@@ -28,6 +32,12 @@ export async function generateSite(
   if (!playbook) throw new CommerceError(400, 'Unknown playbook.');
 
   const pageTemplates = playbook.pages(input);
+
+  // Pages that don't capture a lead themselves get a real internal link to
+  // whichever page does — a structural fact about the site's navigation,
+  // not a claim about how visitors actually move through it (no traffic
+  // data exists for that).
+  const primaryCapturePage = pageTemplates.find((p) => p.hasLeadForm);
 
   return prisma.site.create({
     data: {
@@ -44,6 +54,9 @@ export async function generateSite(
           heroHeadline: p.heroHeadline,
           heroSubheadline: p.heroSubheadline,
           ctaLabel: p.ctaLabel,
+          ctaHref: !p.hasLeadForm && primaryCapturePage && primaryCapturePage.slug !== p.slug
+            ? `/${primaryCapturePage.slug}`
+            : undefined,
           hasLeadForm: p.hasLeadForm,
           sections: p.sections,
           order: i,

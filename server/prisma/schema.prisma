@@ -72,6 +72,13 @@ enum SitePlaybook {
   AGENCY
   RESTAURANT
   FITNESS
+  CREATOR
+}
+
+enum TrustElementType {
+  CASE_STUDY
+  CLIENT_LOGO
+  CERTIFICATION
 }
 
 enum SiteStatus {
@@ -333,6 +340,7 @@ model Site {
   pages          Page[]
   testimonials   Testimonial[]
   leads          Lead[]
+  trustElements  TrustElement[]
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 
@@ -387,6 +395,22 @@ model Lead {
   source    String?
   status    LeadStatus @default(NEW)
   createdAt DateTime   @default(now())
+
+  @@index([siteId])
+}
+
+// Case studies, client logos and certifications — the Trust Map's other
+// categories beyond Testimonial. One flexible model rather than three
+// rigid tables, since each is just a title/description/optional link.
+model TrustElement {
+  id          String           @id @default(cuid())
+  site        Site             @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  siteId      String
+  type        TrustElementType
+  title       String
+  description String?
+  url         String?
+  createdAt   DateTime         @default(now())
 
   @@index([siteId])
 }

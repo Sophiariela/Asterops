@@ -5,7 +5,8 @@ export type PlaybookKey =
   | 'CONSULTANT'
   | 'AGENCY'
   | 'RESTAURANT'
-  | 'FITNESS';
+  | 'FITNESS'
+  | 'CREATOR';
 
 export type GeneratorInput = {
   businessName: string;
@@ -68,6 +69,17 @@ function applyFillToPages(pages: (input: GeneratorInput) => PageTemplate[]) {
 }
 
 export const PLAYBOOKS: Record<PlaybookKey, Playbook> = {
+  CREATOR: {
+    key: 'CREATOR',
+    label: 'Creator',
+    description: 'A community-first site for a creator turning an audience into a business.',
+    pages: applyFillToPages((input) => [
+      { slug: 'home', name: 'Home', heroHeadline: '{{businessName}} — {{industry}} for {{targetAudience}}', heroSubheadline: 'Explore {{services}}.', ctaLabel: 'Join the community', hasLeadForm: true, sections: [benefitsSection(input, 'What you get'), trustPlaceholderSection()] },
+      { slug: 'content', name: 'Content', heroHeadline: 'Latest content', heroSubheadline: '{{services}}.', ctaLabel: 'Join the community', hasLeadForm: false, sections: [] },
+      { slug: 'offers', name: 'Offers', heroHeadline: 'Work with {{businessName}}', heroSubheadline: '{{services}}.', ctaLabel: 'See offers', hasLeadForm: true, sections: [benefitsSection(input, 'Ways to work together')] },
+      { slug: 'contact', name: 'Contact', heroHeadline: "Let's connect", heroSubheadline: 'Questions, collabs, or press.', ctaLabel: 'Send message', hasLeadForm: true, sections: [] },
+    ]),
+  },
   LOCAL_BUSINESS: {
     key: 'LOCAL_BUSINESS',
     label: 'Local business',

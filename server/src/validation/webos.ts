@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
-export const playbookValues = ['LOCAL_BUSINESS', 'SAAS', 'ECOMMERCE', 'CONSULTANT', 'AGENCY', 'RESTAURANT', 'FITNESS'] as const;
+export const playbookValues = ['LOCAL_BUSINESS', 'SAAS', 'ECOMMERCE', 'CONSULTANT', 'AGENCY', 'RESTAURANT', 'FITNESS', 'CREATOR'] as const;
+export const trustElementTypeValues = ['CASE_STUDY', 'CLIENT_LOGO', 'CERTIFICATION'] as const;
 export const leadStatusValues = ['NEW', 'QUALIFIED', 'CONVERTED', 'LOST'] as const;
 
 export const generateSiteSchema = z.object({
@@ -20,6 +21,13 @@ export const updatePageSchema = z.object({
   seoDescription: z.string().max(300).nullable().optional(),
   hasLeadForm: z.boolean().optional(),
   sections: z.array(z.object({ type: z.string(), heading: z.string(), body: z.string() })).optional(),
+});
+
+export const createTrustElementSchema = z.object({
+  type: z.enum(trustElementTypeValues),
+  title: z.string().min(1).max(160),
+  description: z.string().max(1000).optional(),
+  url: z.string().url().optional(),
 });
 
 export const createTestimonialSchema = z.object({

@@ -15,7 +15,12 @@ export type PageForAnalysis = {
 export async function loadSiteForAnalysis(ownerId: string, siteId: string) {
   const site = await prisma.site.findFirst({
     where: { id: siteId, ownerId },
-    include: { pages: { orderBy: { order: 'asc' } }, testimonials: true },
+    include: {
+      pages: { orderBy: { order: 'asc' } },
+      testimonials: true,
+      trustElements: true,
+      leads: { select: { id: true, status: true } },
+    },
   });
   if (!site) throw new CommerceError(404, 'Site not found.');
   return site;
