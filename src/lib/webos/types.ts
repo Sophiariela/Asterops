@@ -1,11 +1,13 @@
-export type PlaybookKey = 'LOCAL_BUSINESS' | 'SAAS' | 'ECOMMERCE' | 'CONSULTANT' | 'AGENCY' | 'RESTAURANT' | 'FITNESS' | 'CREATOR';
+export type PlaybookKey =
+  | 'LOCAL_BUSINESS' | 'SAAS' | 'ECOMMERCE' | 'CONSULTANT' | 'AGENCY' | 'RESTAURANT' | 'FITNESS' | 'CREATOR'
+  | 'PERSONAL_BRAND' | 'PROFESSIONAL_SERVICES';
 export type SiteStatus = 'DRAFT' | 'PUBLISHED';
 export type LeadStatus = 'NEW' | 'QUALIFIED' | 'CONVERTED' | 'LOST';
 export type TrustElementType = 'CASE_STUDY' | 'CLIENT_LOGO' | 'CERTIFICATION';
 
 export type Playbook = { key: PlaybookKey; label: string; description: string };
 
-export type Section = { type: string; heading: string; body: string };
+export type Section = { type: string; heading: string; body: string; imageUrl?: string | null };
 
 export type Page = {
   id: string;
@@ -14,6 +16,7 @@ export type Page = {
   name: string;
   heroHeadline: string;
   heroSubheadline: string;
+  heroImageUrl: string | null;
   ctaLabel: string;
   ctaHref: string | null;
   sections: Section[];
@@ -48,6 +51,7 @@ export type Site = {
   businessName: string;
   industry: string;
   targetAudience: string;
+  logoUrl: string | null;
   playbook: PlaybookKey;
   status: SiteStatus;
   pages: Page[];

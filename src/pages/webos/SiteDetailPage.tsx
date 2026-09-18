@@ -1,12 +1,13 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
-  ArrowLeft, Sparkles, Pencil, Trash2, Plus, PlayCircle, Monitor, Tablet, Smartphone,
+  ArrowLeft, Sparkles, Pencil, Trash2, Plus, PlayCircle,
   CheckCircle2, XCircle, ArrowRight,
 } from 'lucide-react';
 import { api, ApiError } from '../../lib/api';
 import Modal from '../../components/commerce/Modal';
 import BlueprintCard from '../../components/webos/BlueprintCard';
+import WebsiteEditor from '../../components/webos/WebsiteEditor';
 import { computeBlueprint } from '../../lib/webos/blueprint';
 import type {
   Site, Page, Testimonial, TrustElement, TrustElementType, Playbook, WebsiteHealth, ConversionAudit, TrustGap,
@@ -28,14 +29,14 @@ const LEAD_STATUS_STYLE: Record<LeadStatus, string> = {
   LOST: 'bg-slate-200 text-slate-500',
 };
 
-type Tab = 'overview' | 'architecture' | 'pages' | 'trust' | 'leads' | 'preview';
+type Tab = 'website' | 'overview' | 'architecture' | 'pages' | 'trust' | 'leads';
 const TABS: { key: Tab; label: string }[] = [
-  { key: 'overview', label: 'Overview' },
+  { key: 'website', label: 'Website' },
+  { key: 'overview', label: 'Insights' },
   { key: 'architecture', label: 'Architecture' },
   { key: 'pages', label: 'Pages' },
   { key: 'trust', label: 'Trust' },
   { key: 'leads', label: 'Leads' },
-  { key: 'preview', label: 'Preview' },
 ];
 
 const TRUST_ELEMENT_LABEL: Record<TrustElementType, string> = {
@@ -44,17 +45,10 @@ const TRUST_ELEMENT_LABEL: Record<TrustElementType, string> = {
   CERTIFICATION: 'Certification',
 };
 
-type Device = 'desktop' | 'tablet' | 'mobile';
-const DEVICE_WIDTH: Record<Device, string> = {
-  desktop: 'max-w-full',
-  tablet: 'max-w-[768px]',
-  mobile: 'max-w-[375px]',
-};
-
 export default function SiteDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [tab, setTab] = useState<Tab>('overview');
+  const [tab, setTab] = useState<Tab>('website');
 
   const [site, setSite] = useState<Site | null>(null);
   const [playbooks, setPlaybooks] = useState<Playbook[]>([]);
@@ -98,14 +92,10 @@ export default function SiteDetailPage() {
   const [trustElementError, setTrustElementError] = useState('');
   const [trustElementSaving, setTrustElementSaving] = useState(false);
 
-  const [previewPageId, setPreviewPageId] = useState<string>('');
-  const [previewDevice, setPreviewDevice] = useState<Device>('desktop');
-
   const loadCore = () => {
     if (!id) return;
     api.get<{ site: Site }>(`/webos/sites/${id}`).then((data) => {
       setSite(data.site);
-      setPreviewPageId((prev) => prev || data.site.pages[0]?.id || '');
     }).catch(() => navigate('/webos', { replace: true }));
     api.get<{ health: WebsiteHealth }>(`/webos/sites/${id}/analytics/health-score`).then((data) => setHealth(data.health)).catch(() => {});
     api.get<{ trust: TrustGap }>(`/webos/sites/${id}/analytics/trust-gaps`).then((data) => setTrust(data.trust)).catch(() => {});
@@ -275,7 +265,6 @@ export default function SiteDetailPage() {
   }
 
   const playbookLabel = playbooks.find((p) => p.key === site.playbook)?.label ?? site.playbook;
-  const previewPage = site.pages.find((p) => p.id === previewPageId) ?? site.pages[0] ?? null;
   const maxFunnelCount = conversionPaths ? Math.max(1, ...conversionPaths.funnel.map((f) => f.count)) : 1;
 
   return (
@@ -303,11 +292,7 @@ export default function SiteDetailPage() {
         <p className="text-xs text-slate-400 mt-2">This flags the site as ready — WebOS doesn't yet serve pages to a live public URL.</p>
       )}
 
-      <div className="mt-8">
-        <BlueprintCard blueprint={computeBlueprint(site)} title="Website Blueprint" />
-      </div>
-
-      <div className="mt-8 flex items-center gap-1 border-b border-ASTER-100 overflow-x-auto">
+      <div className="mt-6 flex items-center gap-1 border-b border-ASTER-100 overflow-x-auto">
         {TABS.map((t) => (
           <button
             key={t.key}
@@ -319,8 +304,21 @@ export default function SiteDetailPage() {
         ))}
       </div>
 
+      {tab === 'website' && (
+        <div className="mt-6">
+          <WebsiteEditor
+            site={site}
+            onRefresh={loadCore}
+            onAddTestimonial={() => setShowTestimonialForm(true)}
+            onPublish={publish}
+          />
+        </div>
+      )}
+
       {tab === 'overview' && (
         <div className="mt-6 space-y-6">
+          <BlueprintCard blueprint={computeBlueprint(site)} title="Website Blueprint" />
+
           <div className="grid lg:grid-cols-[220px_1fr] gap-6">
             <div className="bg-ink-950 text-white rounded-[28px] card-shadow p-6 text-center flex flex-col justify-center">
               <p className="text-white/60 text-xs font-bold uppercase tracking-wide">Website Score</p>
@@ -691,61 +689,6 @@ export default function SiteDetailPage() {
               )}
             </tbody>
           </table>
-        </div>
-      )}
-
-      {tab === 'preview' && (
-        <div className="mt-6">
-          <div className="flex items-center justify-between gap-4 flex-wrap mb-4">
-            <select
-              value={previewPageId}
-              onChange={(e) => setPreviewPageId(e.target.value)}
-              className="border-2 border-ASTER-100 focus:border-ASTER-600 rounded-2xl px-4 py-2.5 text-sm font-semibold outline-none transition-colors"
-            >
-              {site.pages.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
-            </select>
-            <div className="flex items-center gap-1 bg-slate-100 rounded-full p-1">
-              {([
-                { key: 'desktop' as Device, icon: Monitor },
-                { key: 'tablet' as Device, icon: Tablet },
-                { key: 'mobile' as Device, icon: Smartphone },
-              ]).map(({ key, icon: Icon }) => (
-                <button
-                  key={key}
-                  onClick={() => setPreviewDevice(key)}
-                  className={`p-2 rounded-full transition-colors ${previewDevice === key ? 'bg-white text-ASTER-600 card-shadow-sm' : 'text-slate-400 hover:text-ink-900'}`}
-                  aria-label={key}
-                >
-                  <Icon size={16} />
-                </button>
-              ))}
-            </div>
-          </div>
-          <p className="text-xs text-slate-400 mb-4">Renders this page's real content only — not a final visual design, since WebOS doesn't serve a live rendered page yet.</p>
-
-          <div className={`mx-auto border border-ASTER-100 rounded-[28px] card-shadow bg-white overflow-hidden transition-all ${DEVICE_WIDTH[previewDevice]}`}>
-            {previewPage && (
-              <div className="p-8 sm:p-10">
-                <h2 className="font-display font-extrabold text-2xl sm:text-3xl text-ink-900">{previewPage.heroHeadline}</h2>
-                <p className="text-slate-500 mt-3">{previewPage.heroSubheadline}</p>
-                <button className="mt-5 bg-ASTER-600 text-white font-bold text-sm px-5 py-2.5 rounded-full">{previewPage.ctaLabel}</button>
-                <div className="mt-8 space-y-6 pt-8 border-t border-ASTER-100">
-                  {previewPage.sections.map((s, i) => (
-                    <div key={i}>
-                      <p className="font-display font-bold text-lg text-ink-900">{s.heading}</p>
-                      <p className="text-sm text-slate-500 mt-1.5">{s.body}</p>
-                    </div>
-                  ))}
-                  {previewPage.hasLeadForm && (
-                    <div className="bg-slate-50 rounded-2xl p-5">
-                      <p className="text-sm font-bold text-ink-900">Contact form</p>
-                      <p className="text-xs text-slate-400 mt-1">Real lead-capture form fields render here once the page is live.</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
         </div>
       )}
 

@@ -1,4 +1,13 @@
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:4000/api';
+const API_ORIGIN = API_URL.replace(/\/api\/?$/, '');
+
+// Uploaded files (logos, photos) are served from /uploads on the API's
+// origin, not under /api — this resolves the relative path the backend
+// stores into an absolute URL the browser can load.
+export function resolveUploadUrl(path: string | null | undefined): string | null {
+  if (!path) return null;
+  return /^https?:\/\//.test(path) ? path : `${API_ORIGIN}${path}`;
+}
 
 export class ApiError extends Error {
   status: number;
