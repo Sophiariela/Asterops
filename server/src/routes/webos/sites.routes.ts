@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { authenticate, requireRole } from '../../middleware/auth.js';
-import { generateSiteSchema } from '../../validation/webos.js';
+import { upload } from '../../middleware/upload.js';
+import { generateSiteSchema, updateSiteSchema } from '../../validation/webos.js';
 import * as sitesService from '../../services/webos/sites.service.js';
 import { listPublishedSummariesForLegacyPicker } from '../../services/webos/templates.service.js';
 
@@ -32,6 +33,23 @@ sitesRouter.post('/generate', async (req, res) => {
 
 sitesRouter.post('/:id/publish', async (req, res) => {
   const site = await sitesService.publishSite(req.user!.userId, req.params.id);
+  res.json({ site });
+});
+
+sitesRouter.patch('/:id', async (req, res) => {
+  const parsed = updateSiteSchema.safeParse(req.body);
+  if (!parsed.success) {
+    return res.status(400).json({ error: parsed.error.issues[0]?.message ?? 'Invalid input.' });
+  }
+  const site = await sitesService.updateSite(req.user!.userId, req.params.id, parsed.data);
+  res.json({ site });
+});
+
+sitesRouter.post('/:id/logo', upload.single('logo'), async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: 'No file uploaded.' });
+  }
+  const site = await sitesService.setSiteLogo(req.user!.userId, req.params.id, `/uploads/${req.file.filename}`);
   res.json({ site });
 });
 

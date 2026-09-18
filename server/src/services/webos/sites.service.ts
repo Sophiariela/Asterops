@@ -83,3 +83,15 @@ export async function publishSite(ownerId: string, id: string) {
   if (!existing) throw new CommerceError(404, 'Site not found.');
   return prisma.site.update({ where: { id }, data: { status: 'PUBLISHED' } });
 }
+
+export async function updateSite(ownerId: string, id: string, data: Partial<{ businessName: string }>) {
+  const existing = await prisma.site.findFirst({ where: { id, ownerId } });
+  if (!existing) throw new CommerceError(404, 'Site not found.');
+  return prisma.site.update({ where: { id }, data });
+}
+
+export async function setSiteLogo(ownerId: string, id: string, logoUrl: string) {
+  const existing = await prisma.site.findFirst({ where: { id, ownerId } });
+  if (!existing) throw new CommerceError(404, 'Site not found.');
+  return prisma.site.update({ where: { id }, data: { logoUrl } });
+}

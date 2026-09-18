@@ -22,7 +22,7 @@ export type PageTemplate = {
   hasLeadForm: boolean;
   seoTitle: string | null;
   seoDescription: string | null;
-  sections: { type: string; heading: string; body: string }[];
+  sections: { type: string; heading: string; body: string; imageUrl: string | null }[];
 };
 
 // These section types represent "what we offer" content — the real
@@ -67,7 +67,7 @@ export function buildPagesFromTemplate(template: TemplateWithTree, input: Genera
     const vars = buildVars(input, page);
     const sections = [...page.sections]
       .sort((a, b) => a.order - b.order)
-      .map((s) => ({ type: s.type, heading: fillTemplate(s.heading, vars), body: sectionBody(s, input, vars) }));
+      .map((s) => ({ type: s.type, heading: fillTemplate(s.heading, vars), body: sectionBody(s, input, vars), imageUrl: null }));
 
     return {
       slug: page.slug,

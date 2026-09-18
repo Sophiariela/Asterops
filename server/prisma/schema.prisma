@@ -348,6 +348,7 @@ model Site {
   businessName    String
   industry        String
   targetAudience  String
+  logoUrl         String?
   playbook        SitePlaybook
   template        Template?      @relation(fields: [templateId], references: [id], onDelete: SetNull)
   templateId      String?
@@ -439,6 +440,7 @@ model Page {
   name            String
   heroHeadline    String
   heroSubheadline String
+  heroImageUrl    String?
   ctaLabel        String
   ctaHref         String?
   sections        Json

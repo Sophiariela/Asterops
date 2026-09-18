@@ -16,6 +16,10 @@ export const generateSiteSchema = z.object({
   playbook: z.enum(playbookValues),
 });
 
+export const updateSiteSchema = z.object({
+  businessName: z.string().min(1).max(120).optional(),
+});
+
 export const generateFromTemplateSchema = z.object({
   templateId: z.string().min(1),
   businessName: z.string().min(1).max(120),
@@ -85,7 +89,12 @@ export const updatePageSchema = z.object({
   seoTitle: z.string().max(160).nullable().optional(),
   seoDescription: z.string().max(300).nullable().optional(),
   hasLeadForm: z.boolean().optional(),
-  sections: z.array(z.object({ type: z.string(), heading: z.string(), body: z.string() })).optional(),
+  sections: z.array(z.object({
+    type: z.string(),
+    heading: z.string(),
+    body: z.string(),
+    imageUrl: z.string().max(300).nullable().optional(),
+  })).optional(),
 });
 
 export const createTrustElementSchema = z.object({
