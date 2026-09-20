@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { Plus, Trash2, Users } from 'lucide-react';
 import { api, ApiError } from '../../lib/api';
 import Modal from '../commerce/Modal';
+import { formatDateTime } from '../../lib/webos/locale';
 import type { Reservation, ReservationStatus, Table } from '../../lib/webos/types';
 
 const STATUSES: ReservationStatus[] = ['PENDING', 'CONFIRMED', 'CANCELLED'];
@@ -11,7 +12,7 @@ const STATUS_STYLE: Record<ReservationStatus, string> = {
   CANCELLED: 'bg-slate-200 text-slate-500',
 };
 
-export default function ReservationsDashboard({ siteId }: { siteId: string }) {
+export default function ReservationsDashboard({ siteId, timezone, country }: { siteId: string; timezone: string | null; country: string | null }) {
   const [reservations, setReservations] = useState<Reservation[] | null>(null);
   const [tables, setTables] = useState<Table[] | null>(null);
   const [filter, setFilter] = useState<'upcoming' | ReservationStatus>('upcoming');
@@ -118,7 +119,7 @@ export default function ReservationsDashboard({ siteId }: { siteId: string }) {
                   <p className="text-slate-400 text-xs">{r.customerEmail}{r.customerPhone ? ` · ${r.customerPhone}` : ''}</p>
                 </td>
                 <td className="px-6 py-4 text-slate-600 flex items-center gap-1.5"><Users size={13} /> {r.partySize}</td>
-                <td className="px-6 py-4 text-slate-600 text-xs">{new Date(r.reservationAt).toLocaleString()}</td>
+                <td className="px-6 py-4 text-slate-600 text-xs">{formatDateTime(r.reservationAt, country, timezone)}</td>
                 <td className="px-6 py-4">
                   <select
                     value={r.tableId ?? ''}

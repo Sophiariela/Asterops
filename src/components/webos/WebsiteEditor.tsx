@@ -2,7 +2,8 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { Monitor, Tablet, Smartphone, Plus, Star, UtensilsCrossed, CalendarCheck, ArrowUpRight, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { api, ApiError } from '../../lib/api';
 import { EditableText, EditableImage } from './editable';
-import type { Site, Page, MenuItem } from '../../lib/webos/types';
+import { formatMoney } from '../../lib/webos/currency';
+import type { Site, Page, MenuItem, Currency } from '../../lib/webos/types';
 
 type Device = 'desktop' | 'tablet' | 'mobile';
 const DEVICE_WIDTH: Record<Device, string> = {
@@ -11,7 +12,7 @@ const DEVICE_WIDTH: Record<Device, string> = {
   mobile: 'max-w-[390px]',
 };
 
-function EditablePrice({ cents, onSave }: { cents: number | null; onSave: (cents: number | null) => void }) {
+function EditablePrice({ cents, currency, onSave }: { cents: number | null; currency: Currency; onSave: (cents: number | null) => void }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(cents === null ? '' : (cents / 100).toFixed(2));
 
@@ -48,7 +49,7 @@ function EditablePrice({ cents, onSave }: { cents: number | null; onSave: (cents
       className="text-sm font-bold text-ink-900 tabular-nums whitespace-nowrap cursor-text rounded transition-shadow hover:shadow-[0_0_0_2px_rgba(124,58,237,0.4)]"
       title="Click to edit price"
     >
-      {cents === null ? <span className="text-slate-400 font-normal italic text-xs">no price</span> : `$${(cents / 100).toFixed(2)}`}
+      {cents === null ? <span className="text-slate-400 font-normal italic text-xs">no price</span> : formatMoney(cents, currency)}
     </span>
   );
 }
@@ -307,7 +308,7 @@ export default function WebsiteEditor({
                   <div className="p-4">
                     <div className="flex items-center justify-between gap-2">
                       <EditableText value={item.name} onSave={(v) => patchMenuItem(item.id, { name: v })} as="p" className="text-sm font-bold text-ink-900" />
-                      <EditablePrice cents={item.priceCents} onSave={(c) => patchMenuItem(item.id, { priceCents: c })} />
+                      <EditablePrice cents={item.priceCents} currency={site.currency} onSave={(c) => patchMenuItem(item.id, { priceCents: c })} />
                     </div>
                     {item.description && <p className="text-xs text-slate-500 mt-1">{item.description}</p>}
                   </div>
@@ -347,7 +348,7 @@ export default function WebsiteEditor({
                             </p>
                             {item.description && <p className="text-xs text-slate-500 mt-0.5">{item.description}</p>}
                           </div>
-                          <EditablePrice cents={item.priceCents} onSave={(c) => patchMenuItem(item.id, { priceCents: c })} />
+                          <EditablePrice cents={item.priceCents} currency={site.currency} onSave={(c) => patchMenuItem(item.id, { priceCents: c })} />
                         </div>
                       ))}
                       {cat.items.length === 0 && <p className="text-xs text-slate-400">No items in this category yet.</p>}

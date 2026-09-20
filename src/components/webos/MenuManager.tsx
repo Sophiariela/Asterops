@@ -2,7 +2,8 @@ import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { Plus, Trash2, Star, Image as ImageIcon, Pencil } from 'lucide-react';
 import { api, ApiError, resolveUploadUrl } from '../../lib/api';
 import Modal from '../commerce/Modal';
-import type { MenuCategory, MenuItem } from '../../lib/webos/types';
+import { formatMoney, currencySymbol } from '../../lib/webos/currency';
+import type { MenuCategory, MenuItem, Currency } from '../../lib/webos/types';
 
 function dollarsToCents(v: string): number | undefined {
   const n = Number(v);
@@ -12,7 +13,7 @@ function dollarsToCents(v: string): number | undefined {
 
 type ItemModalState = { categoryId: string; categoryName: string; item: MenuItem | null };
 
-export default function MenuManager({ siteId }: { siteId: string }) {
+export default function MenuManager({ siteId, currency }: { siteId: string; currency: Currency }) {
   const [categories, setCategories] = useState<MenuCategory[] | null>(null);
 
   const [showCategoryForm, setShowCategoryForm] = useState(false);
@@ -129,7 +130,10 @@ export default function MenuManager({ siteId }: { siteId: string }) {
 
   return (
     <div className="space-y-6">
-      <p className="text-sm text-slate-500">Build your menu the way you'd stock a shelf: add a category, then add items to it — each with a name, price, description, and photo.</p>
+      <p className="text-sm text-slate-500">
+        Build your menu the way you'd stock a shelf: add a category, then add items to it — each with a name, price, description, and photo.
+        Prices display in <strong>{currency}</strong> — change this in Settings → Business Settings.
+      </p>
 
       <div className="flex items-center justify-between">
         <p className="text-xs font-bold text-slate-400 uppercase tracking-wide">Categories ({categories.length})</p>
@@ -167,7 +171,7 @@ export default function MenuManager({ siteId }: { siteId: string }) {
                     {item.description && <p className="text-xs text-slate-500 mt-0.5 truncate">{item.description}</p>}
                   </button>
                   <span className="text-sm font-bold text-ink-900 tabular-nums shrink-0">
-                    {item.priceCents === null ? <span className="text-slate-400 font-normal italic text-xs">no price</span> : `$${(item.priceCents / 100).toFixed(2)}`}
+                    {item.priceCents === null ? <span className="text-slate-400 font-normal italic text-xs">no price</span> : formatMoney(item.priceCents, currency)}
                   </span>
                   <label className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 cursor-pointer shrink-0">
                     <input type="checkbox" checked={item.available} onChange={(e) => toggleItem(item.id, 'available', e.target.checked)} className="accent-ASTER-600" />
@@ -231,8 +235,11 @@ export default function MenuManager({ siteId }: { siteId: string }) {
               <input required value={itemForm.name} onChange={(e) => setItemForm((f) => ({ ...f, name: e.target.value }))} className="w-full border-2 border-ASTER-100 focus:border-ASTER-600 rounded-2xl px-4 py-3 text-[15px] outline-none transition-colors" />
             </div>
             <div>
-              <label className="text-[13px] font-bold text-ink-900 block mb-1.5">Price (USD)</label>
-              <input value={itemForm.price} onChange={(e) => setItemForm((f) => ({ ...f, price: e.target.value }))} placeholder="e.g. 12.50 — leave blank to set later" className="w-full border-2 border-ASTER-100 focus:border-ASTER-600 rounded-2xl px-4 py-3 text-[15px] outline-none transition-colors" />
+              <label className="text-[13px] font-bold text-ink-900 block mb-1.5">Price ({currency})</label>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-[15px] font-semibold pointer-events-none">{currencySymbol(currency)}</span>
+                <input value={itemForm.price} onChange={(e) => setItemForm((f) => ({ ...f, price: e.target.value }))} placeholder="12.50 — leave blank to set later" className="w-full border-2 border-ASTER-100 focus:border-ASTER-600 rounded-2xl pl-11 pr-4 py-3 text-[15px] outline-none transition-colors" />
+              </div>
             </div>
             <div>
               <label className="text-[13px] font-bold text-ink-900 block mb-1.5">Description</label>

@@ -11,10 +11,11 @@ import WebsiteEditor from '../../components/webos/WebsiteEditor';
 import ReservationsDashboard from '../../components/webos/ReservationsDashboard';
 import MenuManager from '../../components/webos/MenuManager';
 import { computeBlueprint } from '../../lib/webos/blueprint';
+import { CURRENCIES } from '../../lib/webos/currency';
 import type {
   Site, Page, Testimonial, TrustElement, TrustElementType, Playbook, WebsiteHealth, ConversionAudit, TrustGap,
   RecommendedAction, Lead, LeadStatus, ConversionPathsResult, PageInventoryItem,
-  PageSectionInventory, TrustMap, LeadCaptureMap, DeploymentReadiness,
+  PageSectionInventory, TrustMap, LeadCaptureMap, DeploymentReadiness, Currency, CountryPreset,
 } from '../../lib/webos/types';
 
 function scoreColor(score: number) {
@@ -46,6 +47,7 @@ export default function SiteDetailPage() {
 
   const [site, setSite] = useState<Site | null>(null);
   const [playbooks, setPlaybooks] = useState<Playbook[]>([]);
+  const [countryPresets, setCountryPresets] = useState<CountryPreset[]>([]);
   const [health, setHealth] = useState<WebsiteHealth | null>(null);
   const [audit, setAudit] = useState<ConversionAudit | null>(null);
   const [auditRunning, setAuditRunning] = useState(false);
@@ -111,6 +113,7 @@ export default function SiteDetailPage() {
   useEffect(loadCore, [id]);
   useEffect(() => {
     api.get<{ playbooks: Playbook[] }>('/webos/sites/playbooks').then((data) => setPlaybooks(data.playbooks)).catch(() => {});
+    api.get<{ countries: CountryPreset[] }>('/webos/sites/country-presets').then((data) => setCountryPresets(data.countries)).catch(() => {});
   }, []);
   useEffect(() => {
     if (tab === 'settings' && site) {
@@ -278,6 +281,18 @@ export default function SiteDetailPage() {
     }
   };
 
+  const updateCurrency = async (currency: Currency) => {
+    if (!id) return;
+    await api.patch(`/webos/sites/${id}`, { currency });
+    loadCore();
+  };
+
+  const updateCountry = async (country: string) => {
+    if (!id) return;
+    await api.patch(`/webos/sites/${id}`, country ? { country } : {});
+    loadCore();
+  };
+
   const deleteSite = async () => {
     if (!id) return;
     setDeleting(true);
@@ -358,13 +373,13 @@ export default function SiteDetailPage() {
 
       {tab === 'reservations' && (
         <div className="mt-6">
-          <ReservationsDashboard siteId={site.id} />
+          <ReservationsDashboard siteId={site.id} timezone={site.timezone} country={site.country} />
         </div>
       )}
 
       {tab === 'menu' && (
         <div className="mt-6">
-          <MenuManager siteId={site.id} />
+          <MenuManager siteId={site.id} currency={site.currency} />
         </div>
       )}
 
@@ -726,6 +741,33 @@ export default function SiteDetailPage() {
               {settingsSaved && <span className="text-sm font-semibold text-emerald-600">Saved</span>}
             </div>
           </form>
+
+          <div className="bg-white rounded-[28px] card-shadow border border-ASTER-100 p-6 space-y-4">
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-wide">Business settings</p>
+            <div>
+              <label className="text-[13px] font-bold text-ink-900 block mb-1.5">Currency</label>
+              <select
+                value={site.currency}
+                onChange={(e) => updateCurrency(e.target.value as Currency)}
+                className="w-full border-2 border-ASTER-100 focus:border-ASTER-600 rounded-2xl px-4 py-3 text-[15px] outline-none transition-colors"
+              >
+                {CURRENCIES.map((c) => <option key={c.code} value={c.code}>{c.symbol} {c.code} — {c.label}</option>)}
+              </select>
+              <p className="text-xs text-slate-400 mt-1.5">Menu prices display in this currency everywhere on the site.</p>
+            </div>
+            <div>
+              <label className="text-[13px] font-bold text-ink-900 block mb-1.5">Country</label>
+              <select
+                value={site.country ?? ''}
+                onChange={(e) => e.target.value && updateCountry(e.target.value)}
+                className="w-full border-2 border-ASTER-100 focus:border-ASTER-600 rounded-2xl px-4 py-3 text-[15px] outline-none transition-colors"
+              >
+                <option value="">Not set</option>
+                {countryPresets.map((c) => <option key={c.code} value={c.code}>{c.name}</option>)}
+              </select>
+              <p className="text-xs text-slate-400 mt-1.5">Choosing a country automatically sets your currency and timezone (used for reservation times) to match.</p>
+            </div>
+          </div>
 
           <div className="bg-white rounded-[28px] card-shadow border border-ASTER-100 p-6">
             <p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-3">Publishing</p>

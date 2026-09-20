@@ -5,6 +5,8 @@ export type SiteStatus = 'DRAFT' | 'PUBLISHED';
 export type LeadStatus = 'NEW' | 'QUALIFIED' | 'CONVERTED' | 'LOST';
 export type TrustElementType = 'CASE_STUDY' | 'CLIENT_LOGO' | 'CERTIFICATION';
 export type ReservationStatus = 'PENDING' | 'CONFIRMED' | 'CANCELLED';
+export type Currency = 'USD' | 'BRL' | 'EUR' | 'GBP' | 'INR' | 'CAD' | 'AUD';
+export type CountryPreset = { code: string; name: string; currency: Currency; timezone: string };
 
 export type Playbook = { key: PlaybookKey; label: string; description: string };
 
@@ -73,6 +75,9 @@ export type Site = {
   industry: string;
   targetAudience: string;
   logoUrl: string | null;
+  currency: Currency;
+  country: string | null;
+  timezone: string | null;
   playbook: PlaybookKey;
   status: SiteStatus;
   pages: Page[];
