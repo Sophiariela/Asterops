@@ -8,6 +8,7 @@ export const trustElementTypeValues = ['CASE_STUDY', 'CLIENT_LOGO', 'CERTIFICATI
 export const leadStatusValues = ['NEW', 'QUALIFIED', 'CONVERTED', 'LOST'] as const;
 export const templateComplexityValues = ['SIMPLE', 'STANDARD', 'ADVANCED'] as const;
 export const reservationStatusValues = ['PENDING', 'CONFIRMED', 'CANCELLED'] as const;
+export const siteCurrencyValues = ['USD', 'BRL', 'EUR', 'GBP', 'INR', 'CAD', 'AUD'] as const;
 
 export const generateSiteSchema = z.object({
   businessName: z.string().min(1).max(120),
@@ -21,6 +22,8 @@ export const updateSiteSchema = z.object({
   businessName: z.string().min(1).max(120).optional(),
   industry: z.string().min(1).max(120).optional(),
   targetAudience: z.string().min(1).max(160).optional(),
+  currency: z.enum(siteCurrencyValues).optional(),
+  country: z.string().length(2).optional(),
 });
 
 export const generateFromTemplateSchema = z.object({

@@ -1,8 +1,9 @@
-import type { SitePlaybook } from '@prisma/client';
+import type { SitePlaybook, SiteCurrency } from '@prisma/client';
 import { prisma } from '../../lib/prisma.js';
 import { CommerceError } from '../../lib/commerceError.js';
 import { getPublishedTemplateByKey, getPublishedTemplateById } from './templates.service.js';
 import { buildPagesFromTemplate, type GeneratorInput } from './templateEngine.js';
+import { findCountryPreset } from '../../lib/countryPresets.js';
 
 export async function listSites(ownerId: string) {
   return prisma.site.findMany({
@@ -108,10 +109,23 @@ export async function publishSite(ownerId: string, id: string) {
 export async function updateSite(
   ownerId: string,
   id: string,
-  data: Partial<{ businessName: string; industry: string; targetAudience: string }>,
+  data: Partial<{ businessName: string; industry: string; targetAudience: string; currency: SiteCurrency; country: string }>,
 ) {
   const existing = await prisma.site.findFirst({ where: { id, ownerId } });
   if (!existing) throw new CommerceError(404, 'Site not found.');
+
+  // Country is a shortcut that fills in Currency + Timezone together —
+  // it always wins over a currency sent in the same request, since
+  // picking a country is the more specific, more recent intent.
+  if (data.country) {
+    const preset = findCountryPreset(data.country);
+    if (!preset) throw new CommerceError(400, 'Unsupported country.');
+    return prisma.site.update({
+      where: { id },
+      data: { ...data, country: preset.code, currency: preset.currency, timezone: preset.timezone },
+    });
+  }
+
   return prisma.site.update({ where: { id }, data });
 }
 

@@ -94,6 +94,16 @@ enum TrustElementType {
   CERTIFICATION
 }
 
+enum SiteCurrency {
+  USD
+  BRL
+  EUR
+  GBP
+  INR
+  CAD
+  AUD
+}
+
 enum SiteStatus {
   DRAFT
   PUBLISHED
@@ -349,6 +359,9 @@ model Site {
   industry        String
   targetAudience  String
   logoUrl         String?
+  currency        SiteCurrency   @default(USD)
+  country         String?
+  timezone        String?
   playbook        SitePlaybook
   template        Template?      @relation(fields: [templateId], references: [id], onDelete: SetNull)
   templateId      String?

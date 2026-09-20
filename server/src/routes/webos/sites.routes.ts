@@ -4,12 +4,17 @@ import { upload } from '../../middleware/upload.js';
 import { generateSiteSchema, updateSiteSchema } from '../../validation/webos.js';
 import * as sitesService from '../../services/webos/sites.service.js';
 import { listPublishedSummariesForLegacyPicker } from '../../services/webos/templates.service.js';
+import { COUNTRY_PRESETS } from '../../lib/countryPresets.js';
 
 export const sitesRouter = Router();
 sitesRouter.use(authenticate, requireRole('CUSTOMER'));
 
 sitesRouter.get('/playbooks', async (_req, res) => {
   res.json({ playbooks: await listPublishedSummariesForLegacyPicker() });
+});
+
+sitesRouter.get('/country-presets', (_req, res) => {
+  res.json({ countries: COUNTRY_PRESETS });
 });
 
 sitesRouter.get('/', async (req, res) => {
