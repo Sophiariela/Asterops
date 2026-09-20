@@ -1,7 +1,12 @@
 import { useEffect, useRef, useState, type ElementType, type KeyboardEvent } from 'react';
-import { Monitor, Tablet, Smartphone, Image as ImageIcon, Plus, Star } from 'lucide-react';
+import { Monitor, Tablet, Smartphone, Image as ImageIcon, Plus, Star, UtensilsCrossed, CalendarCheck, ArrowUpRight } from 'lucide-react';
 import { api, resolveUploadUrl } from '../../lib/api';
 import type { Site, Page } from '../../lib/webos/types';
+
+function formatPrice(cents: number | null): string {
+  if (cents === null) return 'Add price';
+  return `$${(cents / 100).toFixed(2)}`;
+}
 
 type Device = 'desktop' | 'tablet' | 'mobile';
 const DEVICE_WIDTH: Record<Device, string> = {
@@ -139,11 +144,15 @@ export default function WebsiteEditor({
   onRefresh,
   onAddTestimonial,
   onPublish,
+  onManageMenu,
+  onManageReservations,
 }: {
   site: Site;
   onRefresh: () => void;
   onAddTestimonial: () => void;
   onPublish: () => void;
+  onManageMenu?: () => void;
+  onManageReservations?: () => void;
 }) {
   const [activePageId, setActivePageId] = useState(site.pages[0]?.id ?? '');
   const [device, setDevice] = useState<Device>('desktop');
@@ -181,6 +190,10 @@ export default function WebsiteEditor({
   if (!page) {
     return <p className="text-slate-400">No pages on this site yet.</p>;
   }
+
+  const isRestaurant = site.playbook === 'RESTAURANT';
+  const isMenuPage = isRestaurant && page.slug === 'menu';
+  const isReservationIntentPage = isRestaurant && (page.slug === 'home' || page.slug === 'reservations');
 
   return (
     <div>
@@ -273,9 +286,50 @@ export default function WebsiteEditor({
           </div>
         </div>
 
+        {/* Restaurant Menu — dynamic from the Menu Manager, not static bullet text */}
+        {isMenuPage && (
+          <div className="p-6 sm:p-10 border-t border-ASTER-100">
+            <div className="flex items-center justify-between gap-4 mb-5">
+              <p className="font-display font-bold text-xl text-ink-900 flex items-center gap-2"><UtensilsCrossed size={18} className="text-ASTER-600" /> Menu</p>
+              {onManageMenu && (
+                <button onClick={onManageMenu} className="flex items-center gap-1 text-xs font-bold text-ASTER-600 hover:text-ASTER-700">
+                  Manage menu <ArrowUpRight size={13} />
+                </button>
+              )}
+            </div>
+            {site.menuCategories.length === 0 ? (
+              <p className="text-sm text-slate-400">No menu items yet — add categories and items in Menu Manager.</p>
+            ) : (
+              <div className="space-y-6">
+                {site.menuCategories.map((cat) => (
+                  <div key={cat.id}>
+                    <p className="text-xs font-bold text-ASTER-600 uppercase tracking-wide mb-2">{cat.name}</p>
+                    <div className="space-y-2">
+                      {cat.items.map((item) => (
+                        <div key={item.id} className={`flex items-start justify-between gap-4 py-2 border-b border-ASTER-50 ${!item.available ? 'opacity-50' : ''}`}>
+                          <div>
+                            <p className="text-sm font-semibold text-ink-900 flex items-center gap-1.5">
+                              {item.name}
+                              {item.featured && <span className="text-[9px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded-full">FEATURED</span>}
+                              {!item.available && <span className="text-[9px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded-full">UNAVAILABLE</span>}
+                            </p>
+                            {item.description && <p className="text-xs text-slate-500 mt-0.5">{item.description}</p>}
+                          </div>
+                          <span className="text-sm font-bold text-ink-900 whitespace-nowrap tabular-nums">{formatPrice(item.priceCents)}</span>
+                        </div>
+                      ))}
+                      {cat.items.length === 0 && <p className="text-xs text-slate-400">No items in this category yet.</p>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Sections */}
         <div className="divide-y divide-ASTER-100">
-          {page.sections.map((section, i) =>
+          {!isMenuPage && page.sections.map((section, i) =>
             section.type === 'trust-placeholder' ? (
               <div key={i} className="p-6 sm:p-10">
                 <EditableText
@@ -326,8 +380,36 @@ export default function WebsiteEditor({
           )}
         </div>
 
-        {/* Lead capture form */}
-        {page.hasLeadForm && (
+        {/* Reservation form — real date/time/party-size flow, replacing the generic contact form for a restaurant's booking pages */}
+        {page.hasLeadForm && isReservationIntentPage && (
+          <div className="p-6 sm:p-10 bg-slate-50 border-t border-ASTER-100">
+            <div className="flex items-center justify-between gap-4 mb-1">
+              <p className="font-display font-bold text-lg text-ink-900 flex items-center gap-2"><CalendarCheck size={18} className="text-ASTER-600" /> Reserve a table</p>
+              {onManageReservations && (
+                <button onClick={onManageReservations} className="flex items-center gap-1 text-xs font-bold text-ASTER-600 hover:text-ASTER-700">
+                  Manage reservations <ArrowUpRight size={13} />
+                </button>
+              )}
+            </div>
+            <p className="text-xs text-slate-400 mb-4">Preview — captures a real reservation request once the site is published and live.</p>
+            <div className="grid sm:grid-cols-2 gap-3 max-w-lg">
+              <input disabled type="date" className="border-2 border-ASTER-100 rounded-xl px-4 py-2.5 text-sm bg-white text-slate-400" />
+              <input disabled type="time" className="border-2 border-ASTER-100 rounded-xl px-4 py-2.5 text-sm bg-white text-slate-400" />
+              <select disabled className="sm:col-span-2 border-2 border-ASTER-100 rounded-xl px-4 py-2.5 text-sm bg-white text-slate-400">
+                <option>Party size</option>
+              </select>
+              <input disabled placeholder="Name" className="border-2 border-ASTER-100 rounded-xl px-4 py-2.5 text-sm bg-white" />
+              <input disabled placeholder="Email" className="border-2 border-ASTER-100 rounded-xl px-4 py-2.5 text-sm bg-white" />
+              <input disabled placeholder="Phone (optional)" className="sm:col-span-2 border-2 border-ASTER-100 rounded-xl px-4 py-2.5 text-sm bg-white" />
+              <button disabled className="sm:col-span-2 bg-ASTER-600 text-white font-bold text-sm py-2.5 rounded-full opacity-90">
+                Request reservation
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Generic lead capture form — everything else (e.g. a restaurant's general Contact page, or any non-restaurant site) */}
+        {page.hasLeadForm && !isReservationIntentPage && (
           <div className="p-6 sm:p-10 bg-slate-50 border-t border-ASTER-100">
             <p className="font-display font-bold text-lg text-ink-900 mb-1">Get in touch</p>
             <p className="text-xs text-slate-400 mb-4">Preview — this form captures real leads once the site is published and live.</p>

@@ -8,6 +8,8 @@ import { api, ApiError } from '../../lib/api';
 import Modal from '../../components/commerce/Modal';
 import BlueprintCard from '../../components/webos/BlueprintCard';
 import WebsiteEditor from '../../components/webos/WebsiteEditor';
+import ReservationsDashboard from '../../components/webos/ReservationsDashboard';
+import MenuManager from '../../components/webos/MenuManager';
 import { computeBlueprint } from '../../lib/webos/blueprint';
 import type {
   Site, Page, Testimonial, TrustElement, TrustElementType, Playbook, WebsiteHealth, ConversionAudit, TrustGap,
@@ -29,7 +31,7 @@ const LEAD_STATUS_STYLE: Record<LeadStatus, string> = {
   LOST: 'bg-slate-200 text-slate-500',
 };
 
-type Tab = 'website' | 'overview' | 'architecture' | 'pages' | 'trust' | 'leads';
+type Tab = 'website' | 'overview' | 'architecture' | 'pages' | 'trust' | 'leads' | 'reservations' | 'menu';
 const TABS: { key: Tab; label: string }[] = [
   { key: 'website', label: 'Website' },
   { key: 'overview', label: 'Insights' },
@@ -293,7 +295,12 @@ export default function SiteDetailPage() {
       )}
 
       <div className="mt-6 flex items-center gap-1 border-b border-ASTER-100 overflow-x-auto">
-        {TABS.map((t) => (
+        {[
+          ...TABS,
+          ...(site.playbook === 'RESTAURANT'
+            ? ([{ key: 'reservations', label: 'Reservations' }, { key: 'menu', label: 'Menu' }] as { key: Tab; label: string }[])
+            : []),
+        ].map((t) => (
           <button
             key={t.key}
             onClick={() => setTab(t.key)}
@@ -311,7 +318,21 @@ export default function SiteDetailPage() {
             onRefresh={loadCore}
             onAddTestimonial={() => setShowTestimonialForm(true)}
             onPublish={publish}
+            onManageMenu={() => setTab('menu')}
+            onManageReservations={() => setTab('reservations')}
           />
+        </div>
+      )}
+
+      {tab === 'reservations' && (
+        <div className="mt-6">
+          <ReservationsDashboard siteId={site.id} />
+        </div>
+      )}
+
+      {tab === 'menu' && (
+        <div className="mt-6">
+          <MenuManager siteId={site.id} />
         </div>
       )}
 

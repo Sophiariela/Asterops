@@ -4,6 +4,7 @@ export type PlaybookKey =
 export type SiteStatus = 'DRAFT' | 'PUBLISHED';
 export type LeadStatus = 'NEW' | 'QUALIFIED' | 'CONVERTED' | 'LOST';
 export type TrustElementType = 'CASE_STUDY' | 'CLIENT_LOGO' | 'CERTIFICATION';
+export type ReservationStatus = 'PENDING' | 'CONFIRMED' | 'CANCELLED';
 
 export type Playbook = { key: PlaybookKey; label: string; description: string };
 
@@ -46,6 +47,25 @@ export type TrustElement = {
   createdAt: string;
 };
 
+export type MenuItem = {
+  id: string;
+  categoryId: string;
+  name: string;
+  description: string | null;
+  priceCents: number | null;
+  available: boolean;
+  featured: boolean;
+  order: number;
+};
+
+export type MenuCategory = {
+  id: string;
+  siteId: string;
+  name: string;
+  order: number;
+  items: MenuItem[];
+};
+
 export type Site = {
   id: string;
   businessName: string;
@@ -57,9 +77,34 @@ export type Site = {
   pages: Page[];
   testimonials: Testimonial[];
   trustElements: TrustElement[];
+  menuCategories: MenuCategory[];
   createdAt: string;
   updatedAt: string;
   _count?: { pages: number; testimonials: number; leads: number };
+};
+
+export type Table = {
+  id: string;
+  siteId: string;
+  name: string;
+  capacity: number;
+  createdAt: string;
+};
+
+export type Reservation = {
+  id: string;
+  siteId: string;
+  tableId: string | null;
+  table?: { id: string; name: string } | null;
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string | null;
+  partySize: number;
+  reservationAt: string;
+  durationMinutes: number;
+  status: ReservationStatus;
+  notes: string | null;
+  createdAt: string;
 };
 
 export type HealthFactor = { key: string; label: string; available: boolean; score: number | null; detail: string };
