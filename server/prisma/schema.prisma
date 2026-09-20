@@ -578,6 +578,7 @@ model MenuItem {
   name        String
   description String?
   priceCents  Int?
+  imageUrl    String?
   available   Boolean      @default(true)
   featured    Boolean      @default(false)
   order       Int          @default(0)

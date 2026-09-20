@@ -19,6 +19,8 @@ export const generateSiteSchema = z.object({
 
 export const updateSiteSchema = z.object({
   businessName: z.string().min(1).max(120).optional(),
+  industry: z.string().min(1).max(120).optional(),
+  targetAudience: z.string().min(1).max(160).optional(),
 });
 
 export const generateFromTemplateSchema = z.object({

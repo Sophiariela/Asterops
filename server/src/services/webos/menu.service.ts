@@ -70,6 +70,12 @@ export async function updateItem(
   return prisma.menuItem.update({ where: { id }, data });
 }
 
+export async function setItemImage(ownerId: string, siteId: string, id: string, imageUrl: string) {
+  const item = await prisma.menuItem.findFirst({ where: { id, category: { siteId, site: { ownerId } } } });
+  if (!item) throw new CommerceError(404, 'Menu item not found.');
+  return prisma.menuItem.update({ where: { id }, data: { imageUrl } });
+}
+
 export async function deleteItem(ownerId: string, siteId: string, id: string) {
   const item = await prisma.menuItem.findFirst({ where: { id, category: { siteId, site: { ownerId } } } });
   if (!item) throw new CommerceError(404, 'Menu item not found.');

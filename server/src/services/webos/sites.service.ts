@@ -105,7 +105,11 @@ export async function publishSite(ownerId: string, id: string) {
   return prisma.site.update({ where: { id }, data: { status: 'PUBLISHED' } });
 }
 
-export async function updateSite(ownerId: string, id: string, data: Partial<{ businessName: string }>) {
+export async function updateSite(
+  ownerId: string,
+  id: string,
+  data: Partial<{ businessName: string; industry: string; targetAudience: string }>,
+) {
   const existing = await prisma.site.findFirst({ where: { id, ownerId } });
   if (!existing) throw new CommerceError(404, 'Site not found.');
   return prisma.site.update({ where: { id }, data });
