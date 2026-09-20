@@ -1,12 +1,8 @@
-import { useEffect, useRef, useState, type ElementType, type KeyboardEvent } from 'react';
-import { Monitor, Tablet, Smartphone, Image as ImageIcon, Plus, Star, UtensilsCrossed, CalendarCheck, ArrowUpRight } from 'lucide-react';
-import { api, resolveUploadUrl } from '../../lib/api';
-import type { Site, Page } from '../../lib/webos/types';
-
-function formatPrice(cents: number | null): string {
-  if (cents === null) return 'Add price';
-  return `$${(cents / 100).toFixed(2)}`;
-}
+import { useEffect, useState, type FormEvent } from 'react';
+import { Monitor, Tablet, Smartphone, Plus, Star, UtensilsCrossed, CalendarCheck, ArrowUpRight, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { api, ApiError } from '../../lib/api';
+import { EditableText, EditableImage } from './editable';
+import type { Site, Page, MenuItem } from '../../lib/webos/types';
 
 type Device = 'desktop' | 'tablet' | 'mobile';
 const DEVICE_WIDTH: Record<Device, string> = {
@@ -15,127 +11,115 @@ const DEVICE_WIDTH: Record<Device, string> = {
   mobile: 'max-w-[390px]',
 };
 
-const EDITABLE_HOVER =
-  'cursor-text rounded transition-shadow hover:shadow-[0_0_0_2px_rgba(124,58,237,0.4)] hover:shadow-ASTER-400 outline-none';
-
-function EditableText({
-  value,
-  onSave,
-  as: Tag = 'span',
-  className = '',
-  multiline = false,
-  placeholder = 'Click to edit',
-}: {
-  value: string;
-  onSave: (value: string) => void;
-  as?: ElementType;
-  className?: string;
-  multiline?: boolean;
-  placeholder?: string;
-}) {
+function EditablePrice({ cents, onSave }: { cents: number | null; onSave: (cents: number | null) => void }) {
   const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState(value);
+  const [draft, setDraft] = useState(cents === null ? '' : (cents / 100).toFixed(2));
 
   useEffect(() => {
-    if (!editing) setDraft(value);
-  }, [value, editing]);
+    if (!editing) setDraft(cents === null ? '' : (cents / 100).toFixed(2));
+  }, [cents, editing]);
 
   const commit = () => {
     setEditing(false);
-    const trimmed = draft.trim();
-    if (trimmed && trimmed !== value) onSave(trimmed);
-    else setDraft(value);
-  };
-
-  const cancel = () => {
-    setDraft(value);
-    setEditing(false);
-  };
-
-  const onKeyDown = (e: KeyboardEvent) => {
-    if (e.key === 'Escape') cancel();
-    if (e.key === 'Enter' && !multiline) {
-      e.preventDefault();
-      commit();
+    if (draft.trim() === '') {
+      onSave(null);
+      return;
     }
+    const n = Number(draft);
+    if (!Number.isNaN(n) && n >= 0) onSave(Math.round(n * 100));
   };
 
   if (editing) {
-    return multiline ? (
-      <textarea
-        autoFocus
-        value={draft}
-        onChange={(e) => setDraft(e.target.value)}
-        onBlur={commit}
-        onKeyDown={onKeyDown}
-        rows={Math.max(2, draft.split('\n').length)}
-        className={`${className} w-full bg-white text-ink-900 rounded-lg px-2 py-1.5 outline-none ring-2 ring-ASTER-500 resize-y`}
-      />
-    ) : (
+    return (
       <input
         autoFocus
         value={draft}
         onChange={(e) => setDraft(e.target.value)}
         onBlur={commit}
-        onKeyDown={onKeyDown}
-        className={`${className} w-full bg-white text-ink-900 rounded-lg px-2 py-1 outline-none ring-2 ring-ASTER-500`}
+        onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); commit(); } }}
+        className="w-20 bg-white text-ink-900 rounded-lg px-2 py-1 outline-none ring-2 ring-ASTER-500 text-sm font-bold text-right"
       />
     );
   }
 
   return (
-    <Tag onClick={() => setEditing(true)} className={`${className} ${EDITABLE_HOVER} whitespace-pre-line`} title="Click to edit">
-      {value || placeholder}
-    </Tag>
+    <span
+      onClick={(e) => { e.stopPropagation(); setEditing(true); }}
+      className="text-sm font-bold text-ink-900 tabular-nums whitespace-nowrap cursor-text rounded transition-shadow hover:shadow-[0_0_0_2px_rgba(124,58,237,0.4)]"
+      title="Click to edit price"
+    >
+      {cents === null ? <span className="text-slate-400 font-normal italic text-xs">no price</span> : `$${(cents / 100).toFixed(2)}`}
+    </span>
   );
 }
 
-function EditableImage({
-  src,
-  onUpload,
-  className = '',
-  label = 'Add photo',
-  rounded = 'rounded-2xl',
-}: {
-  src: string | null | undefined;
-  onUpload: (file: File) => void;
-  className?: string;
-  label?: string;
-  rounded?: string;
-}) {
-  const inputRef = useRef<HTMLInputElement>(null);
-  const resolved = resolveUploadUrl(src);
+function ReservationBookingForm({ siteId }: { siteId: string }) {
+  const [form, setForm] = useState({ date: '', time: '', partySize: '2', name: '', email: '', phone: '', notes: '' });
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
+  const [confirmed, setConfirmed] = useState<{ name: string; date: string; time: string; partySize: string } | null>(null);
+
+  const submit = async (e: FormEvent) => {
+    e.preventDefault();
+    setError('');
+    if (!form.date || !form.time || !form.name || !form.email) {
+      setError('Please fill in date, time, name and email.');
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const reservationAt = new Date(`${form.date}T${form.time}`).toISOString();
+      await api.post('/webos/public/reservations', {
+        siteId,
+        customerName: form.name,
+        customerEmail: form.email,
+        customerPhone: form.phone || undefined,
+        partySize: Number(form.partySize),
+        reservationAt,
+        notes: form.notes || undefined,
+      });
+      setConfirmed({ name: form.name, date: form.date, time: form.time, partySize: form.partySize });
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Could not submit this reservation.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (confirmed) {
+    return (
+      <div className="text-center py-8 max-w-lg mx-auto">
+        <CheckCircle2 className="mx-auto text-emerald-600" size={32} />
+        <p className="font-display font-bold text-lg text-ink-900 mt-3">Reservation requested!</p>
+        <p className="text-sm text-slate-500 mt-1">
+          {confirmed.name}, party of {confirmed.partySize} on {confirmed.date} at {confirmed.time}. We'll confirm shortly.
+        </p>
+        <button onClick={() => setConfirmed(null)} className="mt-4 text-sm font-bold text-ASTER-600 hover:text-ASTER-700">
+          Make another reservation
+        </button>
+      </div>
+    );
+  }
+
+  const today = new Date().toISOString().slice(0, 10);
 
   return (
-    <div
-      className={`relative group ${rounded} overflow-hidden bg-gradient-to-br from-ASTER-100 to-ASTER-50 cursor-pointer ${className}`}
-      onClick={() => inputRef.current?.click()}
-    >
-      {resolved ? (
-        <img src={resolved} alt="" className="w-full h-full object-cover" />
-      ) : (
-        <div className="w-full h-full flex flex-col items-center justify-center text-ASTER-400 gap-1.5 min-h-[80px]">
-          <ImageIcon size={24} />
-          <span className="text-[11px] font-bold">{label}</span>
-        </div>
-      )}
-      <div className="absolute inset-0 bg-ink-950/0 group-hover:bg-ink-950/35 transition-colors flex items-center justify-center">
-        <span className="text-white text-[11px] font-bold bg-ink-950/70 px-3 py-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-          {resolved ? 'Replace photo' : label}
-        </span>
-      </div>
-      <input
-        ref={inputRef}
-        type="file"
-        accept="image/*"
-        className="hidden"
-        onChange={(e) => {
-          const file = e.target.files?.[0];
-          if (file) onUpload(file);
-          e.target.value = '';
-        }}
-      />
-    </div>
+    <form onSubmit={submit} className="grid sm:grid-cols-2 gap-3 max-w-lg">
+      <input required type="date" min={today} value={form.date} onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))} className="border-2 border-ASTER-100 focus:border-ASTER-600 rounded-xl px-4 py-2.5 text-sm outline-none transition-colors" />
+      <input required type="time" value={form.time} onChange={(e) => setForm((f) => ({ ...f, time: e.target.value }))} className="border-2 border-ASTER-100 focus:border-ASTER-600 rounded-xl px-4 py-2.5 text-sm outline-none transition-colors" />
+      <select value={form.partySize} onChange={(e) => setForm((f) => ({ ...f, partySize: e.target.value }))} className="sm:col-span-2 border-2 border-ASTER-100 focus:border-ASTER-600 rounded-xl px-4 py-2.5 text-sm outline-none transition-colors">
+        {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => <option key={n} value={n}>{n} {n === 1 ? 'guest' : 'guests'}</option>)}
+        <option value={12}>10+ guests</option>
+      </select>
+      <input required placeholder="Name" value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} className="border-2 border-ASTER-100 focus:border-ASTER-600 rounded-xl px-4 py-2.5 text-sm outline-none transition-colors" />
+      <input required type="email" placeholder="Email" value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} className="border-2 border-ASTER-100 focus:border-ASTER-600 rounded-xl px-4 py-2.5 text-sm outline-none transition-colors" />
+      <input placeholder="Phone (optional)" value={form.phone} onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))} className="sm:col-span-2 border-2 border-ASTER-100 focus:border-ASTER-600 rounded-xl px-4 py-2.5 text-sm outline-none transition-colors" />
+      <textarea placeholder="Special requests (optional)" rows={2} value={form.notes} onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))} className="sm:col-span-2 border-2 border-ASTER-100 focus:border-ASTER-600 rounded-xl px-4 py-2.5 text-sm outline-none transition-colors resize-none" />
+      {error && <p className="sm:col-span-2 text-rose-500 text-sm font-semibold">{error}</p>}
+      <button type="submit" disabled={submitting} className="sm:col-span-2 bg-ASTER-600 hover:bg-ASTER-700 disabled:opacity-60 text-white font-bold text-sm py-2.5 rounded-full transition-all">
+        {submitting ? 'Submitting…' : 'Request reservation'}
+      </button>
+    </form>
   );
 }
 
@@ -165,6 +149,8 @@ export default function WebsiteEditor({
 
   const patchSite = (data: Partial<{ businessName: string }>) => api.patch(`/webos/sites/${site.id}`, data).then(onRefresh);
   const patchPage = (pageId: string, data: Record<string, unknown>) => api.patch(`/webos/pages/${pageId}`, data).then(onRefresh);
+  const patchMenuItem = (id: string, data: Partial<Pick<MenuItem, 'name' | 'priceCents'>>) =>
+    api.patch(`/webos/sites/${site.id}/menu/items/${id}`, data).then(onRefresh);
 
   const uploadLogo = (file: File) => {
     const fd = new FormData();
@@ -181,10 +167,20 @@ export default function WebsiteEditor({
     fd.append('image', file);
     api.postForm(`/webos/pages/${pageId}/sections/${index}/image`, fd).then(onRefresh);
   };
+  const uploadMenuItemImage = (itemId: string, file: File) => {
+    const fd = new FormData();
+    fd.append('image', file);
+    api.postForm(`/webos/sites/${site.id}/menu/items/${itemId}/image`, fd).then(onRefresh);
+  };
 
   const saveSectionField = (p: Page, index: number, field: 'heading' | 'body', value: string) => {
     const sections = p.sections.map((s, i) => (i === index ? { ...s, [field]: value } : s));
     patchPage(p.id, { sections });
+  };
+
+  const goToPageBySlug = (slug: string) => {
+    const target = site.pages.find((p) => p.slug === slug);
+    if (target) setActivePageId(target.id);
   };
 
   if (!page) {
@@ -193,7 +189,10 @@ export default function WebsiteEditor({
 
   const isRestaurant = site.playbook === 'RESTAURANT';
   const isMenuPage = isRestaurant && page.slug === 'menu';
-  const isReservationIntentPage = isRestaurant && (page.slug === 'home' || page.slug === 'reservations');
+  const isReservationsPage = isRestaurant && page.slug === 'reservations';
+  const isHomePage = page.slug === 'home';
+  const featuredItems = isRestaurant ? site.menuCategories.flatMap((c) => c.items).filter((i) => i.featured) : [];
+  const ctaTargetSlug = page.ctaHref?.replace(/^\//, '');
 
   return (
     <div>
@@ -227,7 +226,7 @@ export default function WebsiteEditor({
         </div>
       </div>
 
-      <p className="text-[11px] text-slate-400 mb-3">Click any text or photo below to edit it directly — this is what the finished site will contain once published.</p>
+      <p className="text-[11px] text-slate-400 mb-3">Click any text, price or photo below to edit it directly — this is what the finished site will contain once published.</p>
 
       <div className={`mx-auto bg-white border border-ASTER-100 rounded-[28px] card-shadow overflow-hidden transition-all ${DEVICE_WIDTH[device]}`}>
         {/* Navbar */}
@@ -273,7 +272,7 @@ export default function WebsiteEditor({
               className="text-white/90 text-sm sm:text-base max-w-xl px-1"
               multiline
             />
-            <div className="mt-1">
+            <div className="mt-1 flex items-center gap-2">
               <span className="inline-block bg-ASTER-600 rounded-full">
                 <EditableText
                   value={page.ctaLabel}
@@ -282,11 +281,43 @@ export default function WebsiteEditor({
                   className="inline-block text-white font-bold text-sm px-5 py-2.5"
                 />
               </span>
+              {ctaTargetSlug && (
+                <button
+                  onClick={() => goToPageBySlug(ctaTargetSlug)}
+                  className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-colors"
+                  title={`This button links to the ${ctaTargetSlug} page — click to go there`}
+                >
+                  <ArrowRight size={14} />
+                </button>
+              )}
             </div>
           </div>
         </div>
 
-        {/* Restaurant Menu — dynamic from the Menu Manager, not static bullet text */}
+        {/* Featured menu items — Home page only, real content pulled from Menu Manager */}
+        {isHomePage && isRestaurant && featuredItems.length > 0 && (
+          <div className="p-6 sm:p-10 border-t border-ASTER-100">
+            <p className="font-display font-bold text-xl text-ink-900 mb-5 flex items-center gap-2">
+              <Star size={18} className="text-amber-500" fill="currentColor" /> Featured on our menu
+            </p>
+            <div className="grid sm:grid-cols-3 gap-4">
+              {featuredItems.map((item) => (
+                <div key={item.id} className="bg-slate-50 rounded-2xl overflow-hidden">
+                  <EditableImage src={item.imageUrl} onUpload={(f) => uploadMenuItemImage(item.id, f)} className="aspect-video" rounded="rounded-none" />
+                  <div className="p-4">
+                    <div className="flex items-center justify-between gap-2">
+                      <EditableText value={item.name} onSave={(v) => patchMenuItem(item.id, { name: v })} as="p" className="text-sm font-bold text-ink-900" />
+                      <EditablePrice cents={item.priceCents} onSave={(c) => patchMenuItem(item.id, { priceCents: c })} />
+                    </div>
+                    {item.description && <p className="text-xs text-slate-500 mt-1">{item.description}</p>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Restaurant Menu — dynamic from the Menu Manager, editable right here */}
         {isMenuPage && (
           <div className="p-6 sm:p-10 border-t border-ASTER-100">
             <div className="flex items-center justify-between gap-4 mb-5">
@@ -306,16 +337,17 @@ export default function WebsiteEditor({
                     <p className="text-xs font-bold text-ASTER-600 uppercase tracking-wide mb-2">{cat.name}</p>
                     <div className="space-y-2">
                       {cat.items.map((item) => (
-                        <div key={item.id} className={`flex items-start justify-between gap-4 py-2 border-b border-ASTER-50 ${!item.available ? 'opacity-50' : ''}`}>
-                          <div>
+                        <div key={item.id} className={`flex items-center gap-3 py-2 border-b border-ASTER-50 ${!item.available ? 'opacity-50' : ''}`}>
+                          <EditableImage src={item.imageUrl} onUpload={(f) => uploadMenuItemImage(item.id, f)} className="w-12 h-12 shrink-0" rounded="rounded-lg" label="" />
+                          <div className="flex-1 min-w-0">
                             <p className="text-sm font-semibold text-ink-900 flex items-center gap-1.5">
-                              {item.name}
-                              {item.featured && <span className="text-[9px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded-full">FEATURED</span>}
-                              {!item.available && <span className="text-[9px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded-full">UNAVAILABLE</span>}
+                              <EditableText value={item.name} onSave={(v) => patchMenuItem(item.id, { name: v })} as="span" />
+                              {item.featured && <span className="text-[9px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded-full shrink-0">FEATURED</span>}
+                              {!item.available && <span className="text-[9px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded-full shrink-0">UNAVAILABLE</span>}
                             </p>
                             {item.description && <p className="text-xs text-slate-500 mt-0.5">{item.description}</p>}
                           </div>
-                          <span className="text-sm font-bold text-ink-900 whitespace-nowrap tabular-nums">{formatPrice(item.priceCents)}</span>
+                          <EditablePrice cents={item.priceCents} onSave={(c) => patchMenuItem(item.id, { priceCents: c })} />
                         </div>
                       ))}
                       {cat.items.length === 0 && <p className="text-xs text-slate-400">No items in this category yet.</p>}
@@ -380,8 +412,8 @@ export default function WebsiteEditor({
           )}
         </div>
 
-        {/* Reservation form — real date/time/party-size flow, replacing the generic contact form for a restaurant's booking pages */}
-        {page.hasLeadForm && isReservationIntentPage && (
+        {/* Reservation booking — a real, functional form (not a preview) on the Reservations page */}
+        {isReservationsPage && (
           <div className="p-6 sm:p-10 bg-slate-50 border-t border-ASTER-100">
             <div className="flex items-center justify-between gap-4 mb-1">
               <p className="font-display font-bold text-lg text-ink-900 flex items-center gap-2"><CalendarCheck size={18} className="text-ASTER-600" /> Reserve a table</p>
@@ -391,25 +423,13 @@ export default function WebsiteEditor({
                 </button>
               )}
             </div>
-            <p className="text-xs text-slate-400 mb-4">Preview — captures a real reservation request once the site is published and live.</p>
-            <div className="grid sm:grid-cols-2 gap-3 max-w-lg">
-              <input disabled type="date" className="border-2 border-ASTER-100 rounded-xl px-4 py-2.5 text-sm bg-white text-slate-400" />
-              <input disabled type="time" className="border-2 border-ASTER-100 rounded-xl px-4 py-2.5 text-sm bg-white text-slate-400" />
-              <select disabled className="sm:col-span-2 border-2 border-ASTER-100 rounded-xl px-4 py-2.5 text-sm bg-white text-slate-400">
-                <option>Party size</option>
-              </select>
-              <input disabled placeholder="Name" className="border-2 border-ASTER-100 rounded-xl px-4 py-2.5 text-sm bg-white" />
-              <input disabled placeholder="Email" className="border-2 border-ASTER-100 rounded-xl px-4 py-2.5 text-sm bg-white" />
-              <input disabled placeholder="Phone (optional)" className="sm:col-span-2 border-2 border-ASTER-100 rounded-xl px-4 py-2.5 text-sm bg-white" />
-              <button disabled className="sm:col-span-2 bg-ASTER-600 text-white font-bold text-sm py-2.5 rounded-full opacity-90">
-                Request reservation
-              </button>
-            </div>
+            <p className="text-xs text-slate-400 mb-4">Fully functional — submissions appear in your Reservations dashboard right away.</p>
+            <ReservationBookingForm siteId={site.id} />
           </div>
         )}
 
         {/* Generic lead capture form — everything else (e.g. a restaurant's general Contact page, or any non-restaurant site) */}
-        {page.hasLeadForm && !isReservationIntentPage && (
+        {page.hasLeadForm && !isReservationsPage && (
           <div className="p-6 sm:p-10 bg-slate-50 border-t border-ASTER-100">
             <p className="font-display font-bold text-lg text-ink-900 mb-1">Get in touch</p>
             <p className="text-xs text-slate-400 mb-4">Preview — this form captures real leads once the site is published and live.</p>

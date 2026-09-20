@@ -2,7 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
   ArrowLeft, Sparkles, Pencil, Trash2, Plus, PlayCircle,
-  CheckCircle2, XCircle, ArrowRight,
+  CheckCircle2, XCircle,
 } from 'lucide-react';
 import { api, ApiError } from '../../lib/api';
 import Modal from '../../components/commerce/Modal';
@@ -13,7 +13,7 @@ import MenuManager from '../../components/webos/MenuManager';
 import { computeBlueprint } from '../../lib/webos/blueprint';
 import type {
   Site, Page, Testimonial, TrustElement, TrustElementType, Playbook, WebsiteHealth, ConversionAudit, TrustGap,
-  RecommendedAction, Lead, LeadStatus, ArchitecturePage, ConversionPathsResult, PageInventoryItem,
+  RecommendedAction, Lead, LeadStatus, ConversionPathsResult, PageInventoryItem,
   PageSectionInventory, TrustMap, LeadCaptureMap, DeploymentReadiness,
 } from '../../lib/webos/types';
 
@@ -31,15 +31,7 @@ const LEAD_STATUS_STYLE: Record<LeadStatus, string> = {
   LOST: 'bg-slate-200 text-slate-500',
 };
 
-type Tab = 'website' | 'overview' | 'architecture' | 'pages' | 'trust' | 'leads' | 'reservations' | 'menu';
-const TABS: { key: Tab; label: string }[] = [
-  { key: 'website', label: 'Website' },
-  { key: 'overview', label: 'Insights' },
-  { key: 'architecture', label: 'Architecture' },
-  { key: 'pages', label: 'Pages' },
-  { key: 'trust', label: 'Trust' },
-  { key: 'leads', label: 'Leads' },
-];
+type Tab = 'overview' | 'pages' | 'menu' | 'reservations' | 'trust' | 'forms' | 'analytics' | 'settings';
 
 const TRUST_ELEMENT_LABEL: Record<TrustElementType, string> = {
   CASE_STUDY: 'Case study',
@@ -50,7 +42,7 @@ const TRUST_ELEMENT_LABEL: Record<TrustElementType, string> = {
 export default function SiteDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [tab, setTab] = useState<Tab>('website');
+  const [tab, setTab] = useState<Tab>('overview');
 
   const [site, setSite] = useState<Site | null>(null);
   const [playbooks, setPlaybooks] = useState<Playbook[]>([]);
@@ -61,7 +53,6 @@ export default function SiteDetailPage() {
   const [actions, setActions] = useState<RecommendedAction[]>([]);
   const [leads, setLeads] = useState<Lead[]>([]);
 
-  const [architecture, setArchitecture] = useState<ArchitecturePage[] | null>(null);
   const [conversionPaths, setConversionPaths] = useState<ConversionPathsResult | null>(null);
   const [pageInventory, setPageInventory] = useState<PageInventoryItem[] | null>(null);
   const [sectionInventory, setSectionInventory] = useState<PageSectionInventory[] | null>(null);
@@ -94,6 +85,12 @@ export default function SiteDetailPage() {
   const [trustElementError, setTrustElementError] = useState('');
   const [trustElementSaving, setTrustElementSaving] = useState(false);
 
+  const [settingsForm, setSettingsForm] = useState({ businessName: '', industry: '', targetAudience: '' });
+  const [settingsSaving, setSettingsSaving] = useState(false);
+  const [settingsSaved, setSettingsSaved] = useState(false);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
   const loadCore = () => {
     if (!id) return;
     api.get<{ site: Site }>(`/webos/sites/${id}`).then((data) => {
@@ -103,7 +100,6 @@ export default function SiteDetailPage() {
     api.get<{ trust: TrustGap }>(`/webos/sites/${id}/analytics/trust-gaps`).then((data) => setTrust(data.trust)).catch(() => {});
     api.get<{ actions: RecommendedAction[] }>(`/webos/sites/${id}/analytics/action-center`).then((data) => setActions(data.actions)).catch(() => {});
     api.get<{ leads: Lead[] }>(`/webos/sites/${id}/leads`).then((data) => setLeads(data.leads)).catch(() => {});
-    api.get<{ architecture: ArchitecturePage[] }>(`/webos/sites/${id}/analytics/architecture`).then((data) => setArchitecture(data.architecture)).catch(() => {});
     api.get<ConversionPathsResult>(`/webos/sites/${id}/analytics/conversion-paths`).then(setConversionPaths).catch(() => {});
     api.get<{ pages: PageInventoryItem[] }>(`/webos/sites/${id}/analytics/page-inventory`).then((data) => setPageInventory(data.pages)).catch(() => {});
     api.get<{ pages: PageSectionInventory[] }>(`/webos/sites/${id}/analytics/section-inventory`).then((data) => setSectionInventory(data.pages)).catch(() => {});
@@ -116,6 +112,12 @@ export default function SiteDetailPage() {
   useEffect(() => {
     api.get<{ playbooks: Playbook[] }>('/webos/sites/playbooks').then((data) => setPlaybooks(data.playbooks)).catch(() => {});
   }, []);
+  useEffect(() => {
+    if (tab === 'settings' && site) {
+      setSettingsForm({ businessName: site.businessName, industry: site.industry, targetAudience: site.targetAudience });
+      setSettingsSaved(false);
+    }
+  }, [tab, site]);
 
   const runAudit = async () => {
     if (!id) return;
@@ -262,6 +264,31 @@ export default function SiteDetailPage() {
     setLeads((rows) => rows.map((l) => (l.id === leadId ? { ...l, status } : l)));
   };
 
+  const saveSettings = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!id) return;
+    setSettingsSaving(true);
+    setSettingsSaved(false);
+    try {
+      await api.patch(`/webos/sites/${id}`, settingsForm);
+      setSettingsSaved(true);
+      loadCore();
+    } finally {
+      setSettingsSaving(false);
+    }
+  };
+
+  const deleteSite = async () => {
+    if (!id) return;
+    setDeleting(true);
+    try {
+      await api.del(`/webos/sites/${id}`);
+      navigate('/webos', { replace: true });
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   if (!site) {
     return <p className="text-slate-400">Loading site…</p>;
   }
@@ -296,10 +323,15 @@ export default function SiteDetailPage() {
 
       <div className="mt-6 flex items-center gap-1 border-b border-ASTER-100 overflow-x-auto">
         {[
-          ...TABS,
+          { key: 'overview' as Tab, label: 'Overview' },
+          { key: 'pages' as Tab, label: 'Pages' },
           ...(site.playbook === 'RESTAURANT'
-            ? ([{ key: 'reservations', label: 'Reservations' }, { key: 'menu', label: 'Menu' }] as { key: Tab; label: string }[])
+            ? ([{ key: 'menu', label: 'Menu' }, { key: 'reservations', label: 'Reservations' }] as { key: Tab; label: string }[])
             : []),
+          { key: 'trust' as Tab, label: 'Trust' },
+          { key: 'forms' as Tab, label: 'Forms' },
+          { key: 'analytics' as Tab, label: 'Analytics' },
+          { key: 'settings' as Tab, label: 'Settings' },
         ].map((t) => (
           <button
             key={t.key}
@@ -311,7 +343,7 @@ export default function SiteDetailPage() {
         ))}
       </div>
 
-      {tab === 'website' && (
+      {tab === 'overview' && (
         <div className="mt-6">
           <WebsiteEditor
             site={site}
@@ -336,9 +368,9 @@ export default function SiteDetailPage() {
         </div>
       )}
 
-      {tab === 'overview' && (
+      {tab === 'analytics' && (
         <div className="mt-6 space-y-6">
-          <BlueprintCard blueprint={computeBlueprint(site)} title="Website Blueprint" />
+          <BlueprintCard blueprint={computeBlueprint(site)} title="Website at a Glance" />
 
           <div className="grid lg:grid-cols-[220px_1fr] gap-6">
             <div className="bg-ink-950 text-white rounded-[28px] card-shadow p-6 text-center flex flex-col justify-center">
@@ -438,65 +470,23 @@ export default function SiteDetailPage() {
               </div>
             )}
           </div>
-        </div>
-      )}
 
-      {tab === 'architecture' && (
-        <div className="mt-6 space-y-6">
-          <div>
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-1">Website Architecture</p>
-            <p className="text-xs text-slate-400 mb-4">Real content blocks in generation order — not a confirmed visual layout, since WebOS doesn't render a live page yet.</p>
-            <div className="grid sm:grid-cols-2 gap-4">
-              {(architecture ?? []).map((p) => (
-                <div key={p.pageId} className="bg-white rounded-2xl card-shadow-sm border border-ASTER-100 p-5">
-                  <p className="font-semibold text-ink-900 mb-3">{p.name} <span className="text-slate-400 text-xs font-normal">/{p.slug}</span></p>
-                  <ol className="space-y-2">
-                    {p.nodes.map((n, i) => (
-                      <li key={i} className="flex items-center gap-2 text-sm">
-                        <span className="text-[10px] font-bold text-slate-400 w-5 shrink-0">{i + 1}</span>
-                        <span className="text-[10px] font-bold text-ASTER-600 bg-ASTER-50 px-2 py-0.5 rounded-full uppercase tracking-wide shrink-0">{n.type}</span>
-                        <span className="text-ink-900 truncate">{n.label}</span>
-                      </li>
-                    ))}
-                  </ol>
+          {/* Customer journey — folded in from the old Conversion Paths view, kept plain-language */}
+          <div className="bg-white rounded-[28px] card-shadow border border-ASTER-100 p-6">
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-4">Where your inquiries stand</p>
+            <div className="space-y-2">
+              {(conversionPaths?.funnel ?? []).map((f) => (
+                <div key={f.status} className="flex items-center gap-3">
+                  <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full w-24 text-center shrink-0 ${LEAD_STATUS_STYLE[f.status]}`}>{f.status}</span>
+                  <div className="flex-1 bg-slate-100 rounded-full h-2.5 overflow-hidden">
+                    <div className="h-full bg-ASTER-600 rounded-full" style={{ width: `${(f.count / maxFunnelCount) * 100}%` }} />
+                  </div>
+                  <span className="text-sm font-bold text-ink-900 tabular-nums w-6 text-right">{f.count}</span>
                 </div>
               ))}
-            </div>
-          </div>
-
-          <div>
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-4">Conversion Paths</p>
-            <div className="bg-white rounded-[28px] card-shadow border border-ASTER-100 p-6">
-              <p className="text-xs font-semibold text-slate-500 mb-2">Real internal routing (from each page's call-to-action link)</p>
-              <ul className="space-y-2 mb-5">
-                {(conversionPaths?.directCapturePoints ?? []).map((d, i) => (
-                  <li key={`direct-${i}`} className="flex items-center gap-2 text-sm text-ink-900">
-                    <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">CAPTURES LEAD</span>
-                    {d.page} <span className="text-slate-400">— "{d.ctaLabel}"</span>
-                  </li>
-                ))}
-                {(conversionPaths?.paths ?? []).map((p, i) => (
-                  <li key={`path-${i}`} className="flex items-center gap-2 text-sm text-ink-900">
-                    {p.fromPage} <ArrowRight size={13} className="text-slate-300" /> {p.toPage} <span className="text-slate-400">— "{p.ctaLabel}"</span>
-                  </li>
-                ))}
-                {conversionPaths && conversionPaths.paths.length === 0 && conversionPaths.directCapturePoints.length === 0 && (
-                  <li className="text-sm text-slate-400">No internal conversion paths found yet.</li>
-                )}
-              </ul>
-
-              <p className="text-xs font-semibold text-slate-500 mb-2 pt-4 border-t border-ASTER-100">Real lead funnel (by status — no visitor/landing-page stage, since there's no traffic data)</p>
-              <div className="space-y-2">
-                {(conversionPaths?.funnel ?? []).map((f) => (
-                  <div key={f.status} className="flex items-center gap-3">
-                    <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full w-24 text-center shrink-0 ${LEAD_STATUS_STYLE[f.status]}`}>{f.status}</span>
-                    <div className="flex-1 bg-slate-100 rounded-full h-2.5 overflow-hidden">
-                      <div className="h-full bg-ASTER-600 rounded-full" style={{ width: `${(f.count / maxFunnelCount) * 100}%` }} />
-                    </div>
-                    <span className="text-sm font-bold text-ink-900 tabular-nums w-6 text-right">{f.count}</span>
-                  </div>
-                ))}
-              </div>
+              {conversionPaths && conversionPaths.funnel.every((f) => f.count === 0) && (
+                <p className="text-sm text-slate-400">No inquiries yet — this fills in as leads and reservations come in.</p>
+              )}
             </div>
           </div>
         </div>
@@ -672,7 +662,7 @@ export default function SiteDetailPage() {
         </div>
       )}
 
-      {tab === 'leads' && (
+      {tab === 'forms' && (
         <div className="mt-6 bg-white rounded-[28px] card-shadow border border-ASTER-100 overflow-hidden">
           <table className="w-full text-sm">
             <thead className="bg-slate-50 text-slate-400 text-left">
@@ -706,10 +696,69 @@ export default function SiteDetailPage() {
                 </tr>
               ))}
               {leads.length === 0 && (
-                <tr><td colSpan={5} className="px-6 py-10 text-center text-slate-400">No leads yet — this needs a live, publicly-hosted page with a lead form to start filling in.</td></tr>
+                <tr><td colSpan={5} className="px-6 py-10 text-center text-slate-400">No form submissions yet — this needs a live, publicly-hosted page to start filling in.</td></tr>
               )}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {tab === 'settings' && (
+        <div className="mt-6 space-y-6 max-w-xl">
+          <form onSubmit={saveSettings} className="bg-white rounded-[28px] card-shadow border border-ASTER-100 p-6 space-y-4">
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-wide">Business info</p>
+            <div>
+              <label className="text-[13px] font-bold text-ink-900 block mb-1.5">Business name</label>
+              <input value={settingsForm.businessName} onChange={(e) => setSettingsForm((f) => ({ ...f, businessName: e.target.value }))} className="w-full border-2 border-ASTER-100 focus:border-ASTER-600 rounded-2xl px-4 py-3 text-[15px] outline-none transition-colors" />
+            </div>
+            <div>
+              <label className="text-[13px] font-bold text-ink-900 block mb-1.5">Industry</label>
+              <input value={settingsForm.industry} onChange={(e) => setSettingsForm((f) => ({ ...f, industry: e.target.value }))} className="w-full border-2 border-ASTER-100 focus:border-ASTER-600 rounded-2xl px-4 py-3 text-[15px] outline-none transition-colors" />
+            </div>
+            <div>
+              <label className="text-[13px] font-bold text-ink-900 block mb-1.5">Who this site is for</label>
+              <input value={settingsForm.targetAudience} onChange={(e) => setSettingsForm((f) => ({ ...f, targetAudience: e.target.value }))} className="w-full border-2 border-ASTER-100 focus:border-ASTER-600 rounded-2xl px-4 py-3 text-[15px] outline-none transition-colors" />
+            </div>
+            <div className="flex items-center gap-3">
+              <button type="submit" disabled={settingsSaving} className="bg-ASTER-600 hover:bg-ASTER-700 disabled:opacity-60 text-white font-bold px-6 py-3 rounded-full transition-all">
+                {settingsSaving ? 'Saving…' : 'Save changes'}
+              </button>
+              {settingsSaved && <span className="text-sm font-semibold text-emerald-600">Saved</span>}
+            </div>
+          </form>
+
+          <div className="bg-white rounded-[28px] card-shadow border border-ASTER-100 p-6">
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-3">Publishing</p>
+            <div className="flex items-center justify-between gap-4">
+              <p className="text-sm text-ink-900">Your site is currently <strong>{site.status === 'PUBLISHED' ? 'published' : 'a draft'}</strong>.</p>
+              {site.status === 'DRAFT' && (
+                <button onClick={publish} className="bg-ASTER-600 hover:bg-ASTER-700 text-white font-bold text-sm px-4 py-2 rounded-full transition-all whitespace-nowrap">
+                  Publish now
+                </button>
+              )}
+            </div>
+          </div>
+
+          <div className="bg-white rounded-[28px] card-shadow border border-rose-200 p-6">
+            <p className="text-xs font-bold text-rose-500 uppercase tracking-wide mb-3">Danger zone</p>
+            {!confirmingDelete ? (
+              <button onClick={() => setConfirmingDelete(true)} className="text-sm font-bold text-rose-600 hover:text-rose-700">
+                Delete this site
+              </button>
+            ) : (
+              <div>
+                <p className="text-sm text-ink-900 mb-3">This permanently deletes "{site.businessName}" and everything in it — pages, leads, testimonials. This can't be undone.</p>
+                <div className="flex items-center gap-3">
+                  <button onClick={deleteSite} disabled={deleting} className="bg-rose-600 hover:bg-rose-700 disabled:opacity-60 text-white font-bold text-sm px-4 py-2.5 rounded-full transition-all">
+                    {deleting ? 'Deleting…' : 'Yes, delete permanently'}
+                  </button>
+                  <button onClick={() => setConfirmingDelete(false)} className="text-sm font-semibold text-slate-500 hover:text-ink-900">
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       )}
 

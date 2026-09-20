@@ -53,6 +53,7 @@ export type MenuItem = {
   name: string;
   description: string | null;
   priceCents: number | null;
+  imageUrl: string | null;
   available: boolean;
   featured: boolean;
   order: number;
