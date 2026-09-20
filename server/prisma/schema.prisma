@@ -358,6 +358,9 @@ model Site {
   testimonials    Testimonial[]
   leads           Lead[]
   trustElements   TrustElement[]
+  tables          Table[]
+  reservations    Reservation[]
+  menuCategories  MenuCategory[]
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
 
@@ -499,4 +502,87 @@ model TrustElement {
   createdAt   DateTime         @default(now())
 
   @@index([siteId])
+}
+
+// ---------------------------------------------------------------------
+// Restaurant vertical — a real reservation system and menu manager,
+// replacing the generic lead-capture form and text-bullet "menu"
+// section on the Restaurant template. Reservation/Table/MenuCategory/
+// MenuItem are plain Site-scoped models (not gated to one playbook at
+// the schema level) so nothing here is a special case in the database —
+// only the Restaurant template's generated pages and the frontend UI
+// surface them.
+// ---------------------------------------------------------------------
+
+enum ReservationStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
+
+model Table {
+  id           String        @id @default(cuid())
+  site         Site          @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  siteId       String
+  name         String
+  capacity     Int
+  reservations Reservation[]
+  createdAt    DateTime      @default(now())
+
+  @@index([siteId])
+}
+
+// reservationAt + durationMinutes (a fixed default seating length, not a
+// measurement) is what makes table-conflict checking possible without
+// a separate "end time" the customer would have to guess at submission.
+model Reservation {
+  id              String            @id @default(cuid())
+  site            Site              @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  siteId          String
+  table           Table?            @relation(fields: [tableId], references: [id], onDelete: SetNull)
+  tableId         String?
+  customerName    String
+  customerEmail   String
+  customerPhone   String?
+  partySize       Int
+  reservationAt   DateTime
+  durationMinutes Int               @default(90)
+  status          ReservationStatus @default(PENDING)
+  notes           String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  @@index([siteId])
+  @@index([tableId])
+}
+
+model MenuCategory {
+  id        String     @id @default(cuid())
+  site      Site       @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  siteId    String
+  name      String
+  order     Int        @default(0)
+  items     MenuItem[]
+  createdAt DateTime   @default(now())
+
+  @@index([siteId])
+}
+
+// priceCents is nullable — a freshly generated item has a real name (the
+// business's own entered offering) but no fabricated price; the Menu
+// Manager shows "Add price" until the owner sets one.
+model MenuItem {
+  id          String       @id @default(cuid())
+  category    MenuCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId  String
+  name        String
+  description String?
+  priceCents  Int?
+  available   Boolean      @default(true)
+  featured    Boolean      @default(false)
+  order       Int          @default(0)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([categoryId])
 }

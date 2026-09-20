@@ -19,6 +19,7 @@ export async function getSite(ownerId: string, id: string) {
       pages: { orderBy: { order: 'asc' } },
       testimonials: { orderBy: { createdAt: 'desc' } },
       trustElements: { orderBy: { createdAt: 'desc' } },
+      menuCategories: { orderBy: { order: 'asc' }, include: { items: { orderBy: { order: 'asc' } } } },
     },
   });
   if (!site) throw new CommerceError(404, 'Site not found.');
@@ -38,7 +39,7 @@ export async function generateSite(
 
   const pageTemplates = buildPagesFromTemplate(template, input);
 
-  return prisma.site.create({
+  const site = await prisma.site.create({
     data: {
       ownerId,
       businessName: input.businessName,
@@ -68,8 +69,28 @@ export async function generateSite(
       pages: { orderBy: { order: 'asc' } },
       testimonials: { orderBy: { createdAt: 'desc' } },
       trustElements: { orderBy: { createdAt: 'desc' } },
+      menuCategories: { orderBy: { order: 'asc' }, include: { items: { orderBy: { order: 'asc' } } } },
     },
   });
+
+  // Restaurant sites start with a real Menu category seeded from the
+  // business's own entered offerings — real item names, but no fabricated
+  // price (priceCents stays null until the owner sets one in Menu Manager).
+  if (template.key === 'RESTAURANT' && input.services.length) {
+    await prisma.menuCategory.create({
+      data: {
+        siteId: site.id,
+        name: 'Menu',
+        order: 0,
+        items: {
+          create: input.services.map((name, i) => ({ name, order: i })),
+        },
+      },
+    });
+    return getSite(ownerId, site.id);
+  }
+
+  return site;
 }
 
 export async function deleteSite(ownerId: string, id: string) {

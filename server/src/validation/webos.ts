@@ -7,6 +7,7 @@ export const playbookValues = [
 export const trustElementTypeValues = ['CASE_STUDY', 'CLIENT_LOGO', 'CERTIFICATION'] as const;
 export const leadStatusValues = ['NEW', 'QUALIFIED', 'CONVERTED', 'LOST'] as const;
 export const templateComplexityValues = ['SIMPLE', 'STANDARD', 'ADVANCED'] as const;
+export const reservationStatusValues = ['PENDING', 'CONFIRMED', 'CANCELLED'] as const;
 
 export const generateSiteSchema = z.object({
   businessName: z.string().min(1).max(120),
@@ -130,4 +131,46 @@ export const createLeadSchema = z.object({
 
 export const updateLeadStatusSchema = z.object({
   status: z.enum(leadStatusValues),
+});
+
+const reservationFields = {
+  customerName: z.string().min(1).max(120),
+  customerEmail: z.string().email(),
+  customerPhone: z.string().max(40).optional(),
+  partySize: z.number().int().min(1).max(30),
+  reservationAt: z.string().min(1),
+  notes: z.string().max(500).optional(),
+};
+
+export const publicReservationSchema = z.object({ siteId: z.string().min(1), ...reservationFields });
+export const createReservationSchema = z.object(reservationFields);
+export const updateReservationStatusSchema = z.object({ status: z.enum(reservationStatusValues) });
+export const assignTableSchema = z.object({ tableId: z.string().min(1).nullable() });
+
+export const createTableSchema = z.object({
+  name: z.string().min(1).max(60),
+  capacity: z.number().int().min(1).max(50),
+});
+
+export const createMenuCategorySchema = z.object({ name: z.string().min(1).max(80) });
+export const updateMenuCategorySchema = z.object({
+  name: z.string().min(1).max(80).optional(),
+  order: z.number().int().min(0).optional(),
+});
+
+export const createMenuItemSchema = z.object({
+  name: z.string().min(1).max(120),
+  description: z.string().max(500).optional(),
+  priceCents: z.number().int().min(0).max(10_000_00).optional(),
+  available: z.boolean().optional(),
+  featured: z.boolean().optional(),
+});
+
+export const updateMenuItemSchema = z.object({
+  name: z.string().min(1).max(120).optional(),
+  description: z.string().max(500).nullable().optional(),
+  priceCents: z.number().int().min(0).max(10_000_00).nullable().optional(),
+  available: z.boolean().optional(),
+  featured: z.boolean().optional(),
+  order: z.number().int().min(0).optional(),
 });

@@ -25,6 +25,9 @@ import { webosAnalyticsRouter } from './routes/webos/analytics.routes.js';
 import { templatesRouter } from './routes/webos/templates.routes.js';
 import { generatedSitesRouter } from './routes/webos/generatedSites.routes.js';
 import { adminTemplatesRouter } from './routes/webos/adminTemplates.routes.js';
+import { reservationsRouter, publicReservationsRouter } from './routes/webos/reservations.routes.js';
+import { tablesRouter } from './routes/webos/tables.routes.js';
+import { menuRouter, publicMenuRouter } from './routes/webos/menu.routes.js';
 import { CommerceError } from './lib/commerceError.js';
 import { UPLOAD_ROOT } from './middleware/upload.js';
 
@@ -74,9 +77,14 @@ app.use('/api/commerce', (err: Error, _req: express.Request, res: express.Respon
 
 // WebOS
 app.use('/api/webos/public/leads', publicLeadsRouter);
+app.use('/api/webos/public/reservations', publicReservationsRouter);
+app.use('/api/webos/public/menu', publicMenuRouter);
 app.use('/api/webos/sites/:siteId/testimonials', testimonialsRouter);
 app.use('/api/webos/sites/:siteId/trust-elements', trustElementsRouter);
 app.use('/api/webos/sites/:siteId/leads', leadsRouter);
+app.use('/api/webos/sites/:siteId/reservations', reservationsRouter);
+app.use('/api/webos/sites/:siteId/tables', tablesRouter);
+app.use('/api/webos/sites/:siteId/menu', menuRouter);
 app.use('/api/webos/sites/:siteId/analytics', webosAnalyticsRouter);
 app.use('/api/webos/sites', sitesRouter);
 app.use('/api/webos/pages', pagesRouter);
