@@ -32,10 +32,8 @@ leadsRouter.patch('/:id/status', async (req: Request<SiteParams & { id: string }
   res.json({ lead });
 });
 
-// Unauthenticated: meant to be called from a visitor-facing lead form.
-// No such form is publicly served anywhere yet (WebOS has no live hosting),
-// so this endpoint exists ahead of that — it's real infrastructure, just
-// without a live caller today.
+// Unauthenticated: called from the visitor-facing lead form rendered by
+// the public site at /site/:slug.
 export const publicLeadsRouter = Router();
 
 publicLeadsRouter.post('/', async (req, res) => {

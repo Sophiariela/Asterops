@@ -68,8 +68,9 @@ menuRouter.post('/items/:id/image', upload.single('image'), async (req: Request<
   res.json({ item });
 });
 
-// Unauthenticated: the eventual live public menu page reads this. Same
-// "real infrastructure, no live caller yet" story as public leads.
+// Unauthenticated: kept for callers that only need the menu, though the
+// public site page itself now gets menuCategories inline from
+// getPublicSiteBySlug.
 export const publicMenuRouter = Router();
 
 publicMenuRouter.get('/:siteId', async (req, res) => {

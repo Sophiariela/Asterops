@@ -30,6 +30,7 @@ import WebOSLayout from './pages/webos/WebOSLayout';
 import SitesPage from './pages/webos/SitesPage';
 import SiteDetailPage from './pages/webos/SiteDetailPage';
 import TemplateLibraryPage from './pages/webos/TemplateLibraryPage';
+import PublicSitePage from './pages/webos/PublicSitePage';
 
 export default function App() {
   return (
@@ -44,6 +45,8 @@ export default function App() {
         <Route path="/products/:slug" element={<ProductPage />} />
         <Route path="/solutions/:slug" element={<SolutionPage />} />
         <Route path="/ecosystem" element={<EcosystemPage />} />
+        <Route path="/site/:slug" element={<PublicSitePage />} />
+        <Route path="/site/:slug/:pageSlug" element={<PublicSitePage />} />
 
         <Route element={<ProtectedRoute roles={['CUSTOMER']} />}>
           <Route path="/checkout" element={<Checkout />} />

@@ -4,6 +4,23 @@ import { CommerceError } from '../../lib/commerceError.js';
 import { getPublishedTemplateByKey, getPublishedTemplateById } from './templates.service.js';
 import { buildPagesFromTemplate, type GeneratorInput } from './templateEngine.js';
 import { findCountryPreset } from '../../lib/countryPresets.js';
+import { slugify } from '../../lib/slugify.js';
+
+async function generateUniqueSiteSlug(businessName: string, excludeId?: string): Promise<string> {
+  const base = slugify(businessName);
+  let candidate = base;
+  let n = 1;
+  // eslint-disable-next-line no-await-in-loop
+  while (
+    await prisma.site.findFirst({
+      where: { slug: candidate, ...(excludeId ? { id: { not: excludeId } } : {}) },
+    })
+  ) {
+    n += 1;
+    candidate = `${base}-${n}`;
+  }
+  return candidate;
+}
 
 export async function listSites(ownerId: string) {
   return prisma.site.findMany({
@@ -27,6 +44,51 @@ export async function getSite(ownerId: string, id: string) {
   return site;
 }
 
+// Unauthenticated: backs the live public site renderer (/site/:slug). Only
+// ever returns a PUBLISHED site, and only the fields a visitor-facing page
+// needs — no ownerId, no leads, no trust elements (the preview doesn't
+// render those either).
+export async function getPublicSiteBySlug(slug: string) {
+  const site = await prisma.site.findFirst({
+    where: { slug, status: 'PUBLISHED' },
+    select: {
+      id: true,
+      businessName: true,
+      industry: true,
+      logoUrl: true,
+      currency: true,
+      playbook: true,
+      status: true,
+      slug: true,
+      customDomain: true,
+      publishedAt: true,
+      pages: {
+        orderBy: { order: 'asc' },
+        select: {
+          id: true, slug: true, name: true, heroHeadline: true, heroSubheadline: true, heroImageUrl: true,
+          ctaLabel: true, ctaHref: true, sections: true, seoTitle: true, seoDescription: true, hasLeadForm: true, order: true,
+        },
+      },
+      testimonials: {
+        orderBy: { createdAt: 'desc' },
+        select: { id: true, authorName: true, authorRole: true, quote: true, rating: true, createdAt: true },
+      },
+      menuCategories: {
+        orderBy: { order: 'asc' },
+        select: {
+          id: true, name: true, order: true,
+          items: {
+            orderBy: { order: 'asc' },
+            select: { id: true, name: true, description: true, priceCents: true, imageUrl: true, available: true, featured: true, order: true },
+          },
+        },
+      },
+    },
+  });
+  if (!site) throw new CommerceError(404, 'Site not found.');
+  return site;
+}
+
 export async function generateSite(
   ownerId: string,
   input: GeneratorInput & { playbook?: SitePlaybook; templateId?: string },
@@ -39,6 +101,7 @@ export async function generateSite(
   if (!template) throw new CommerceError(400, 'Template not found or not published.');
 
   const pageTemplates = buildPagesFromTemplate(template, input);
+  const slug = await generateUniqueSiteSlug(input.businessName);
 
   const site = await prisma.site.create({
     data: {
@@ -50,6 +113,7 @@ export async function generateSite(
       templateId: template.id,
       templateVersion: template.version,
       status: 'DRAFT',
+      slug,
       pages: {
         create: pageTemplates.map((p, i) => ({
           slug: p.slug,
@@ -103,7 +167,11 @@ export async function deleteSite(ownerId: string, id: string) {
 export async function publishSite(ownerId: string, id: string) {
   const existing = await prisma.site.findFirst({ where: { id, ownerId } });
   if (!existing) throw new CommerceError(404, 'Site not found.');
-  return prisma.site.update({ where: { id }, data: { status: 'PUBLISHED' } });
+  const slug = existing.slug ?? (await generateUniqueSiteSlug(existing.businessName, existing.id));
+  return prisma.site.update({
+    where: { id },
+    data: { status: 'PUBLISHED', slug, publishedAt: new Date() },
+  });
 }
 
 export async function updateSite(

@@ -62,3 +62,11 @@ sitesRouter.delete('/:id', async (req, res) => {
   await sitesService.deleteSite(req.user!.userId, req.params.id);
   res.status(204).send();
 });
+
+// Unauthenticated: the live public site renderer at /site/:slug reads this.
+export const publicSitesRouter = Router();
+
+publicSitesRouter.get('/:slug', async (req, res) => {
+  const site = await sitesService.getPublicSiteBySlug(req.params.slug);
+  res.json({ site });
+});

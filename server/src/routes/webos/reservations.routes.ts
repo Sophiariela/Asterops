@@ -44,10 +44,8 @@ reservationsRouter.patch('/:id/table', async (req: Request<SiteParams & { id: st
   res.json({ reservation });
 });
 
-// Unauthenticated: meant to be called from a visitor-facing reservation
-// form. No such form is publicly served anywhere yet (WebOS has no live
-// hosting), so this is real infrastructure ahead of a live caller —
-// exactly the same story as publicLeadsRouter.
+// Unauthenticated: called from the visitor-facing reservation form
+// rendered by the public site at /site/:slug.
 export const publicReservationsRouter = Router();
 
 publicReservationsRouter.post('/', async (req, res) => {

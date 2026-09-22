@@ -2,7 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
   ArrowLeft, Sparkles, Pencil, Trash2, Plus, PlayCircle,
-  CheckCircle2, XCircle,
+  CheckCircle2, XCircle, ExternalLink, Copy,
 } from 'lucide-react';
 import { api, ApiError } from '../../lib/api';
 import Modal from '../../components/commerce/Modal';
@@ -12,6 +12,7 @@ import ReservationsDashboard from '../../components/webos/ReservationsDashboard'
 import MenuManager from '../../components/webos/MenuManager';
 import { computeBlueprint } from '../../lib/webos/blueprint';
 import { CURRENCIES } from '../../lib/webos/currency';
+import { getPublicSiteUrl } from '../../lib/webos/publicUrl';
 import type {
   Site, Page, Testimonial, TrustElement, TrustElementType, Playbook, WebsiteHealth, ConversionAudit, TrustGap,
   RecommendedAction, Lead, LeadStatus, ConversionPathsResult, PageInventoryItem,
@@ -92,6 +93,7 @@ export default function SiteDetailPage() {
   const [settingsSaved, setSettingsSaved] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [toast, setToast] = useState('');
 
   const loadCore = () => {
     if (!id) return;
@@ -136,7 +138,21 @@ export default function SiteDetailPage() {
   const publish = async () => {
     if (!id) return;
     const data = await api.post<{ site: Site }>(`/webos/sites/${id}/publish`);
-    setSite((s) => (s ? { ...s, status: data.site.status } : s));
+    setSite((s) => (s ? { ...s, ...data.site } : s));
+  };
+
+  const showToast = (message: string) => {
+    setToast(message);
+    setTimeout(() => setToast(''), 2400);
+  };
+
+  const copyPublicLink = async (url: string) => {
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch {
+      // Clipboard API unavailable — the URL is still visible and selectable for manual copy.
+    }
+    showToast('Link copied.');
   };
 
   const openEditPage = (page: Page) => {
@@ -310,6 +326,10 @@ export default function SiteDetailPage() {
 
   const playbookLabel = playbooks.find((p) => p.key === site.playbook)?.label ?? site.playbook;
   const maxFunnelCount = conversionPaths ? Math.max(1, ...conversionPaths.funnel.map((f) => f.count)) : 1;
+  const publicUrl = getPublicSiteUrl(site);
+  const publishedOnLabel = site.publishedAt
+    ? new Date(site.publishedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    : null;
 
   return (
     <div>
@@ -324,17 +344,27 @@ export default function SiteDetailPage() {
           <span className="inline-block mt-2 text-[11px] font-bold text-ASTER-600 bg-ASTER-50 px-2.5 py-1 rounded-full">{playbookLabel}</span>
         </div>
         <div className="flex items-center gap-3">
-          <span className={`text-xs font-bold px-3 py-1.5 rounded-full ${site.status === 'PUBLISHED' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>{site.status}</span>
-          {site.status === 'DRAFT' && (
+          <span className={`text-xs font-bold px-3 py-1.5 rounded-full ${site.status === 'PUBLISHED' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-500'}`}>
+            {site.status === 'PUBLISHED' ? 'Published' : 'Draft'}
+          </span>
+          {site.status === 'DRAFT' ? (
             <button onClick={publish} className="bg-ASTER-600 hover:bg-ASTER-700 text-white font-bold text-sm px-4 py-2 rounded-full transition-all">
-              Mark ready to publish
+              Publish Site
             </button>
+          ) : (
+            publicUrl && (
+              <a
+                href={publicUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1.5 border-2 border-ASTER-100 hover:border-ASTER-600 text-ink-900 font-bold text-sm px-4 py-2 rounded-full transition-all"
+              >
+                <ExternalLink size={14} /> Open Site
+              </a>
+            )
           )}
         </div>
       </div>
-      {site.status === 'DRAFT' && (
-        <p className="text-xs text-slate-400 mt-2">This flags the site as ready — WebOS doesn't yet serve pages to a live public URL.</p>
-      )}
 
       <div className="mt-6 flex items-center gap-1 border-b border-ASTER-100 overflow-x-auto">
         {[
@@ -770,15 +800,53 @@ export default function SiteDetailPage() {
           </div>
 
           <div className="bg-white rounded-[28px] card-shadow border border-ASTER-100 p-6">
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-3">Publishing</p>
-            <div className="flex items-center justify-between gap-4">
-              <p className="text-sm text-ink-900">Your site is currently <strong>{site.status === 'PUBLISHED' ? 'published' : 'a draft'}</strong>.</p>
-              {site.status === 'DRAFT' && (
-                <button onClick={publish} className="bg-ASTER-600 hover:bg-ASTER-700 text-white font-bold text-sm px-4 py-2 rounded-full transition-all whitespace-nowrap">
-                  Publish now
-                </button>
-              )}
+            <div className="flex items-center justify-between gap-4 mb-1">
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-wide">Publishing</p>
+              <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full whitespace-nowrap ${site.status === 'PUBLISHED' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-500'}`}>
+                {site.status === 'PUBLISHED' ? 'Published' : 'Draft'}
+              </span>
             </div>
+
+            {site.status === 'PUBLISHED' ? (
+              <>
+                <p className="text-sm text-ink-900 mt-3">Your site is currently <strong>published</strong>.</p>
+                {publishedOnLabel && <p className="text-xs text-slate-400 mt-1">Published on {publishedOnLabel}</p>}
+
+                {publicUrl && (
+                  <div className="mt-4">
+                    <label className="text-[13px] font-bold text-ink-900 block mb-1.5">Public URL</label>
+                    <div className="flex items-center gap-2 bg-slate-50 border-2 border-ASTER-100 rounded-2xl px-4 py-3">
+                      <a href={publicUrl} target="_blank" rel="noreferrer" className="text-sm font-semibold text-ASTER-600 hover:underline truncate">
+                        {publicUrl.replace(/^https:\/\//, '')}
+                      </a>
+                    </div>
+                    <div className="flex items-center gap-3 mt-3 flex-wrap">
+                      <a
+                        href={publicUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1.5 bg-ASTER-600 hover:bg-ASTER-700 text-white font-bold text-sm px-4 py-2 rounded-full transition-all"
+                      >
+                        <ExternalLink size={14} /> Open Site
+                      </a>
+                      <button
+                        onClick={() => copyPublicLink(publicUrl)}
+                        className="inline-flex items-center gap-1.5 border-2 border-ASTER-100 hover:border-ASTER-600 text-ink-900 font-bold text-sm px-4 py-2 rounded-full transition-all"
+                      >
+                        <Copy size={14} /> Copy Link
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </>
+            ) : (
+              <>
+                <p className="text-sm text-ink-900 mt-3">Your site is currently a <strong>draft</strong> — it isn't live yet.</p>
+                <button onClick={publish} className="mt-4 bg-ASTER-600 hover:bg-ASTER-700 text-white font-bold text-sm px-4 py-2 rounded-full transition-all whitespace-nowrap">
+                  Publish Site
+                </button>
+              </>
+            )}
           </div>
 
           <div className="bg-white rounded-[28px] card-shadow border border-rose-200 p-6">
@@ -901,6 +969,12 @@ export default function SiteDetailPage() {
             </button>
           </form>
         </Modal>
+      )}
+
+      {toast && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 bg-ink-950 text-white text-sm font-semibold px-4 py-2.5 rounded-full shadow-lg">
+          <CheckCircle2 size={16} className="text-emerald-400" /> {toast}
+        </div>
       )}
     </div>
   );

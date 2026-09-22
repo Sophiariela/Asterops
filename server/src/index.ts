@@ -16,7 +16,7 @@ import { inventoryRouter } from './routes/commerce/inventory.routes.js';
 import { customersRouter } from './routes/commerce/customers.routes.js';
 import { ordersRouter } from './routes/commerce/orders.routes.js';
 import { analyticsRouter } from './routes/commerce/analytics.routes.js';
-import { sitesRouter } from './routes/webos/sites.routes.js';
+import { sitesRouter, publicSitesRouter } from './routes/webos/sites.routes.js';
 import { pagesRouter } from './routes/webos/pages.routes.js';
 import { testimonialsRouter } from './routes/webos/testimonials.routes.js';
 import { trustElementsRouter } from './routes/webos/trustElements.routes.js';
@@ -76,6 +76,7 @@ app.use('/api/commerce', (err: Error, _req: express.Request, res: express.Respon
 });
 
 // WebOS
+app.use('/api/webos/public/sites', publicSitesRouter);
 app.use('/api/webos/public/leads', publicLeadsRouter);
 app.use('/api/webos/public/reservations', publicReservationsRouter);
 app.use('/api/webos/public/menu', publicMenuRouter);

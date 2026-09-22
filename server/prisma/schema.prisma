@@ -130,14 +130,14 @@ model User {
   passwordResetTokens PasswordResetToken[]
 
   // CommerceOS — this User is the tenant/owner of everything below.
-  categories          Category[]         @relation("CategoryOwner")
-  products            Product[]          @relation("ProductOwner")
-  commerceCustomers   CommerceCustomer[] @relation("CommerceCustomerOwner")
-  commerceOrders      CommerceOrder[]    @relation("CommerceOrderOwner")
-  stockMovements      StockMovement[]    @relation("StockMovementOwner")
+  categories        Category[]         @relation("CategoryOwner")
+  products          Product[]          @relation("ProductOwner")
+  commerceCustomers CommerceCustomer[] @relation("CommerceCustomerOwner")
+  commerceOrders    CommerceOrder[]    @relation("CommerceOrderOwner")
+  stockMovements    StockMovement[]    @relation("StockMovementOwner")
 
   // WebOS — this User is the tenant/owner of everything below.
-  sites               Site[]             @relation("SiteOwner")
+  sites Site[] @relation("SiteOwner")
 }
 
 model Plan {
@@ -250,10 +250,10 @@ model Category {
 }
 
 model Product {
-  id             String               @id @default(cuid())
-  owner          User                 @relation("ProductOwner", fields: [ownerId], references: [id])
+  id             String              @id @default(cuid())
+  owner          User                @relation("ProductOwner", fields: [ownerId], references: [id])
   ownerId        String
-  category       Category?            @relation(fields: [categoryId], references: [id])
+  category       Category?           @relation(fields: [categoryId], references: [id])
   categoryId     String?
   name           String
   slug           String
@@ -262,14 +262,14 @@ model Product {
   price          Int
   compareAtPrice Int?
   costPrice      Int?
-  status         ProductStatus        @default(ACTIVE)
-  stockQuantity  Int                  @default(0)
-  reorderPoint   Int                  @default(0)
+  status         ProductStatus       @default(ACTIVE)
+  stockQuantity  Int                 @default(0)
+  reorderPoint   Int                 @default(0)
   imageUrl       String?
   orderItems     CommerceOrderItem[]
   stockMovements StockMovement[]
-  createdAt      DateTime             @default(now())
-  updatedAt      DateTime             @updatedAt
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
 
   @@unique([ownerId, sku])
   @@unique([ownerId, slug])
@@ -326,15 +326,15 @@ model CommerceOrderItem {
 }
 
 model StockMovement {
-  id        String               @id @default(cuid())
-  owner     User                 @relation("StockMovementOwner", fields: [ownerId], references: [id])
+  id        String              @id @default(cuid())
+  owner     User                @relation("StockMovementOwner", fields: [ownerId], references: [id])
   ownerId   String
-  product   Product              @relation(fields: [productId], references: [id], onDelete: Cascade)
+  product   Product             @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId String
   change    Int
   reason    StockMovementReason
   note      String?
-  createdAt DateTime             @default(now())
+  createdAt DateTime            @default(now())
 
   @@index([ownerId])
   @@index([productId])
@@ -367,6 +367,9 @@ model Site {
   templateId      String?
   templateVersion Int?
   status          SiteStatus     @default(DRAFT)
+  slug            String?        @unique
+  customDomain    String?        @unique
+  publishedAt     DateTime?
   pages           Page[]
   testimonials    Testimonial[]
   leads           Lead[]
@@ -393,7 +396,7 @@ model Site {
 // ---------------------------------------------------------------------
 
 model Template {
-  id                 String              @id @default(cuid())
+  id                 String             @id @default(cuid())
   key                SitePlaybook
   name               String
   industry           String
@@ -401,16 +404,16 @@ model Template {
   complexity         TemplateComplexity
   description        String
   recommendedUseCase String
-  isEcommerce        Boolean             @default(false)
-  status             TemplateStatus      @default(DRAFT)
-  version            Int                 @default(1)
-  parentTemplate     Template?           @relation("TemplateVersions", fields: [parentTemplateId], references: [id], onDelete: SetNull)
+  isEcommerce        Boolean            @default(false)
+  status             TemplateStatus     @default(DRAFT)
+  version            Int                @default(1)
+  parentTemplate     Template?          @relation("TemplateVersions", fields: [parentTemplateId], references: [id], onDelete: SetNull)
   parentTemplateId   String?
-  versions           Template[]          @relation("TemplateVersions")
+  versions           Template[]         @relation("TemplateVersions")
   pages              TemplatePage[]
   sites              Site[]
-  createdAt          DateTime            @default(now())
-  updatedAt          DateTime            @updatedAt
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
 
   @@index([key])
   @@index([status])

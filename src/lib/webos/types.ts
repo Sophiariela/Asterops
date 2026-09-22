@@ -80,6 +80,9 @@ export type Site = {
   timezone: string | null;
   playbook: PlaybookKey;
   status: SiteStatus;
+  slug: string | null;
+  customDomain: string | null;
+  publishedAt: string | null;
   pages: Page[];
   testimonials: Testimonial[];
   trustElements: TrustElement[];
@@ -87,6 +90,34 @@ export type Site = {
   createdAt: string;
   updatedAt: string;
   _count?: { pages: number; testimonials: number; leads: number };
+};
+
+// The public site renderer (/site/:slug) gets a deliberately narrower shape
+// than the authenticated Site type — no ownerId/targetAudience/trustElements,
+// just what a visitor-facing page needs. Mirrors the `select` in
+// getPublicSiteBySlug on the server exactly.
+export type PublicPage = Pick<
+  Page,
+  'id' | 'slug' | 'name' | 'heroHeadline' | 'heroSubheadline' | 'heroImageUrl' | 'ctaLabel' | 'ctaHref' | 'sections' | 'seoTitle' | 'seoDescription' | 'hasLeadForm' | 'order'
+>;
+export type PublicTestimonial = Pick<Testimonial, 'id' | 'authorName' | 'authorRole' | 'quote' | 'rating' | 'createdAt'>;
+export type PublicMenuItem = Pick<MenuItem, 'id' | 'name' | 'description' | 'priceCents' | 'imageUrl' | 'available' | 'featured' | 'order'>;
+export type PublicMenuCategory = { id: string; name: string; order: number; items: PublicMenuItem[] };
+
+export type PublicSite = {
+  id: string;
+  businessName: string;
+  industry: string;
+  logoUrl: string | null;
+  currency: Currency;
+  playbook: PlaybookKey;
+  status: SiteStatus;
+  slug: string | null;
+  customDomain: string | null;
+  publishedAt: string | null;
+  pages: PublicPage[];
+  testimonials: PublicTestimonial[];
+  menuCategories: PublicMenuCategory[];
 };
 
 export type Table = {
