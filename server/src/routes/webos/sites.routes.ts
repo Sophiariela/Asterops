@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { authenticate, requireRole } from '../../middleware/auth.js';
-import { upload } from '../../middleware/upload.js';
+import { upload, resizeUploadedImage, handleUploadError } from '../../middleware/upload.js';
 import { generateSiteSchema, updateSiteSchema } from '../../validation/webos.js';
 import * as sitesService from '../../services/webos/sites.service.js';
 import { listPublishedSummariesForLegacyPicker } from '../../services/webos/templates.service.js';
@@ -41,6 +41,11 @@ sitesRouter.post('/:id/publish', async (req, res) => {
   res.json({ site });
 });
 
+sitesRouter.post('/:id/unpublish', async (req, res) => {
+  const site = await sitesService.unpublishSite(req.user!.userId, req.params.id);
+  res.json({ site });
+});
+
 sitesRouter.patch('/:id', async (req, res) => {
   const parsed = updateSiteSchema.safeParse(req.body);
   if (!parsed.success) {
@@ -50,7 +55,7 @@ sitesRouter.patch('/:id', async (req, res) => {
   res.json({ site });
 });
 
-sitesRouter.post('/:id/logo', upload.single('logo'), async (req, res) => {
+sitesRouter.post('/:id/logo', upload.single('logo'), resizeUploadedImage, async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: 'No file uploaded.' });
   }
@@ -62,6 +67,8 @@ sitesRouter.delete('/:id', async (req, res) => {
   await sitesService.deleteSite(req.user!.userId, req.params.id);
   res.status(204).send();
 });
+
+sitesRouter.use(handleUploadError);
 
 // Unauthenticated: the live public site renderer at /site/:slug reads this.
 export const publicSitesRouter = Router();

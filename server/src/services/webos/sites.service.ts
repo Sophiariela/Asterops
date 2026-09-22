@@ -174,6 +174,16 @@ export async function publishSite(ownerId: string, id: string) {
   });
 }
 
+// Leaves slug and publishedAt untouched — slug so re-publishing reuses the
+// same URL instead of minting a new one, publishedAt so it keeps meaning
+// "last time this site went live" (what the UI already labels it as) even
+// while the site is currently a draft.
+export async function unpublishSite(ownerId: string, id: string) {
+  const existing = await prisma.site.findFirst({ where: { id, ownerId } });
+  if (!existing) throw new CommerceError(404, 'Site not found.');
+  return prisma.site.update({ where: { id }, data: { status: 'DRAFT' } });
+}
+
 export async function updateSite(
   ownerId: string,
   id: string,

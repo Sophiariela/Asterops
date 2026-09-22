@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useState, type FormEvent, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { Star, UtensilsCrossed, CalendarCheck, CheckCircle2 } from 'lucide-react';
 import { api, ApiError, resolveUploadUrl } from '../../lib/api';
@@ -60,7 +60,60 @@ function LeadCaptureForm({ siteId, pageId }: { siteId: string; pageId: string })
   );
 }
 
-export default function PublicSiteRenderer({ site, page, siteSlug }: { site: PublicSite; page: PublicPage; siteSlug: string }) {
+// A template preview renders against a fake site id, so its contact
+// section must never be able to actually submit anywhere — this stands in
+// for both the lead and reservation forms in that mode.
+function PreviewContactForm() {
+  return (
+    <div>
+      <div className="grid sm:grid-cols-2 gap-3 max-w-lg">
+        <input disabled placeholder="Name" className="border-2 border-ASTER-100 rounded-xl px-4 py-2.5 text-sm bg-white" />
+        <input disabled placeholder="Email" className="border-2 border-ASTER-100 rounded-xl px-4 py-2.5 text-sm bg-white" />
+        <textarea disabled placeholder="Message" rows={3} className="sm:col-span-2 border-2 border-ASTER-100 rounded-xl px-4 py-2.5 text-sm bg-white resize-none" />
+        <button disabled className="sm:col-span-2 bg-ASTER-600 text-white font-bold text-sm py-2.5 rounded-full opacity-90">Send message</button>
+      </div>
+      <p className="text-[11px] text-slate-400 mt-3">Preview — this form collects real submissions once the site is generated and published.</p>
+    </div>
+  );
+}
+
+// Internal nav (navbar/footer/CTA-to-page) needs to behave differently in
+// two contexts: a real public page (real routing via react-router) vs. a
+// template-library preview living inside a modal on an authenticated
+// dashboard route, where following a real Link would navigate the whole
+// app away from the modal. `onNavigate`, when provided, keeps it local.
+function PageLink({
+  to, slug, onNavigate, className, children,
+}: {
+  to: string;
+  slug: string;
+  onNavigate?: (slug: string) => void;
+  className?: string;
+  children: ReactNode;
+}) {
+  if (onNavigate) {
+    return (
+      <button type="button" onClick={() => onNavigate(slug)} className={className}>
+        {children}
+      </button>
+    );
+  }
+  return (
+    <Link to={to} className={className}>
+      {children}
+    </Link>
+  );
+}
+
+export default function PublicSiteRenderer({
+  site, page, siteSlug, onNavigate, previewMode,
+}: {
+  site: PublicSite;
+  page: PublicPage;
+  siteSlug: string;
+  onNavigate?: (slug: string) => void;
+  previewMode?: boolean;
+}) {
   const isRestaurant = site.playbook === 'RESTAURANT';
   const isMenuPage = isRestaurant && page.slug === 'menu';
   const isReservationsPage = isRestaurant && page.slug === 'reservations';
@@ -72,24 +125,26 @@ export default function PublicSiteRenderer({ site, page, siteSlug }: { site: Pub
   const pageHref = (slug: string) => (slug === 'home' ? `/site/${siteSlug}` : `/site/${siteSlug}/${slug}`);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="bg-white">
       {/* Navbar */}
       <div className="flex items-center justify-between gap-4 px-6 sm:px-10 py-4 border-b border-ASTER-100 flex-wrap sticky top-0 bg-white/95 backdrop-blur z-10">
-        <Link to={pageHref('home')} className="flex items-center gap-3 min-w-0">
+        <PageLink to={pageHref('home')} slug="home" onNavigate={onNavigate} className="flex items-center gap-3 min-w-0">
           {site.logoUrl && (
             <img src={resolveUploadUrl(site.logoUrl) ?? undefined} alt="" className="w-10 h-10 rounded-xl object-cover shrink-0" />
           )}
           <span className="font-display font-extrabold text-lg text-ink-900 truncate">{site.businessName}</span>
-        </Link>
+        </PageLink>
         <nav className="flex items-center gap-1 flex-wrap">
           {site.pages.map((p) => (
-            <Link
+            <PageLink
               key={p.id}
               to={pageHref(p.slug)}
+              slug={p.slug}
+              onNavigate={onNavigate}
               className={`text-xs font-bold px-3 py-1.5 rounded-full transition-colors ${page.id === p.id ? 'text-ASTER-600 bg-ASTER-50' : 'text-slate-500 hover:text-ink-900'}`}
             >
               {p.name}
-            </Link>
+            </PageLink>
           ))}
         </nav>
       </div>
@@ -107,9 +162,9 @@ export default function PublicSiteRenderer({ site, page, siteSlug }: { site: Pub
           <p className="text-white/90 text-sm sm:text-base max-w-xl">{page.heroSubheadline}</p>
           <div className="mt-1">
             {ctaTargetPage ? (
-              <Link to={pageHref(ctaTargetPage.slug)} className="inline-block bg-ASTER-600 hover:bg-ASTER-700 rounded-full text-white font-bold text-sm px-5 py-2.5 transition-colors">
+              <PageLink to={pageHref(ctaTargetPage.slug)} slug={ctaTargetPage.slug} onNavigate={onNavigate} className="inline-block bg-ASTER-600 hover:bg-ASTER-700 rounded-full text-white font-bold text-sm px-5 py-2.5 transition-colors">
                 {page.ctaLabel}
-              </Link>
+              </PageLink>
             ) : page.hasLeadForm || isReservationsPage ? (
               <a href="#contact" className="inline-block bg-ASTER-600 hover:bg-ASTER-700 rounded-full text-white font-bold text-sm px-5 py-2.5 transition-colors">
                 {page.ctaLabel}
@@ -211,7 +266,7 @@ export default function PublicSiteRenderer({ site, page, siteSlug }: { site: Pub
               )}
               <div>
                 <h3 className="font-display font-bold text-xl text-ink-900 mb-2">{section.heading}</h3>
-                <p className="text-sm text-slate-600">{section.body}</p>
+                <p className="text-sm text-slate-600 whitespace-pre-line">{section.body}</p>
               </div>
             </div>
           ),
@@ -222,7 +277,7 @@ export default function PublicSiteRenderer({ site, page, siteSlug }: { site: Pub
       {isReservationsPage && (
         <div id="contact" className="p-6 sm:p-10 bg-slate-50 border-t border-ASTER-100">
           <p className="font-display font-bold text-lg text-ink-900 mb-4 flex items-center gap-2"><CalendarCheck size={18} className="text-ASTER-600" /> Reserve a table</p>
-          <ReservationBookingForm siteId={site.id} />
+          {previewMode ? <PreviewContactForm /> : <ReservationBookingForm siteId={site.id} />}
         </div>
       )}
 
@@ -230,7 +285,7 @@ export default function PublicSiteRenderer({ site, page, siteSlug }: { site: Pub
       {page.hasLeadForm && !isReservationsPage && (
         <div id="contact" className="p-6 sm:p-10 bg-slate-50 border-t border-ASTER-100">
           <p className="font-display font-bold text-lg text-ink-900 mb-4">Get in touch</p>
-          <LeadCaptureForm siteId={site.id} pageId={page.id} />
+          {previewMode ? <PreviewContactForm /> : <LeadCaptureForm siteId={site.id} pageId={page.id} />}
         </div>
       )}
 
@@ -242,9 +297,9 @@ export default function PublicSiteRenderer({ site, page, siteSlug }: { site: Pub
         </div>
         <nav className="flex items-center gap-4 flex-wrap">
           {site.pages.map((p) => (
-            <Link key={p.id} to={pageHref(p.slug)} className="text-xs font-semibold hover:text-white transition-colors">
+            <PageLink key={p.id} to={pageHref(p.slug)} slug={p.slug} onNavigate={onNavigate} className="text-xs font-semibold hover:text-white transition-colors">
               {p.name}
-            </Link>
+            </PageLink>
           ))}
         </nav>
       </div>

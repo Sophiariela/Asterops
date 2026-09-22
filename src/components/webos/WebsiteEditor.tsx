@@ -60,6 +60,7 @@ export default function WebsiteEditor({
   onRefresh,
   onAddTestimonial,
   onPublish,
+  onUnpublish,
   onManageMenu,
   onManageReservations,
 }: {
@@ -67,6 +68,7 @@ export default function WebsiteEditor({
   onRefresh: () => void;
   onAddTestimonial: () => void;
   onPublish: () => void;
+  onUnpublish: () => void;
   onManageMenu?: () => void;
   onManageReservations?: () => void;
 }) {
@@ -87,22 +89,22 @@ export default function WebsiteEditor({
   const uploadLogo = (file: File) => {
     const fd = new FormData();
     fd.append('logo', file);
-    api.postForm(`/webos/sites/${site.id}/logo`, fd).then(onRefresh);
+    return api.postForm(`/webos/sites/${site.id}/logo`, fd).then(onRefresh);
   };
   const uploadHeroImage = (pageId: string, file: File) => {
     const fd = new FormData();
     fd.append('image', file);
-    api.postForm(`/webos/pages/${pageId}/hero-image`, fd).then(onRefresh);
+    return api.postForm(`/webos/pages/${pageId}/hero-image`, fd).then(onRefresh);
   };
   const uploadSectionImage = (pageId: string, index: number, file: File) => {
     const fd = new FormData();
     fd.append('image', file);
-    api.postForm(`/webos/pages/${pageId}/sections/${index}/image`, fd).then(onRefresh);
+    return api.postForm(`/webos/pages/${pageId}/sections/${index}/image`, fd).then(onRefresh);
   };
   const uploadMenuItemImage = (itemId: string, file: File) => {
     const fd = new FormData();
     fd.append('image', file);
-    api.postForm(`/webos/sites/${site.id}/menu/items/${itemId}/image`, fd).then(onRefresh);
+    return api.postForm(`/webos/sites/${site.id}/menu/items/${itemId}/image`, fd).then(onRefresh);
   };
 
   const saveSectionField = (p: Page, index: number, field: 'heading' | 'body', value: string) => {
@@ -153,7 +155,12 @@ export default function WebsiteEditor({
               Publish
             </button>
           ) : (
-            <span className="text-xs font-bold px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-700 whitespace-nowrap">Published</span>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-700 whitespace-nowrap">Published</span>
+              <button onClick={onUnpublish} className="text-xs font-bold text-slate-400 hover:text-rose-600 transition-colors whitespace-nowrap">
+                Unpublish
+              </button>
+            </div>
           )}
         </div>
       </div>

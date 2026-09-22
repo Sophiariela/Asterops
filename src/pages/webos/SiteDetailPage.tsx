@@ -13,6 +13,7 @@ import MenuManager from '../../components/webos/MenuManager';
 import { computeBlueprint } from '../../lib/webos/blueprint';
 import { CURRENCIES } from '../../lib/webos/currency';
 import { getPublicSiteUrl } from '../../lib/webos/publicUrl';
+import { formatRelativeTime } from '../../lib/webos/time';
 import type {
   Site, Page, Testimonial, TrustElement, TrustElementType, Playbook, WebsiteHealth, ConversionAudit, TrustGap,
   RecommendedAction, Lead, LeadStatus, ConversionPathsResult, PageInventoryItem,
@@ -94,6 +95,9 @@ export default function SiteDetailPage() {
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [toast, setToast] = useState('');
+  const [confirmingUnpublish, setConfirmingUnpublish] = useState(false);
+  const [unpublishing, setUnpublishing] = useState(false);
+  const [reservationsCount, setReservationsCount] = useState<number | null>(null);
 
   const loadCore = () => {
     if (!id) return;
@@ -110,6 +114,7 @@ export default function SiteDetailPage() {
     api.get<{ trustMap: TrustMap }>(`/webos/sites/${id}/analytics/trust-map`).then((data) => setTrustMap(data.trustMap)).catch(() => {});
     api.get<{ leadCaptureMap: LeadCaptureMap }>(`/webos/sites/${id}/analytics/lead-capture-map`).then((data) => setLeadCaptureMap(data.leadCaptureMap)).catch(() => {});
     api.get<{ readiness: DeploymentReadiness }>(`/webos/sites/${id}/analytics/deployment-readiness`).then((data) => setReadiness(data.readiness)).catch(() => {});
+    api.get<{ reservations: unknown[] }>(`/webos/sites/${id}/reservations`).then((data) => setReservationsCount(data.reservations.length)).catch(() => setReservationsCount(null));
   };
 
   useEffect(loadCore, [id]);
@@ -139,6 +144,18 @@ export default function SiteDetailPage() {
     if (!id) return;
     const data = await api.post<{ site: Site }>(`/webos/sites/${id}/publish`);
     setSite((s) => (s ? { ...s, ...data.site } : s));
+  };
+
+  const unpublish = async () => {
+    if (!id) return;
+    setUnpublishing(true);
+    try {
+      const data = await api.post<{ site: Site }>(`/webos/sites/${id}/unpublish`);
+      setSite((s) => (s ? { ...s, ...data.site } : s));
+      setConfirmingUnpublish(false);
+    } finally {
+      setUnpublishing(false);
+    }
   };
 
   const showToast = (message: string) => {
@@ -352,16 +369,25 @@ export default function SiteDetailPage() {
               Publish Site
             </button>
           ) : (
-            publicUrl && (
-              <a
-                href={publicUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-1.5 border-2 border-ASTER-100 hover:border-ASTER-600 text-ink-900 font-bold text-sm px-4 py-2 rounded-full transition-all"
+            <>
+              <button
+                onClick={unpublish}
+                disabled={unpublishing}
+                className="text-sm font-bold text-slate-400 hover:text-rose-600 disabled:opacity-60 transition-colors"
               >
-                <ExternalLink size={14} /> Open Site
-              </a>
-            )
+                {unpublishing ? 'Unpublishing…' : 'Unpublish'}
+              </button>
+              {publicUrl && (
+                <a
+                  href={publicUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1.5 border-2 border-ASTER-100 hover:border-ASTER-600 text-ink-900 font-bold text-sm px-4 py-2 rounded-full transition-all"
+                >
+                  <ExternalLink size={14} /> Open Site
+                </a>
+              )}
+            </>
           )}
         </div>
       </div>
@@ -389,12 +415,72 @@ export default function SiteDetailPage() {
       </div>
 
       {tab === 'overview' && (
-        <div className="mt-6">
+        <div className="mt-6 space-y-6">
+          <div className="bg-white rounded-[28px] card-shadow border border-ASTER-100 p-6">
+            <div className="flex items-center justify-between gap-4 flex-wrap mb-5">
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-wide">Website Management</p>
+              <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full whitespace-nowrap ${site.status === 'PUBLISHED' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-500'}`}>
+                {site.status === 'PUBLISHED' ? 'Published' : 'Draft'}
+              </span>
+            </div>
+
+            {publicUrl ? (
+              <div className="flex items-center justify-between gap-3 flex-wrap bg-slate-50 border border-ASTER-100 rounded-2xl px-4 py-3 mb-5">
+                <a href={publicUrl} target="_blank" rel="noreferrer" className="text-sm font-semibold text-ASTER-600 hover:underline truncate">
+                  {publicUrl.replace(/^https:\/\//, '')}
+                </a>
+                <div className="flex items-center gap-2 shrink-0">
+                  <a
+                    href={publicUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1.5 bg-ASTER-600 hover:bg-ASTER-700 text-white font-bold text-xs px-3 py-1.5 rounded-full transition-all"
+                  >
+                    <ExternalLink size={12} /> Open Site
+                  </a>
+                  <button
+                    onClick={() => copyPublicLink(publicUrl)}
+                    className="inline-flex items-center gap-1.5 border-2 border-ASTER-100 hover:border-ASTER-600 text-ink-900 font-bold text-xs px-3 py-1.5 rounded-full transition-all"
+                  >
+                    <Copy size={12} /> Copy Link
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm text-slate-400 mb-5">Publish this site to get a public URL.</p>
+            )}
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-1">
+              <div>
+                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wide">SEO</p>
+                <p className="font-display font-extrabold text-xl text-ink-900 mt-1">
+                  {pageInventory ? `${pageInventory.filter((p) => p.seoStatus === 'complete').length}/${pageInventory.length}` : '—'}
+                </p>
+                <p className="text-[11px] text-slate-400">pages complete</p>
+              </div>
+              <div>
+                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wide">Leads</p>
+                <p className="font-display font-extrabold text-xl text-ink-900 mt-1">{leads.length}</p>
+              </div>
+              {site.playbook === 'RESTAURANT' && (
+                <div>
+                  <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wide">Reservations</p>
+                  <p className="font-display font-extrabold text-xl text-ink-900 mt-1">{reservationsCount ?? '—'}</p>
+                </div>
+              )}
+              <div>
+                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wide">Last updated</p>
+                <p className="font-display font-extrabold text-xl text-ink-900 mt-1">{formatRelativeTime(site.updatedAt)}</p>
+              </div>
+            </div>
+          </div>
+
           <WebsiteEditor
             site={site}
             onRefresh={loadCore}
             onAddTestimonial={() => setShowTestimonialForm(true)}
             onPublish={publish}
+            onUnpublish={unpublish}
             onManageMenu={() => setTab('menu')}
             onManageReservations={() => setTab('reservations')}
           />
@@ -838,6 +924,26 @@ export default function SiteDetailPage() {
                     </div>
                   </div>
                 )}
+
+                <div className="mt-5 pt-5 border-t border-ASTER-100">
+                  {!confirmingUnpublish ? (
+                    <button onClick={() => setConfirmingUnpublish(true)} className="text-sm font-bold text-slate-400 hover:text-rose-600 transition-colors">
+                      Unpublish site
+                    </button>
+                  ) : (
+                    <div>
+                      <p className="text-sm text-ink-900 mb-3">This takes your site offline — visitors won't be able to reach it until you publish again.</p>
+                      <div className="flex items-center gap-3">
+                        <button onClick={unpublish} disabled={unpublishing} className="bg-rose-600 hover:bg-rose-700 disabled:opacity-60 text-white font-bold text-sm px-4 py-2.5 rounded-full transition-all">
+                          {unpublishing ? 'Unpublishing…' : 'Yes, unpublish'}
+                        </button>
+                        <button onClick={() => setConfirmingUnpublish(false)} className="text-sm font-semibold text-slate-500 hover:text-ink-900">
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </>
             ) : (
               <>

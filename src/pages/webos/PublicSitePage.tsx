@@ -61,5 +61,9 @@ export default function PublicSitePage() {
     );
   }
 
-  return <PublicSiteRenderer site={site} page={page} siteSlug={site.slug ?? slug!} />;
+  return (
+    <div className="min-h-screen">
+      <PublicSiteRenderer site={site} page={page} siteSlug={site.slug ?? slug!} />
+    </div>
+  );
 }

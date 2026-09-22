@@ -1,23 +1,10 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Monitor, Smartphone, Sparkles, ArrowRight, Layers, Target } from 'lucide-react';
+import { Search, Monitor, Tablet, Smartphone, Sparkles, ArrowRight, Layers, Target } from 'lucide-react';
 import { api, ApiError } from '../../lib/api';
+import PublicSiteRenderer from '../../components/webos/PublicSiteRenderer';
+import { buildTemplatePreviewSite } from '../../lib/webos/templatePreview';
 import type { TemplateSummary, TemplateDetail, TemplateComplexity } from '../../lib/webos/types';
-
-function fillVars(pattern: string, vars: Record<string, string>): string {
-  return pattern.replace(/\{\{(\w+)\}\}/g, (m, k) => (k in vars ? vars[k] : m));
-}
-
-function exampleVars(t: Pick<TemplateSummary, 'industry' | 'primaryGoal'>) {
-  return {
-    businessName: 'Your Business',
-    industry: t.industry,
-    targetAudience: 'your ideal customer',
-    services: 'your core offer',
-    pageName: '',
-    purpose: t.primaryGoal,
-  };
-}
 
 function scoreColor(score: number) {
   if (score >= 70) return 'text-emerald-600';
@@ -31,7 +18,12 @@ const COMPLEXITY_STYLE: Record<TemplateComplexity, string> = {
   ADVANCED: 'bg-violet-50 text-violet-700',
 };
 
-type Device = 'desktop' | 'mobile';
+type Device = 'desktop' | 'tablet' | 'mobile';
+const DEVICE_WIDTH: Record<Device, string> = {
+  desktop: 'max-w-full',
+  tablet: 'max-w-[768px]',
+  mobile: 'max-w-[390px]',
+};
 
 type GenerateForm = { businessName: string; industry: string; targetAudience: string; services: string };
 const emptyGenerateForm: GenerateForm = { businessName: '', industry: '', targetAudience: '', services: '' };
@@ -48,6 +40,7 @@ export default function TemplateLibraryPage() {
   const [detail, setDetail] = useState<TemplateDetail | null>(null);
   const [detailDevice, setDetailDevice] = useState<Device>('desktop');
   const [detailPageIndex, setDetailPageIndex] = useState(0);
+  const previewSite = useMemo(() => (detail ? buildTemplatePreviewSite(detail) : null), [detail]);
 
   const [generatingFor, setGeneratingFor] = useState<TemplateSummary | null>(null);
   const [form, setForm] = useState<GenerateForm>(emptyGenerateForm);
@@ -213,7 +206,7 @@ export default function TemplateLibraryPage() {
       {/* Template detail modal */}
       {detail && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-950/40" onClick={() => setDetail(null)}>
-          <div className="bg-white rounded-[28px] card-shadow border border-ASTER-100 w-full max-w-3xl max-h-[90vh] overflow-y-auto p-7" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-white rounded-[28px] card-shadow border border-ASTER-100 w-full max-w-5xl max-h-[90vh] overflow-y-auto p-7" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h2 className="font-display font-extrabold text-xl text-ink-900">{detail.name}</h2>
@@ -251,36 +244,31 @@ export default function TemplateLibraryPage() {
                 ))}
               </div>
 
-              <div>
+              <div className="min-w-0">
                 <div className="flex items-center justify-end gap-1 bg-slate-100 rounded-full p-1 mb-3 w-fit ml-auto">
-                  {([{ key: 'desktop' as Device, icon: Monitor }, { key: 'mobile' as Device, icon: Smartphone }]).map(({ key, icon: Icon }) => (
+                  {([{ key: 'desktop' as Device, icon: Monitor }, { key: 'tablet' as Device, icon: Tablet }, { key: 'mobile' as Device, icon: Smartphone }]).map(({ key, icon: Icon }) => (
                     <button key={key} onClick={() => setDetailDevice(key)} className={`p-2 rounded-full transition-colors ${detailDevice === key ? 'bg-white text-ASTER-600 card-shadow-sm' : 'text-slate-400'}`} aria-label={key}>
                       <Icon size={15} />
                     </button>
                   ))}
                 </div>
-                {(() => {
-                  const page = detail.pages[detailPageIndex];
-                  if (!page) return null;
-                  const vars = { ...exampleVars(detail), pageName: page.name, purpose: page.purpose };
-                  return (
-                    <div className={`border border-ASTER-100 rounded-2xl overflow-hidden bg-slate-50 p-6 mx-auto transition-all ${detailDevice === 'mobile' ? 'max-w-[320px]' : 'max-w-full'}`}>
-                      <h3 className="font-display font-extrabold text-xl text-ink-900">{fillVars(page.heroHeadlinePattern, vars)}</h3>
-                      <p className="text-slate-500 text-sm mt-2">{fillVars(page.heroSubheadlinePattern, vars)}</p>
-                      <button className="mt-4 bg-ASTER-600 text-white font-bold text-xs px-4 py-2 rounded-full">{page.ctaLabel}</button>
-                      <div className="mt-6 space-y-4 pt-6 border-t border-ASTER-100">
-                        {page.sections.map((s) => (
-                          <div key={s.id}>
-                            <p className="font-display font-bold text-sm text-ink-900">{fillVars(s.heading, vars)}</p>
-                            <p className="text-xs text-slate-500 mt-1">{s.type === 'trust-placeholder' ? 'Real testimonials appear here once added.' : 'Real content, generated from your services.'}</p>
-                          </div>
-                        ))}
-                        {page.hasLeadForm && <div className="bg-white rounded-xl p-3 text-xs font-semibold text-slate-500">Lead capture form</div>}
-                      </div>
+                {previewSite && previewSite.pages[detailPageIndex] && (
+                  <div className="border border-ASTER-100 rounded-2xl overflow-hidden bg-slate-50">
+                    <div className={`mx-auto max-h-[60vh] overflow-y-auto transition-all ${DEVICE_WIDTH[detailDevice]}`}>
+                      <PublicSiteRenderer
+                        site={previewSite}
+                        page={previewSite.pages[detailPageIndex]}
+                        siteSlug="preview"
+                        previewMode
+                        onNavigate={(slug) => {
+                          const idx = previewSite.pages.findIndex((p) => p.slug === slug);
+                          if (idx >= 0) setDetailPageIndex(idx);
+                        }}
+                      />
                     </div>
-                  );
-                })()}
-                <p className="text-[11px] text-slate-400 mt-3">Structure preview with example copy — your generated site uses your real business name and services instead.</p>
+                  </div>
+                )}
+                <p className="text-[11px] text-slate-400 mt-3">Live preview with example copy and photos — your generated site uses your real business name, services and content instead.</p>
               </div>
             </div>
           </div>
