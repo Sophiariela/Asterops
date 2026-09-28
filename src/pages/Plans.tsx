@@ -4,20 +4,27 @@ import { Check, ArrowRight, ArrowLeft, AlertCircle } from 'lucide-react';
 import { api } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
 import { formatBRL } from '../lib/currency';
-import { PLAN_TIERS, ENTERPRISE_TIER, findTierForProduct } from '../data/plans';
+import { PLAN_TIERS, ENTERPRISE_TIER, FALLBACK_PLANS, findTierForProduct, type BackendPlan } from '../data/plans';
+import { readCachedPlans, writeCachedPlans } from '../lib/plansCache';
 import PaymentMethods from '../components/PaymentMethods';
 import Footer from '../components/Footer';
 
-type BackendPlan = {
-  id: string;
-  name: string;
-  slug: string;
-  description: string;
-  features: string[];
-  price: number;
-  annualPrice: number | null;
-  status: 'ACTIVE' | 'ARCHIVED';
-};
+function PricingCardSkeleton() {
+  return (
+    <div className="bg-white rounded-[28px] p-7 sm:p-8 border border-ASTER-100 card-shadow-sm animate-pulse">
+      <div className="h-6 w-24 bg-slate-200 rounded-full" />
+      <div className="h-4 w-full bg-slate-100 rounded-full mt-4" />
+      <div className="h-4 w-2/3 bg-slate-100 rounded-full mt-2" />
+      <div className="h-9 w-32 bg-slate-200 rounded-full mt-6" />
+      <div className="space-y-3 mt-7">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div key={i} className="h-4 w-full bg-slate-100 rounded-full" />
+        ))}
+      </div>
+      <div className="h-12 w-full bg-slate-200 rounded-full mt-8" />
+    </div>
+  );
+}
 
 export default function Plans() {
   const { user } = useAuth();
@@ -27,15 +34,32 @@ export default function Plans() {
   const highlightedTier = findTierForProduct(productParam)?.slug;
   const wasCancelled = searchParams.get('cancelled') === '1';
 
-  const [backendPlans, setBackendPlans] = useState<BackendPlan[] | null>(null);
-  const [error, setError] = useState('');
+  const [backendPlans, setBackendPlans] = useState<BackendPlan[] | null>(
+    () => readCachedPlans() ?? FALLBACK_PLANS,
+  );
   const [annual, setAnnual] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
+
+    // No abort/timeout on the request itself — a Render cold start can take
+    // well past 2s, and we still want the silent update whenever it lands.
+    // The "timeout protection" is architectural: cached/fallback plans are
+    // already the initial render, so nothing here ever blocks paint.
     api
       .get<{ plans: BackendPlan[] }>('/plans')
-      .then((data) => setBackendPlans(data.plans))
-      .catch(() => setError('Não foi possível carregar os planos agora. Tente novamente em instantes.'));
+      .then((data) => {
+        if (cancelled) return;
+        setBackendPlans(data.plans);
+        writeCachedPlans(data.plans);
+      })
+      .catch(() => {
+        // Cached/fallback pricing is already on screen — fail silently.
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
@@ -85,10 +109,12 @@ export default function Plans() {
           </div>
         </div>
 
-        {error && <p className="text-center text-rose-500 font-semibold mt-10">{error}</p>}
-
-        {!backendPlans && !error && (
-          <p className="text-center text-slate-400 mt-16">Carregando planos…</p>
+        {!backendPlans && (
+          <div className="mt-14 grid md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <PricingCardSkeleton key={i} />
+            ))}
+          </div>
         )}
 
         {backendPlans && (
