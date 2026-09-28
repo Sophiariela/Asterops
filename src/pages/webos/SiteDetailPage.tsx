@@ -2,7 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
   ArrowLeft, Sparkles, Pencil, Trash2, Plus, PlayCircle,
-  CheckCircle2, XCircle, ExternalLink, Copy,
+  CheckCircle2, XCircle, ExternalLink, Copy, Loader2, AlertTriangle,
 } from 'lucide-react';
 import { api, ApiError } from '../../lib/api';
 import Modal from '../../components/commerce/Modal';
@@ -12,7 +12,7 @@ import ReservationsDashboard from '../../components/webos/ReservationsDashboard'
 import MenuManager from '../../components/webos/MenuManager';
 import { computeBlueprint } from '../../lib/webos/blueprint';
 import { CURRENCIES } from '../../lib/webos/currency';
-import { getPublicSiteUrl } from '../../lib/webos/publicUrl';
+import { getPublicSiteUrl, resolvePublicSiteUrl, type DomainStatus } from '../../lib/webos/publicUrl';
 import { formatRelativeTime } from '../../lib/webos/time';
 import type {
   Site, Page, Testimonial, TrustElement, TrustElementType, Playbook, WebsiteHealth, ConversionAudit, TrustGap,
@@ -98,6 +98,11 @@ export default function SiteDetailPage() {
   const [confirmingUnpublish, setConfirmingUnpublish] = useState(false);
   const [unpublishing, setUnpublishing] = useState(false);
   const [reservationsCount, setReservationsCount] = useState<number | null>(null);
+  const [publicUrlInfo, setPublicUrlInfo] = useState<{ url: string | null; domainStatus: DomainStatus; usedFallback: boolean }>({
+    url: null,
+    domainStatus: 'checking',
+    usedFallback: false,
+  });
 
   const loadCore = () => {
     if (!id) return;
@@ -128,6 +133,25 @@ export default function SiteDetailPage() {
       setSettingsSaved(false);
     }
   }, [tab, site]);
+
+  // The synchronous URL (getPublicSiteUrl) renders instantly from known
+  // data; this verifies it's actually reachable — a custom domain that
+  // fails DNS/connectivity falls back to the production URL instead of
+  // the dashboard confidently handing out a dead link.
+  useEffect(() => {
+    if (!site || site.status !== 'PUBLISHED') {
+      setPublicUrlInfo({ url: null, domainStatus: 'checking', usedFallback: false });
+      return;
+    }
+    let cancelled = false;
+    setPublicUrlInfo((prev) => ({ ...prev, domainStatus: 'checking' }));
+    resolvePublicSiteUrl(site).then((result) => {
+      if (!cancelled) setPublicUrlInfo(result);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [site?.slug, site?.customDomain, site?.status]);
 
   const runAudit = async () => {
     if (!id) return;
@@ -343,10 +367,35 @@ export default function SiteDetailPage() {
 
   const playbookLabel = playbooks.find((p) => p.key === site.playbook)?.label ?? site.playbook;
   const maxFunnelCount = conversionPaths ? Math.max(1, ...conversionPaths.funnel.map((f) => f.count)) : 1;
-  const publicUrl = getPublicSiteUrl(site);
+  // Instant best-guess from known data, upgraded to the verified/fallback
+  // result the moment resolvePublicSiteUrl() finishes checking.
+  const publicUrl = publicUrlInfo.url ?? getPublicSiteUrl(site);
+  const { domainStatus, usedFallback } = publicUrlInfo;
   const publishedOnLabel = site.publishedAt
     ? new Date(site.publishedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
     : null;
+
+  const domainStatusBadge = (() => {
+    if (domainStatus === 'checking') {
+      return (
+        <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-slate-400">
+          <Loader2 size={12} className="animate-spin" /> Checking domain…
+        </span>
+      );
+    }
+    if (domainStatus === 'unreachable') {
+      return (
+        <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-amber-600" title="Your custom domain isn't resolving — showing the production URL instead.">
+          <AlertTriangle size={12} /> Custom domain unreachable — showing production URL
+        </span>
+      );
+    }
+    return (
+      <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-emerald-600">
+        <CheckCircle2 size={12} /> {usedFallback ? 'Live (production URL)' : 'Live'}
+      </span>
+    );
+  })();
 
   return (
     <div>
@@ -425,26 +474,29 @@ export default function SiteDetailPage() {
             </div>
 
             {publicUrl ? (
-              <div className="flex items-center justify-between gap-3 flex-wrap bg-slate-50 border border-ASTER-100 rounded-2xl px-4 py-3 mb-5">
-                <a href={publicUrl} target="_blank" rel="noreferrer" className="text-sm font-semibold text-ASTER-600 hover:underline truncate">
-                  {publicUrl.replace(/^https:\/\//, '')}
-                </a>
-                <div className="flex items-center gap-2 shrink-0">
-                  <a
-                    href={publicUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-1.5 bg-ASTER-600 hover:bg-ASTER-700 text-white font-bold text-xs px-3 py-1.5 rounded-full transition-all"
-                  >
-                    <ExternalLink size={12} /> Open Site
+              <div className="bg-slate-50 border border-ASTER-100 rounded-2xl px-4 py-3 mb-5">
+                <div className="flex items-center justify-between gap-3 flex-wrap">
+                  <a href={publicUrl} target="_blank" rel="noreferrer" className="text-sm font-semibold text-ASTER-600 hover:underline truncate">
+                    {publicUrl.replace(/^https:\/\//, '')}
                   </a>
-                  <button
-                    onClick={() => copyPublicLink(publicUrl)}
-                    className="inline-flex items-center gap-1.5 border-2 border-ASTER-100 hover:border-ASTER-600 text-ink-900 font-bold text-xs px-3 py-1.5 rounded-full transition-all"
-                  >
-                    <Copy size={12} /> Copy Link
-                  </button>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <a
+                      href={publicUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1.5 bg-ASTER-600 hover:bg-ASTER-700 text-white font-bold text-xs px-3 py-1.5 rounded-full transition-all"
+                    >
+                      <ExternalLink size={12} /> Open Site
+                    </a>
+                    <button
+                      onClick={() => copyPublicLink(publicUrl)}
+                      className="inline-flex items-center gap-1.5 border-2 border-ASTER-100 hover:border-ASTER-600 text-ink-900 font-bold text-xs px-3 py-1.5 rounded-full transition-all"
+                    >
+                      <Copy size={12} /> Copy Link
+                    </button>
+                  </div>
                 </div>
+                <div className="mt-2">{domainStatusBadge}</div>
               </div>
             ) : (
               <p className="text-sm text-slate-400 mb-5">Publish this site to get a public URL.</p>
@@ -906,6 +958,7 @@ export default function SiteDetailPage() {
                         {publicUrl.replace(/^https:\/\//, '')}
                       </a>
                     </div>
+                    <div className="mt-2">{domainStatusBadge}</div>
                     <div className="flex items-center gap-3 mt-3 flex-wrap">
                       <a
                         href={publicUrl}
