@@ -63,6 +63,7 @@ export default function WebsiteEditor({
   onUnpublish,
   onManageMenu,
   onManageReservations,
+  publishingAvailable = true,
 }: {
   site: Site;
   onRefresh: () => void;
@@ -71,6 +72,7 @@ export default function WebsiteEditor({
   onUnpublish: () => void;
   onManageMenu?: () => void;
   onManageReservations?: () => void;
+  publishingAvailable?: boolean | null;
 }) {
   const [activePageId, setActivePageId] = useState(site.pages[0]?.id ?? '');
   const [device, setDevice] = useState<Device>('desktop');
@@ -151,8 +153,13 @@ export default function WebsiteEditor({
             ))}
           </div>
           {site.status === 'DRAFT' ? (
-            <button onClick={onPublish} className="bg-ASTER-600 hover:bg-ASTER-700 text-white font-bold text-sm px-4 py-2 rounded-full transition-all whitespace-nowrap">
-              Publish
+            <button
+              onClick={onPublish}
+              disabled={publishingAvailable === false}
+              title={publishingAvailable === false ? 'Publishing is not available yet.' : undefined}
+              className="bg-ASTER-600 hover:bg-ASTER-700 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-white font-bold text-sm px-4 py-2 rounded-full transition-all whitespace-nowrap"
+            >
+              {publishingAvailable === false ? 'Publishing unavailable' : 'Publish'}
             </button>
           ) : (
             <div className="flex items-center gap-2">
@@ -165,7 +172,7 @@ export default function WebsiteEditor({
         </div>
       </div>
 
-      <p className="text-[11px] text-slate-400 mb-3">Click any text, price or photo below to edit it directly — this is what the finished site will contain once published.</p>
+      <p className="text-[11px] text-slate-400 mb-3">Click any text, price or photo below to edit it directly. This is what the finished site will contain once published.</p>
 
       <div className={`mx-auto bg-white border border-ASTER-100 rounded-[28px] card-shadow overflow-hidden transition-all ${DEVICE_WIDTH[device]}`}>
         {/* Navbar */}
@@ -224,7 +231,7 @@ export default function WebsiteEditor({
                 <button
                   onClick={() => goToPageBySlug(ctaTargetSlug)}
                   className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-colors"
-                  title={`This button links to the ${ctaTargetSlug} page — click to go there`}
+                  title={`This button links to the ${ctaTargetSlug} page, click to go there`}
                 >
                   <ArrowRight size={14} />
                 </button>
@@ -268,7 +275,7 @@ export default function WebsiteEditor({
               )}
             </div>
             {site.menuCategories.length === 0 ? (
-              <p className="text-sm text-slate-400">No menu items yet — add categories and items in Menu Manager.</p>
+              <p className="text-sm text-slate-400">No menu items yet. Add categories and items in Menu Manager.</p>
             ) : (
               <div className="space-y-6">
                 {site.menuCategories.map((cat) => (
@@ -362,7 +369,7 @@ export default function WebsiteEditor({
                 </button>
               )}
             </div>
-            <p className="text-xs text-slate-400 mb-4">Fully functional — submissions appear in your Reservations dashboard right away.</p>
+            <p className="text-xs text-slate-400 mb-4">Fully functional. Submissions appear in your Reservations dashboard right away.</p>
             <ReservationBookingForm siteId={site.id} />
           </div>
         )}
@@ -371,7 +378,7 @@ export default function WebsiteEditor({
         {page.hasLeadForm && !isReservationsPage && (
           <div className="p-6 sm:p-10 bg-slate-50 border-t border-ASTER-100">
             <p className="font-display font-bold text-lg text-ink-900 mb-1">Get in touch</p>
-            <p className="text-xs text-slate-400 mb-4">Preview — this form captures real leads once the site is published and live.</p>
+            <p className="text-xs text-slate-400 mb-4">Preview. This form captures real leads once the site is published and live.</p>
             <div className="grid sm:grid-cols-2 gap-3 max-w-lg">
               <input disabled placeholder="Name" className="border-2 border-ASTER-100 rounded-xl px-4 py-2.5 text-sm bg-white" />
               <input disabled placeholder="Email" className="border-2 border-ASTER-100 rounded-xl px-4 py-2.5 text-sm bg-white" />

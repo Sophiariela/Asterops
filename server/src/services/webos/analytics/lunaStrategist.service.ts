@@ -19,7 +19,7 @@ Critique the page like a conversion copywriter would, grounded ONLY in the conte
 2. A recommended replacement headline that fixes it, specific to this business — not generic.
 3. One sentence on SEO or trust if there's an obvious gap (e.g. missing meta description).
 
-Plain language, no markdown, no preamble. Three short lines, each starting with "- ".`;
+Plain language, no markdown, no preamble, no em dashes (use periods or commas instead). Three short lines, each starting with "- ".`;
 
 const BLUEPRINT_SYSTEM_PROMPT = `You are Luna, ASTER's website strategist, embedded in WebOS.
 You are given a structural snapshot of one merchant's site: its page architecture (real sections
@@ -31,7 +31,8 @@ behavior — never claim something is positioned above or below something else, 
 visitor or conversion-rate statistic that isn't in the data given.
 
 Write 3 to 5 short strategic recommendations a business owner can act on, grounded ONLY in the
-structure given. Each is one sentence, plain language, no markdown, no preamble, starting with "- ".`;
+structure given. Each is one sentence, plain language, no markdown, no preamble, no em dashes
+(use periods or commas instead), starting with "- ".`;
 
 const TEMPLATE_RECOMMEND_SYSTEM_PROMPT = `You are Luna, ASTER's website strategist.
 You are given a real list of published website templates (name, industry, primary goal, recommended
@@ -40,10 +41,16 @@ use case) and a business's real industry, target audience, and description.
 Pick exactly one template from the list given that best fits this business. Never invent or reference
 a template that isn't in the list.
 
-Respond in exactly two lines, each starting with "- ":
+Respond in exactly two lines, each starting with "- ", with no em dashes (use periods or commas instead):
 - The recommended template's exact name from the list, then one sentence on why it fits.
 - One sentence suggesting a structural adjustment worth considering for this specific business (e.g. an
   extra page, a different call-to-action, dropping a page that doesn't fit).`;
+
+// Belt-and-suspenders for the "no em dashes" instruction above — the model
+// mostly complies, but this guarantees it regardless of what comes back.
+function stripEmDashes(text: string): string {
+  return text.replace(/\s*—\s*/g, ', ').replace(/—/g, ',');
+}
 
 async function callLuna(systemPrompt: string, snapshot: unknown): Promise<string[]> {
   if (!anthropic) {
@@ -70,10 +77,10 @@ async function callLuna(systemPrompt: string, snapshot: unknown): Promise<string
 
   const lines = text
     .split('\n')
-    .map((line) => line.replace(/^-\s*/, '').trim())
+    .map((line) => stripEmDashes(line.replace(/^-\s*/, '').trim()))
     .filter(Boolean);
 
-  return lines.length ? lines : [text.trim()].filter(Boolean);
+  return lines.length ? lines : [stripEmDashes(text.trim())].filter(Boolean);
 }
 
 export async function reviewPage(ownerId: string, siteId: string, pageId: string): Promise<{ review: string[] }> {

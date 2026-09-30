@@ -83,7 +83,7 @@ function sectionBody(type: string, bodyPattern: string, vars: Record<string, str
 // renders populated (what a finished site looks like) instead of empty.
 const EXAMPLE_TESTIMONIALS: PublicTestimonial[] = [
   { id: 'preview-1', authorName: 'Alex Morgan', authorRole: 'Customer', quote: 'Working with them was seamless from start to finish.', rating: 5, createdAt: '2024-01-01T00:00:00.000Z' },
-  { id: 'preview-2', authorName: 'Jamie Lee', authorRole: 'Client', quote: 'Exactly what we needed — professional and reliable.', rating: 5, createdAt: '2024-01-01T00:00:00.000Z' },
+  { id: 'preview-2', authorName: 'Jamie Lee', authorRole: 'Client', quote: 'Exactly what we needed, professional and reliable.', rating: 5, createdAt: '2024-01-01T00:00:00.000Z' },
   { id: 'preview-3', authorName: 'Taylor Reed', authorRole: 'Customer', quote: 'Would recommend without hesitation.', rating: 5, createdAt: '2024-01-01T00:00:00.000Z' },
 ];
 

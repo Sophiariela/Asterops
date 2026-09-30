@@ -6,6 +6,14 @@ import { buildPagesFromTemplate, type GeneratorInput } from './templateEngine.js
 import { findCountryPreset } from '../../lib/countryPresets.js';
 import { slugify } from '../../lib/slugify.js';
 
+// The raw Google OAuth refresh token must never reach the client — every
+// function below that returns a Site row (or rows) runs it through here
+// first. Only googleCalendarConnected (already boolean) is UI-relevant.
+function omitSecrets<T extends { googleCalendarRefreshToken?: string | null }>(site: T): Omit<T, 'googleCalendarRefreshToken'> {
+  const { googleCalendarRefreshToken: _refreshToken, ...safe } = site;
+  return safe;
+}
+
 async function generateUniqueSiteSlug(businessName: string, excludeId?: string): Promise<string> {
   const base = slugify(businessName);
   let candidate = base;
@@ -23,11 +31,12 @@ async function generateUniqueSiteSlug(businessName: string, excludeId?: string):
 }
 
 export async function listSites(ownerId: string) {
-  return prisma.site.findMany({
+  const sites = await prisma.site.findMany({
     where: { ownerId },
     orderBy: { createdAt: 'desc' },
     include: { _count: { select: { pages: true, testimonials: true, leads: true } } },
   });
+  return sites.map(omitSecrets);
 }
 
 export async function getSite(ownerId: string, id: string) {
@@ -37,11 +46,12 @@ export async function getSite(ownerId: string, id: string) {
       pages: { orderBy: { order: 'asc' } },
       testimonials: { orderBy: { createdAt: 'desc' } },
       trustElements: { orderBy: { createdAt: 'desc' } },
+      reviews: { orderBy: { createdAt: 'desc' } },
       menuCategories: { orderBy: { order: 'asc' }, include: { items: { orderBy: { order: 'asc' } } } },
     },
   });
   if (!site) throw new CommerceError(404, 'Site not found.');
-  return site;
+  return omitSecrets(site);
 }
 
 // Unauthenticated: backs the live public site renderer (/site/:slug). Only
@@ -155,7 +165,7 @@ export async function generateSite(
     return getSite(ownerId, site.id);
   }
 
-  return site;
+  return omitSecrets(site);
 }
 
 export async function deleteSite(ownerId: string, id: string) {
@@ -168,10 +178,11 @@ export async function publishSite(ownerId: string, id: string) {
   const existing = await prisma.site.findFirst({ where: { id, ownerId } });
   if (!existing) throw new CommerceError(404, 'Site not found.');
   const slug = existing.slug ?? (await generateUniqueSiteSlug(existing.businessName, existing.id));
-  return prisma.site.update({
+  const site = await prisma.site.update({
     where: { id },
     data: { status: 'PUBLISHED', slug, publishedAt: new Date() },
   });
+  return omitSecrets(site);
 }
 
 // Leaves slug and publishedAt untouched — slug so re-publishing reuses the
@@ -181,34 +192,50 @@ export async function publishSite(ownerId: string, id: string) {
 export async function unpublishSite(ownerId: string, id: string) {
   const existing = await prisma.site.findFirst({ where: { id, ownerId } });
   if (!existing) throw new CommerceError(404, 'Site not found.');
-  return prisma.site.update({ where: { id }, data: { status: 'DRAFT' } });
+  const site = await prisma.site.update({ where: { id }, data: { status: 'DRAFT' } });
+  return omitSecrets(site);
 }
 
 export async function updateSite(
   ownerId: string,
   id: string,
-  data: Partial<{ businessName: string; industry: string; targetAudience: string; currency: SiteCurrency; country: string }>,
+  data: Partial<{
+    businessName: string; industry: string; targetAudience: string; currency: SiteCurrency; country: string; timezone: string;
+    contactEmail: string; reservationEmail: string; reviewEmail: string; phone: string; whatsappNumber: string;
+  }>,
 ) {
   const existing = await prisma.site.findFirst({ where: { id, ownerId } });
   if (!existing) throw new CommerceError(404, 'Site not found.');
 
+  // A Business Settings field submitted as '' means "clear this" (fall
+  // back to the owner's account email / no notification), not "set it to
+  // an empty string" — normalize before writing.
+  const CLEARABLE_FIELDS = ['contactEmail', 'reservationEmail', 'reviewEmail', 'phone', 'whatsappNumber'] as const;
+  const normalized = { ...data };
+  for (const field of CLEARABLE_FIELDS) {
+    if (normalized[field] === '') (normalized as Record<string, unknown>)[field] = null;
+  }
+
   // Country is a shortcut that fills in Currency + Timezone together —
   // it always wins over a currency sent in the same request, since
   // picking a country is the more specific, more recent intent.
-  if (data.country) {
-    const preset = findCountryPreset(data.country);
+  if (normalized.country) {
+    const preset = findCountryPreset(normalized.country);
     if (!preset) throw new CommerceError(400, 'Unsupported country.');
-    return prisma.site.update({
+    const site = await prisma.site.update({
       where: { id },
-      data: { ...data, country: preset.code, currency: preset.currency, timezone: preset.timezone },
+      data: { ...normalized, country: preset.code, currency: preset.currency, timezone: preset.timezone },
     });
+    return omitSecrets(site);
   }
 
-  return prisma.site.update({ where: { id }, data });
+  const site = await prisma.site.update({ where: { id }, data: normalized });
+  return omitSecrets(site);
 }
 
 export async function setSiteLogo(ownerId: string, id: string, logoUrl: string) {
   const existing = await prisma.site.findFirst({ where: { id, ownerId } });
   if (!existing) throw new CommerceError(404, 'Site not found.');
-  return prisma.site.update({ where: { id }, data: { logoUrl } });
+  const site = await prisma.site.update({ where: { id }, data: { logoUrl } });
+  return omitSecrets(site);
 }

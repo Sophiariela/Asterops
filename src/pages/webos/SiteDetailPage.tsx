@@ -10,9 +10,13 @@ import BlueprintCard from '../../components/webos/BlueprintCard';
 import WebsiteEditor from '../../components/webos/WebsiteEditor';
 import ReservationsDashboard from '../../components/webos/ReservationsDashboard';
 import MenuManager from '../../components/webos/MenuManager';
+import BusinessSettingsPanel from '../../components/webos/BusinessSettingsPanel';
+import LeadsDashboard from '../../components/webos/LeadsDashboard';
+import ReviewsPanel from '../../components/webos/ReviewsPanel';
+import OwnerDashboardCards from '../../components/webos/OwnerDashboardCards';
 import { computeBlueprint } from '../../lib/webos/blueprint';
 import { CURRENCIES } from '../../lib/webos/currency';
-import { getPublicSiteUrl, resolvePublicSiteUrl, type DomainStatus } from '../../lib/webos/publicUrl';
+import { getPublicSiteUrl, resolvePublicSiteUrl, checkPublishingAvailable, type DomainStatus } from '../../lib/webos/publicUrl';
 import { formatRelativeTime } from '../../lib/webos/time';
 import type {
   Site, Page, Testimonial, TrustElement, TrustElementType, Playbook, WebsiteHealth, ConversionAudit, TrustGap,
@@ -26,12 +30,12 @@ function scoreColor(score: number) {
   return 'text-rose-600';
 }
 
-const LEAD_STATUSES: LeadStatus[] = ['NEW', 'QUALIFIED', 'CONVERTED', 'LOST'];
+const LEAD_STATUSES: LeadStatus[] = ['NEW', 'CONTACTED', 'QUALIFIED', 'CLOSED'];
 const LEAD_STATUS_STYLE: Record<LeadStatus, string> = {
   NEW: 'bg-amber-100 text-amber-700',
-  QUALIFIED: 'bg-blue-100 text-blue-700',
-  CONVERTED: 'bg-emerald-100 text-emerald-700',
-  LOST: 'bg-slate-200 text-slate-500',
+  CONTACTED: 'bg-blue-100 text-blue-700',
+  QUALIFIED: 'bg-violet-100 text-violet-700',
+  CLOSED: 'bg-slate-200 text-slate-500',
 };
 
 type Tab = 'overview' | 'pages' | 'menu' | 'reservations' | 'trust' | 'forms' | 'analytics' | 'settings';
@@ -103,6 +107,10 @@ export default function SiteDetailPage() {
     domainStatus: 'checking',
     usedFallback: false,
   });
+  // Independent of any one site's own status — gates the Publish action so
+  // a merchant can't be told "Published" when the infrastructure that
+  // would serve the public page isn't actually reachable.
+  const [publishingAvailable, setPublishingAvailable] = useState<boolean | null>(null);
 
   const loadCore = () => {
     if (!id) return;
@@ -153,6 +161,16 @@ export default function SiteDetailPage() {
     };
   }, [site?.slug, site?.customDomain, site?.status]);
 
+  useEffect(() => {
+    let cancelled = false;
+    checkPublishingAvailable().then((available) => {
+      if (!cancelled) setPublishingAvailable(available);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const runAudit = async () => {
     if (!id) return;
     setAuditRunning(true);
@@ -165,7 +183,7 @@ export default function SiteDetailPage() {
   };
 
   const publish = async () => {
-    if (!id) return;
+    if (!id || publishingAvailable === false) return;
     const data = await api.post<{ site: Site }>(`/webos/sites/${id}/publish`);
     setSite((s) => (s ? { ...s, ...data.site } : s));
   };
@@ -318,12 +336,6 @@ export default function SiteDetailPage() {
     loadCore();
   };
 
-  const updateLeadStatus = async (leadId: string, status: LeadStatus) => {
-    if (!id) return;
-    await api.patch(`/webos/sites/${id}/leads/${leadId}/status`, { status });
-    setLeads((rows) => rows.map((l) => (l.id === leadId ? { ...l, status } : l)));
-  };
-
   const saveSettings = async (e: FormEvent) => {
     e.preventDefault();
     if (!id) return;
@@ -385,8 +397,8 @@ export default function SiteDetailPage() {
     }
     if (domainStatus === 'unreachable') {
       return (
-        <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-amber-600" title="Your custom domain isn't resolving — showing the production URL instead.">
-          <AlertTriangle size={12} /> Custom domain unreachable — showing production URL
+        <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-amber-600" title="Your custom domain isn't resolving, so we're showing the production URL instead.">
+          <AlertTriangle size={12} /> Custom domain unreachable, showing production URL
         </span>
       );
     }
@@ -414,9 +426,19 @@ export default function SiteDetailPage() {
             {site.status === 'PUBLISHED' ? 'Published' : 'Draft'}
           </span>
           {site.status === 'DRAFT' ? (
-            <button onClick={publish} className="bg-ASTER-600 hover:bg-ASTER-700 text-white font-bold text-sm px-4 py-2 rounded-full transition-all">
-              Publish Site
-            </button>
+            <div className="flex flex-col items-end gap-1">
+              <button
+                onClick={publish}
+                disabled={publishingAvailable === false}
+                title={publishingAvailable === false ? 'Publishing is not available yet.' : undefined}
+                className="bg-ASTER-600 hover:bg-ASTER-700 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-white font-bold text-sm px-4 py-2 rounded-full transition-all"
+              >
+                Publish Site
+              </button>
+              {publishingAvailable === false && (
+                <span className="text-[11px] font-semibold text-amber-600">Publishing is not available yet.</span>
+              )}
+            </div>
           ) : (
             <>
               <button
@@ -465,6 +487,8 @@ export default function SiteDetailPage() {
 
       {tab === 'overview' && (
         <div className="mt-6 space-y-6">
+          <OwnerDashboardCards siteId={site.id} timezone={site.timezone} country={site.country} />
+
           <div className="bg-white rounded-[28px] card-shadow border border-ASTER-100 p-6">
             <div className="flex items-center justify-between gap-4 flex-wrap mb-5">
               <p className="text-xs font-bold text-slate-400 uppercase tracking-wide">Website Management</p>
@@ -535,6 +559,7 @@ export default function SiteDetailPage() {
             onUnpublish={unpublish}
             onManageMenu={() => setTab('menu')}
             onManageReservations={() => setTab('reservations')}
+            publishingAvailable={publishingAvailable}
           />
         </div>
       )}
@@ -668,7 +693,7 @@ export default function SiteDetailPage() {
                 </div>
               ))}
               {conversionPaths && conversionPaths.funnel.every((f) => f.count === 0) && (
-                <p className="text-sm text-slate-400">No inquiries yet — this fills in as leads and reservations come in.</p>
+                <p className="text-sm text-slate-400">No inquiries yet. This fills in as leads and reservations come in.</p>
               )}
             </div>
           </div>
@@ -822,6 +847,8 @@ export default function SiteDetailPage() {
             </div>
           </div>
 
+          <ReviewsPanel siteId={site.id} onPromoted={loadCore} />
+
           {/* Lead Capture Map */}
           <div>
             <div className="flex items-center justify-between gap-4 flex-wrap mb-4">
@@ -835,7 +862,7 @@ export default function SiteDetailPage() {
                     <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${pt.type === 'direct' ? 'bg-emerald-50 text-emerald-700' : 'bg-blue-50 text-blue-700'}`}>
                       {pt.type === 'direct' ? 'DIRECT' : 'ROUTED'}
                     </span>
-                    {pt.page} <span className="text-slate-400">— "{pt.ctaLabel}"</span>
+                    {pt.page} <span className="text-slate-400">· "{pt.ctaLabel}"</span>
                   </li>
                 ))}
                 {leadCaptureMap && leadCaptureMap.points.length === 0 && <li className="text-sm text-slate-400">No pages capture leads yet.</li>}
@@ -846,43 +873,8 @@ export default function SiteDetailPage() {
       )}
 
       {tab === 'forms' && (
-        <div className="mt-6 bg-white rounded-[28px] card-shadow border border-ASTER-100 overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-slate-50 text-slate-400 text-left">
-              <tr>
-                <th className="px-6 py-3 font-semibold">Contact</th>
-                <th className="px-6 py-3 font-semibold">Page</th>
-                <th className="px-6 py-3 font-semibold">Message</th>
-                <th className="px-6 py-3 font-semibold">Status</th>
-                <th className="px-6 py-3 font-semibold">Received</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-ASTER-100">
-              {leads.map((l) => (
-                <tr key={l.id}>
-                  <td className="px-6 py-4">
-                    <p className="font-semibold text-ink-900">{l.name ?? '—'}</p>
-                    <p className="text-slate-400 text-xs">{l.email}</p>
-                  </td>
-                  <td className="px-6 py-4 text-slate-600">{l.page?.name ?? '—'}</td>
-                  <td className="px-6 py-4 text-slate-500 text-xs max-w-[220px] truncate">{l.message ?? '—'}</td>
-                  <td className="px-6 py-4">
-                    <select
-                      value={l.status}
-                      onChange={(e) => updateLeadStatus(l.id, e.target.value as LeadStatus)}
-                      className={`text-xs font-bold px-2.5 py-1.5 rounded-full outline-none border-0 ${LEAD_STATUS_STYLE[l.status]}`}
-                    >
-                      {LEAD_STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
-                    </select>
-                  </td>
-                  <td className="px-6 py-4 text-slate-400 text-xs">{new Date(l.createdAt).toLocaleDateString()}</td>
-                </tr>
-              ))}
-              {leads.length === 0 && (
-                <tr><td colSpan={5} className="px-6 py-10 text-center text-slate-400">No form submissions yet — this needs a live, publicly-hosted page to start filling in.</td></tr>
-              )}
-            </tbody>
-          </table>
+        <div className="mt-6">
+          <LeadsDashboard siteId={site.id} onChanged={loadCore} />
         </div>
       )}
 
@@ -910,8 +902,10 @@ export default function SiteDetailPage() {
             </div>
           </form>
 
+          <BusinessSettingsPanel site={site} onRefresh={loadCore} />
+
           <div className="bg-white rounded-[28px] card-shadow border border-ASTER-100 p-6 space-y-4">
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-wide">Business settings</p>
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-wide">Regional settings</p>
             <div>
               <label className="text-[13px] font-bold text-ink-900 block mb-1.5">Currency</label>
               <select
@@ -919,7 +913,7 @@ export default function SiteDetailPage() {
                 onChange={(e) => updateCurrency(e.target.value as Currency)}
                 className="w-full border-2 border-ASTER-100 focus:border-ASTER-600 rounded-2xl px-4 py-3 text-[15px] outline-none transition-colors"
               >
-                {CURRENCIES.map((c) => <option key={c.code} value={c.code}>{c.symbol} {c.code} — {c.label}</option>)}
+                {CURRENCIES.map((c) => <option key={c.code} value={c.code}>{c.symbol} {c.code} ({c.label})</option>)}
               </select>
               <p className="text-xs text-slate-400 mt-1.5">Menu prices display in this currency everywhere on the site.</p>
             </div>
@@ -938,21 +932,26 @@ export default function SiteDetailPage() {
           </div>
 
           <div className="bg-white rounded-[28px] card-shadow border border-ASTER-100 p-6">
-            <div className="flex items-center justify-between gap-4 mb-1">
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-wide">Publishing</p>
-              <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full whitespace-nowrap ${site.status === 'PUBLISHED' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-500'}`}>
-                {site.status === 'PUBLISHED' ? 'Published' : 'Draft'}
-              </span>
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-4">Publishing</p>
+
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div>
+                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wide">Site Status</p>
+                <span className={`inline-block mt-1.5 text-[11px] font-bold px-2.5 py-1 rounded-full whitespace-nowrap ${site.status === 'PUBLISHED' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-500'}`}>
+                  {site.status === 'PUBLISHED' ? 'Published' : 'Draft'}
+                </span>
+              </div>
+              <div>
+                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wide">Last Published</p>
+                <p className="text-sm font-semibold text-ink-900 mt-1.5">{publishedOnLabel ?? 'Never'}</p>
+              </div>
             </div>
 
             {site.status === 'PUBLISHED' ? (
               <>
-                <p className="text-sm text-ink-900 mt-3">Your site is currently <strong>published</strong>.</p>
-                {publishedOnLabel && <p className="text-xs text-slate-400 mt-1">Published on {publishedOnLabel}</p>}
-
                 {publicUrl && (
-                  <div className="mt-4">
-                    <label className="text-[13px] font-bold text-ink-900 block mb-1.5">Public URL</label>
+                  <div className="mt-5 pt-5 border-t border-ASTER-100">
+                    <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wide mb-1.5">Live URL</p>
                     <div className="flex items-center gap-2 bg-slate-50 border-2 border-ASTER-100 rounded-2xl px-4 py-3">
                       <a href={publicUrl} target="_blank" rel="noreferrer" className="text-sm font-semibold text-ASTER-600 hover:underline truncate">
                         {publicUrl.replace(/^https:\/\//, '')}
@@ -985,7 +984,7 @@ export default function SiteDetailPage() {
                     </button>
                   ) : (
                     <div>
-                      <p className="text-sm text-ink-900 mb-3">This takes your site offline — visitors won't be able to reach it until you publish again.</p>
+                      <p className="text-sm text-ink-900 mb-3">This takes your site offline. Visitors won't be able to reach it until you publish again.</p>
                       <div className="flex items-center gap-3">
                         <button onClick={unpublish} disabled={unpublishing} className="bg-rose-600 hover:bg-rose-700 disabled:opacity-60 text-white font-bold text-sm px-4 py-2.5 rounded-full transition-all">
                           {unpublishing ? 'Unpublishing…' : 'Yes, unpublish'}
@@ -1000,10 +999,17 @@ export default function SiteDetailPage() {
               </>
             ) : (
               <>
-                <p className="text-sm text-ink-900 mt-3">Your site is currently a <strong>draft</strong> — it isn't live yet.</p>
-                <button onClick={publish} className="mt-4 bg-ASTER-600 hover:bg-ASTER-700 text-white font-bold text-sm px-4 py-2 rounded-full transition-all whitespace-nowrap">
+                <p className="text-sm text-ink-900 mt-3">Your site is currently a <strong>draft</strong>, it isn't live yet.</p>
+                <button
+                  onClick={publish}
+                  disabled={publishingAvailable === false}
+                  className="mt-4 bg-ASTER-600 hover:bg-ASTER-700 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed text-white font-bold text-sm px-4 py-2 rounded-full transition-all whitespace-nowrap"
+                >
                   Publish Site
                 </button>
+                {publishingAvailable === false && (
+                  <p className="text-xs font-semibold text-amber-600 mt-2">Publishing is not available yet.</p>
+                )}
               </>
             )}
           </div>
@@ -1016,7 +1022,7 @@ export default function SiteDetailPage() {
               </button>
             ) : (
               <div>
-                <p className="text-sm text-ink-900 mb-3">This permanently deletes "{site.businessName}" and everything in it — pages, leads, testimonials. This can't be undone.</p>
+                <p className="text-sm text-ink-900 mb-3">This permanently deletes "{site.businessName}" and everything in it: pages, leads, testimonials. This can't be undone.</p>
                 <div className="flex items-center gap-3">
                   <button onClick={deleteSite} disabled={deleting} className="bg-rose-600 hover:bg-rose-700 disabled:opacity-60 text-white font-bold text-sm px-4 py-2.5 rounded-full transition-all">
                     {deleting ? 'Deleting…' : 'Yes, delete permanently'}
@@ -1032,7 +1038,7 @@ export default function SiteDetailPage() {
       )}
 
       {editingPage && (
-        <Modal title={`Edit page — ${editingPage.name}`} onClose={() => setEditingPage(null)}>
+        <Modal title={`Edit page: ${editingPage.name}`} onClose={() => setEditingPage(null)}>
           <form onSubmit={savePage} className="space-y-4">
             <div>
               <label className="text-[13px] font-bold text-ink-900 block mb-1.5">Headline</label>

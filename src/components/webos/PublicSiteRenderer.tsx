@@ -7,7 +7,7 @@ import { formatMoney } from '../../lib/webos/currency';
 import type { PublicSite, PublicPage } from '../../lib/webos/types';
 
 function LeadCaptureForm({ siteId, pageId }: { siteId: string; pageId: string }) {
-  const [form, setForm] = useState({ name: '', email: '', message: '' });
+  const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [sent, setSent] = useState(false);
@@ -26,6 +26,7 @@ function LeadCaptureForm({ siteId, pageId }: { siteId: string; pageId: string })
         pageId,
         name: form.name || undefined,
         email: form.email,
+        phone: form.phone || undefined,
         message: form.message || undefined,
         source: 'website',
       });
@@ -42,7 +43,7 @@ function LeadCaptureForm({ siteId, pageId }: { siteId: string; pageId: string })
       <div className="text-center py-8 max-w-lg">
         <CheckCircle2 className="mx-auto text-emerald-600" size={32} />
         <p className="font-display font-bold text-lg text-ink-900 mt-3">Message sent!</p>
-        <p className="text-sm text-slate-500 mt-1">Thanks for reaching out — we'll get back to you shortly.</p>
+        <p className="text-sm text-slate-500 mt-1">Thanks for reaching out. We'll get back to you shortly.</p>
       </div>
     );
   }
@@ -51,10 +52,63 @@ function LeadCaptureForm({ siteId, pageId }: { siteId: string; pageId: string })
     <form onSubmit={submit} className="grid sm:grid-cols-2 gap-3 max-w-lg">
       <input placeholder="Name" value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} className="border-2 border-ASTER-100 focus:border-ASTER-600 rounded-xl px-4 py-2.5 text-sm outline-none transition-colors" />
       <input required type="email" placeholder="Email" value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} className="border-2 border-ASTER-100 focus:border-ASTER-600 rounded-xl px-4 py-2.5 text-sm outline-none transition-colors" />
+      <input type="tel" placeholder="Phone (optional)" value={form.phone} onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))} className="sm:col-span-2 border-2 border-ASTER-100 focus:border-ASTER-600 rounded-xl px-4 py-2.5 text-sm outline-none transition-colors" />
       <textarea placeholder="Message" rows={3} value={form.message} onChange={(e) => setForm((f) => ({ ...f, message: e.target.value }))} className="sm:col-span-2 border-2 border-ASTER-100 focus:border-ASTER-600 rounded-xl px-4 py-2.5 text-sm outline-none transition-colors resize-none" />
       {error && <p className="sm:col-span-2 text-rose-500 text-sm font-semibold">{error}</p>}
       <button type="submit" disabled={submitting} className="sm:col-span-2 bg-ASTER-600 hover:bg-ASTER-700 disabled:opacity-60 text-white font-bold text-sm py-2.5 rounded-full transition-all">
         {submitting ? 'Sending…' : 'Send message'}
+      </button>
+    </form>
+  );
+}
+
+function LeaveReviewForm({ siteId, source }: { siteId: string; source?: string }) {
+  const [form, setForm] = useState({ authorName: '', rating: 5, comment: '' });
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
+  const [sent, setSent] = useState(false);
+
+  const submit = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!form.authorName.trim() || !form.comment.trim()) {
+      setError('Please add your name and a review.');
+      return;
+    }
+    setError('');
+    setSubmitting(true);
+    try {
+      await api.post('/webos/public/reviews', { siteId, authorName: form.authorName, rating: form.rating, comment: form.comment, source });
+      setSent(true);
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Could not submit this review.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (sent) {
+    return (
+      <div className="text-center py-6">
+        <CheckCircle2 className="mx-auto text-emerald-600" size={28} />
+        <p className="font-display font-bold text-base text-ink-900 mt-2">Thanks for the review!</p>
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={submit} className="max-w-lg space-y-3">
+      <div className="flex gap-1">
+        {[1, 2, 3, 4, 5].map((n) => (
+          <button key={n} type="button" onClick={() => setForm((f) => ({ ...f, rating: n }))} aria-label={`${n} star${n > 1 ? 's' : ''}`}>
+            <Star size={22} className={n <= form.rating ? 'text-amber-400' : 'text-slate-200'} fill="currentColor" strokeWidth={0} />
+          </button>
+        ))}
+      </div>
+      <input placeholder="Your name" value={form.authorName} onChange={(e) => setForm((f) => ({ ...f, authorName: e.target.value }))} className="w-full border-2 border-ASTER-100 focus:border-ASTER-600 rounded-xl px-4 py-2.5 text-sm outline-none transition-colors" />
+      <textarea placeholder="Tell us about your experience" rows={3} value={form.comment} onChange={(e) => setForm((f) => ({ ...f, comment: e.target.value }))} className="w-full border-2 border-ASTER-100 focus:border-ASTER-600 rounded-xl px-4 py-2.5 text-sm outline-none transition-colors resize-none" />
+      {error && <p className="text-rose-500 text-sm font-semibold">{error}</p>}
+      <button type="submit" disabled={submitting} className="bg-ASTER-600 hover:bg-ASTER-700 disabled:opacity-60 text-white font-bold text-sm px-5 py-2.5 rounded-full transition-all">
+        {submitting ? 'Submitting…' : 'Submit review'}
       </button>
     </form>
   );
@@ -72,7 +126,7 @@ function PreviewContactForm() {
         <textarea disabled placeholder="Message" rows={3} className="sm:col-span-2 border-2 border-ASTER-100 rounded-xl px-4 py-2.5 text-sm bg-white resize-none" />
         <button disabled className="sm:col-span-2 bg-ASTER-600 text-white font-bold text-sm py-2.5 rounded-full opacity-90">Send message</button>
       </div>
-      <p className="text-[11px] text-slate-400 mt-3">Preview — this form collects real submissions once the site is generated and published.</p>
+      <p className="text-[11px] text-slate-400 mt-3">Preview. This form collects real submissions once the site is generated and published.</p>
     </div>
   );
 }
@@ -288,6 +342,13 @@ export default function PublicSiteRenderer({
           {previewMode ? <PreviewContactForm /> : <LeadCaptureForm siteId={site.id} pageId={page.id} />}
         </div>
       )}
+
+      {/* Leave a review — available on every public page, not just those
+          with a lead form, since it's a separate, always-on capability. */}
+      <div className="p-6 sm:p-10 border-t border-ASTER-100">
+        <p className="font-display font-bold text-lg text-ink-900 mb-4">Leave a review</p>
+        {previewMode ? <PreviewContactForm /> : <LeaveReviewForm siteId={site.id} source={page.name} />}
+      </div>
 
       {/* Footer */}
       <div className="px-6 sm:px-10 py-8 bg-ink-950 text-white/70 flex items-center justify-between flex-wrap gap-4">

@@ -111,9 +111,9 @@ enum SiteStatus {
 
 enum LeadStatus {
   NEW
+  CONTACTED
   QUALIFIED
-  CONVERTED
-  LOST
+  CLOSED
 }
 
 model User {
@@ -352,33 +352,52 @@ model StockMovement {
 // ---------------------------------------------------------------------
 
 model Site {
-  id              String         @id @default(cuid())
-  owner           User           @relation("SiteOwner", fields: [ownerId], references: [id])
-  ownerId         String
-  businessName    String
-  industry        String
-  targetAudience  String
-  logoUrl         String?
-  currency        SiteCurrency   @default(USD)
-  country         String?
-  timezone        String?
-  playbook        SitePlaybook
-  template        Template?      @relation(fields: [templateId], references: [id], onDelete: SetNull)
-  templateId      String?
-  templateVersion Int?
-  status          SiteStatus     @default(DRAFT)
-  slug            String?        @unique
-  customDomain    String?        @unique
-  publishedAt     DateTime?
-  pages           Page[]
-  testimonials    Testimonial[]
-  leads           Lead[]
-  trustElements   TrustElement[]
-  tables          Table[]
-  reservations    Reservation[]
-  menuCategories  MenuCategory[]
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
+  id                String         @id @default(cuid())
+  owner             User           @relation("SiteOwner", fields: [ownerId], references: [id])
+  ownerId           String
+  businessName      String
+  industry          String
+  targetAudience    String
+  logoUrl           String?
+  currency          SiteCurrency   @default(USD)
+  country           String?
+  timezone          String?
+  // Business Settings — contact routing for automated notifications.
+  // Each defaults to null and falls back to the owner's account email at
+  // send time, so notifications work immediately without forcing setup.
+  contactEmail      String?
+  reservationEmail  String?
+  reviewEmail       String?
+  phone             String?
+  whatsappNumber    String?
+  // Manually flipped for now (no self-serve billing tier exists yet) to
+  // gate WhatsApp/SMS/Google Calendar in the UI until that exists.
+  premiumEnabled    Boolean        @default(false)
+  // Google Calendar sync — unlike the Resend/Twilio/WhatsApp single-account
+  // integrations, this requires a per-site OAuth grant (each restaurant
+  // owner connects their own calendar), so the refresh token is stored
+  // per site rather than gated by one shared server-wide credential.
+  googleCalendarConnected    Boolean  @default(false)
+  googleCalendarRefreshToken String?
+  googleCalendarId           String?
+  playbook          SitePlaybook
+  template          Template?      @relation(fields: [templateId], references: [id], onDelete: SetNull)
+  templateId        String?
+  templateVersion   Int?
+  status            SiteStatus     @default(DRAFT)
+  slug              String?        @unique
+  customDomain      String?        @unique
+  publishedAt       DateTime?
+  pages             Page[]
+  testimonials      Testimonial[]
+  leads             Lead[]
+  reviews           Review[]
+  trustElements     TrustElement[]
+  tables            Table[]
+  reservations      Reservation[]
+  menuCategories    MenuCategory[]
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
 
   @@index([ownerId])
   @@index([templateId])
@@ -488,6 +507,33 @@ model Testimonial {
   @@index([siteId])
 }
 
+enum ReviewStatus {
+  NEW
+  PUBLISHED
+  HIDDEN
+}
+
+// A visitor-submitted review from the public site — distinct from
+// Testimonial (owner-typed, always visible). New reviews start NEW and are
+// never shown publicly on their own; the owner promotes one into a
+// Testimonial from the dashboard to put it on the live site, which reuses
+// the existing trust-map rendering rather than adding a second public
+// review surface.
+model Review {
+  id          String       @id @default(cuid())
+  site        Site         @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  siteId      String
+  authorName  String
+  authorEmail String?
+  rating      Int
+  comment     String
+  source      String?
+  status      ReviewStatus @default(NEW)
+  createdAt   DateTime     @default(now())
+
+  @@index([siteId])
+}
+
 model Lead {
   id        String     @id @default(cuid())
   site      Site       @relation(fields: [siteId], references: [id], onDelete: Cascade)
@@ -496,10 +542,12 @@ model Lead {
   pageId    String?
   name      String?
   email     String
+  phone     String?
   message   String?
   source    String?
   status    LeadStatus @default(NEW)
   createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
 
   @@index([siteId])
 }
@@ -533,6 +581,8 @@ model TrustElement {
 enum ReservationStatus {
   PENDING
   CONFIRMED
+  SEATED
+  COMPLETED
   CANCELLED
 }
 
@@ -565,6 +615,7 @@ model Reservation {
   durationMinutes Int               @default(90)
   status          ReservationStatus @default(PENDING)
   notes           String?
+  googleEventId   String?
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
 

@@ -2,9 +2,10 @@ export type PlaybookKey =
   | 'LOCAL_BUSINESS' | 'SAAS' | 'ECOMMERCE' | 'CONSULTANT' | 'AGENCY' | 'RESTAURANT' | 'FITNESS' | 'CREATOR'
   | 'PERSONAL_BRAND' | 'PROFESSIONAL_SERVICES';
 export type SiteStatus = 'DRAFT' | 'PUBLISHED';
-export type LeadStatus = 'NEW' | 'QUALIFIED' | 'CONVERTED' | 'LOST';
+export type LeadStatus = 'NEW' | 'CONTACTED' | 'QUALIFIED' | 'CLOSED';
 export type TrustElementType = 'CASE_STUDY' | 'CLIENT_LOGO' | 'CERTIFICATION';
-export type ReservationStatus = 'PENDING' | 'CONFIRMED' | 'CANCELLED';
+export type ReservationStatus = 'PENDING' | 'CONFIRMED' | 'SEATED' | 'COMPLETED' | 'CANCELLED';
+export type ReviewStatus = 'NEW' | 'PUBLISHED' | 'HIDDEN';
 export type Currency = 'USD' | 'BRL' | 'EUR' | 'GBP' | 'INR' | 'CAD' | 'AUD';
 export type CountryPreset = { code: string; name: string; currency: Currency; timezone: string };
 
@@ -69,6 +70,18 @@ export type MenuCategory = {
   items: MenuItem[];
 };
 
+export type Review = {
+  id: string;
+  siteId: string;
+  authorName: string;
+  authorEmail: string | null;
+  rating: number;
+  comment: string;
+  source: string | null;
+  status: ReviewStatus;
+  createdAt: string;
+};
+
 export type Site = {
   id: string;
   businessName: string;
@@ -78,6 +91,15 @@ export type Site = {
   currency: Currency;
   country: string | null;
   timezone: string | null;
+  // Business Settings — contact routing for automated notifications.
+  contactEmail: string | null;
+  reservationEmail: string | null;
+  reviewEmail: string | null;
+  phone: string | null;
+  whatsappNumber: string | null;
+  premiumEnabled: boolean;
+  googleCalendarConnected: boolean;
+  googleCalendarId: string | null;
   playbook: PlaybookKey;
   status: SiteStatus;
   slug: string | null;
@@ -86,6 +108,7 @@ export type Site = {
   pages: Page[];
   testimonials: Testimonial[];
   trustElements: TrustElement[];
+  reviews: Review[];
   menuCategories: MenuCategory[];
   createdAt: string;
   updatedAt: string;
@@ -147,6 +170,9 @@ export type Reservation = {
 export type HealthFactor = { key: string; label: string; available: boolean; score: number | null; detail: string };
 export type WebsiteHealth = { siteId: string; score: number; factors: HealthFactor[]; strengths: string[]; issues: string[] };
 
+export type BusinessScoreFactor = { key: string; label: string; available: boolean; score: number | null; detail: string };
+export type BusinessScore = { siteId: string; score: number; factors: BusinessScoreFactor[]; recommendations: string[] };
+
 export type ConversionCheck = { key: string; label: string; penalty: number; detail: string; recommendation: string | null };
 export type ConversionAudit = { score: number; checks: ConversionCheck[]; recommendations: string[] };
 
@@ -161,10 +187,12 @@ export type Lead = {
   page?: { name: string } | null;
   name: string | null;
   email: string;
+  phone: string | null;
   message: string | null;
   source: string | null;
   status: LeadStatus;
   createdAt: string;
+  updatedAt: string;
 };
 
 export type ArchitectureNode = { type: string; label: string };

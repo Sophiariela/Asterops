@@ -49,7 +49,7 @@ function sectionBody(section: TemplateSection, input: GeneratorInput, vars: Reco
     return items.map((s) => `• ${s}`).join('\n');
   }
   if (section.type === 'trust-placeholder') {
-    return 'No testimonials added yet — the Trust Engine will flag this until at least 3 are added.';
+    return 'No testimonials added yet. The Trust Engine will flag this until at least 3 are added.';
   }
   return fillTemplate(section.bodyPattern, vars);
 }

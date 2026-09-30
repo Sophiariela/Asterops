@@ -43,8 +43,8 @@ export async function getSectionInventory(ownerId: string, siteId: string): Prom
     const missingSections = recommended.filter((t) => !present.has(t)).map((t) => SECTION_LABEL[t] ?? t);
 
     const optimizationOpportunities: string[] = [];
-    if (isWeakHeadline(p.heroHeadline)) optimizationOpportunities.push('Headline is short or generic — make it specific to this business.');
-    if (missingSections.length > 0) optimizationOpportunities.push(`Missing ${missingSections.join(', ')} — this page type usually needs it.`);
+    if (isWeakHeadline(p.heroHeadline)) optimizationOpportunities.push('Headline is short or generic. Make it specific to this business.');
+    if (missingSections.length > 0) optimizationOpportunities.push(`Missing ${missingSections.join(', ')}. This page type usually needs it.`);
 
     return {
       pageId: p.id,

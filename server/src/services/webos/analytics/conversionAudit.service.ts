@@ -25,7 +25,7 @@ export async function runConversionAudit(ownerId: string, siteId: string): Promi
   checks.push({
     key: 'cta-presence', label: 'Call-to-action presence', penalty: ctaPenalty,
     detail: `${pages.length - missingCta} of ${pages.length} pages have a clear CTA.`,
-    recommendation: ctaPenalty > 0 ? `${missingCta} page(s) have no call-to-action — every page should ask the visitor to do something.` : null,
+    recommendation: ctaPenalty > 0 ? `${missingCta} page(s) have no call-to-action. Every page should ask the visitor to do something.` : null,
   });
 
   // 2. Lead capture presence (sitewide)
@@ -33,7 +33,7 @@ export async function runConversionAudit(ownerId: string, siteId: string): Promi
   checks.push({
     key: 'lead-capture', label: 'Lead capture', penalty: hasLeadForm ? 0 : 25,
     detail: hasLeadForm ? 'At least one page captures leads.' : 'No page on this site captures leads.',
-    recommendation: hasLeadForm ? null : 'Add a lead capture form — right now a visitor has no way to become a lead.',
+    recommendation: hasLeadForm ? null : 'Add a lead capture form. Right now a visitor has no way to become a lead.',
   });
 
   // 3. Headline clarity
@@ -42,7 +42,7 @@ export async function runConversionAudit(ownerId: string, siteId: string): Promi
   checks.push({
     key: 'headline-clarity', label: 'Headline clarity', penalty: headlinePenalty,
     detail: `${pages.length - weakHeadlines} of ${pages.length} pages have a substantial headline.`,
-    recommendation: headlinePenalty > 0 ? `${weakHeadlines} page(s) have a very short or generic headline — clarity beats cleverness.` : null,
+    recommendation: headlinePenalty > 0 ? `${weakHeadlines} page(s) have a very short or generic headline. Clarity beats cleverness.` : null,
   });
 
   // 4. Trust signals
@@ -51,7 +51,7 @@ export async function runConversionAudit(ownerId: string, siteId: string): Promi
   checks.push({
     key: 'trust-signals', label: 'Social proof', penalty: trustPenalty,
     detail: `${site.testimonials.length} testimonial(s) on this site.`,
-    recommendation: trustPenalty > 0 ? 'Add social proof — testimonials next to a CTA measurably reduce hesitation.' : null,
+    recommendation: trustPenalty > 0 ? 'Add social proof. Testimonials next to a CTA measurably reduce hesitation.' : null,
   });
 
   // 5. SEO completeness
@@ -60,7 +60,7 @@ export async function runConversionAudit(ownerId: string, siteId: string): Promi
   checks.push({
     key: 'seo-completeness', label: 'SEO completeness', penalty: seoPenalty,
     detail: `${seo.complete} of ${pages.length} pages have SEO title + description.`,
-    recommendation: seoPenalty > 0 ? `${pages.length - seo.complete} page(s) are missing SEO metadata — they won't show well in search results.` : null,
+    recommendation: seoPenalty > 0 ? `${pages.length - seo.complete} page(s) are missing SEO metadata. They won't show well in search results.` : null,
   });
 
   const score = Math.max(0, 100 - checks.reduce((s, c) => s + c.penalty, 0));

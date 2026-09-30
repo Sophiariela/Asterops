@@ -23,8 +23,8 @@ export async function getTrustGaps(ownerId: string, siteId: string): Promise<Tru
     message: count === 0
       ? 'Your website has no customer proof.'
       : hasGap
-        ? `Your website has ${count} testimonial(s) — below the recommended minimum of ${TESTIMONIAL_TARGET}.`
-        : `Your website has ${count} testimonial(s) — enough to build trust.`,
+        ? `Your website has ${count} testimonial(s), below the recommended minimum of ${TESTIMONIAL_TARGET}.`
+        : `Your website has ${count} testimonial(s), enough to build trust.`,
     recommendation: hasGap ? `Add ${TESTIMONIAL_TARGET - count} more testimonial(s).` : null,
   };
 }

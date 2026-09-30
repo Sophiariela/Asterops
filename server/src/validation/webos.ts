@@ -5,10 +5,11 @@ export const playbookValues = [
   'PERSONAL_BRAND', 'PROFESSIONAL_SERVICES',
 ] as const;
 export const trustElementTypeValues = ['CASE_STUDY', 'CLIENT_LOGO', 'CERTIFICATION'] as const;
-export const leadStatusValues = ['NEW', 'QUALIFIED', 'CONVERTED', 'LOST'] as const;
+export const leadStatusValues = ['NEW', 'CONTACTED', 'QUALIFIED', 'CLOSED'] as const;
 export const templateComplexityValues = ['SIMPLE', 'STANDARD', 'ADVANCED'] as const;
-export const reservationStatusValues = ['PENDING', 'CONFIRMED', 'CANCELLED'] as const;
+export const reservationStatusValues = ['PENDING', 'CONFIRMED', 'SEATED', 'COMPLETED', 'CANCELLED'] as const;
 export const siteCurrencyValues = ['USD', 'BRL', 'EUR', 'GBP', 'INR', 'CAD', 'AUD'] as const;
+export const reviewStatusValues = ['NEW', 'PUBLISHED', 'HIDDEN'] as const;
 
 export const generateSiteSchema = z.object({
   businessName: z.string().min(1).max(120),
@@ -18,12 +19,24 @@ export const generateSiteSchema = z.object({
   playbook: z.enum(playbookValues),
 });
 
+// A blank string from an emptied form field clears the setting (falls
+// back to the owner's account email / no notification) rather than
+// failing validation, so `z.literal('')` is accepted alongside a real
+// email for each Business Settings contact field.
+const optionalEmail = z.union([z.string().email(), z.literal('')]).optional();
+
 export const updateSiteSchema = z.object({
   businessName: z.string().min(1).max(120).optional(),
   industry: z.string().min(1).max(120).optional(),
   targetAudience: z.string().min(1).max(160).optional(),
   currency: z.enum(siteCurrencyValues).optional(),
   country: z.string().length(2).optional(),
+  timezone: z.string().max(60).optional(),
+  contactEmail: optionalEmail,
+  reservationEmail: optionalEmail,
+  reviewEmail: optionalEmail,
+  phone: z.union([z.string().max(40), z.literal('')]).optional(),
+  whatsappNumber: z.union([z.string().max(40), z.literal('')]).optional(),
 });
 
 export const generateFromTemplateSchema = z.object({
@@ -122,6 +135,7 @@ export const publicLeadSchema = z.object({
   pageId: z.string().min(1).optional(),
   name: z.string().max(120).optional(),
   email: z.string().email(),
+  phone: z.string().max(40).optional(),
   message: z.string().max(2000).optional(),
   source: z.string().max(60).optional(),
 });
@@ -130,6 +144,7 @@ export const createLeadSchema = z.object({
   pageId: z.string().min(1).optional(),
   name: z.string().max(120).optional(),
   email: z.string().email(),
+  phone: z.string().max(40).optional(),
   message: z.string().max(2000).optional(),
   source: z.string().max(60).optional(),
 });
@@ -156,6 +171,17 @@ export const createTableSchema = z.object({
   name: z.string().min(1).max(60),
   capacity: z.number().int().min(1).max(50),
 });
+
+export const createReviewPublicSchema = z.object({
+  siteId: z.string().min(1),
+  authorName: z.string().min(1).max(120),
+  authorEmail: z.string().email().optional(),
+  rating: z.number().int().min(1).max(5),
+  comment: z.string().min(1).max(2000),
+  source: z.string().max(60).optional(),
+});
+
+export const updateReviewStatusSchema = z.object({ status: z.enum(reviewStatusValues) });
 
 export const createMenuCategorySchema = z.object({ name: z.string().min(1).max(80) });
 export const updateMenuCategorySchema = z.object({

@@ -33,10 +33,10 @@ function page(spec: Omit<PageSpec, 'sections'> & { sections?: SectionSpec[] }): 
 // and purpose — not a shared generic string — so "SEO structure" is part
 // of the template itself, not left for the customer to fill in later.
 function seoTitlePattern() {
-  return '{{pageName}} — {{businessName}}';
+  return '{{pageName}} | {{businessName}}';
 }
 function seoDescriptionPattern() {
-  return '{{purpose}} — {{businessName}} serves {{targetAudience}} in {{industry}}.';
+  return '{{purpose}}. {{businessName}} serves {{targetAudience}} in {{industry}}.';
 }
 
 const TEMPLATES: TemplateSpec[] = [
@@ -51,12 +51,12 @@ const TEMPLATES: TemplateSpec[] = [
     pages: [
       page({
         slug: 'home', name: 'Home', purpose: 'Convert first-time visitors into a trial',
-        heroHeadlinePattern: '{{businessName}} — transform with {{industry}} training',
+        heroHeadlinePattern: '{{businessName}} helps you transform with {{industry}} training',
         heroSubheadlinePattern: 'Programs built for {{targetAudience}}: {{services}}.',
         ctaLabel: 'Start your free trial', hasLeadForm: true,
         sections: [
           { type: 'benefits', heading: 'Why members stay', bodyPattern: '' },
-          { type: 'transformations', heading: 'Real transformations', bodyPattern: "Members of {{businessName}} have used {{services}} to hit goals they'd stalled on for years — real progress, not before/after gimmicks." },
+          { type: 'transformations', heading: 'Real transformations', bodyPattern: "Members of {{businessName}} have used {{services}} to hit goals they'd stalled on for years. Real progress, not before/after gimmicks." },
           { type: 'trust-placeholder', heading: 'What members say', bodyPattern: '' },
         ],
       }),
@@ -70,7 +70,7 @@ const TEMPLATES: TemplateSpec[] = [
         slug: 'trainers', name: 'Trainers', purpose: 'Build trust in the coaching team',
         heroHeadlinePattern: 'Meet the team', heroSubheadlinePattern: 'Certified coaches for {{targetAudience}}.',
         ctaLabel: 'Start your free trial', hasLeadForm: false,
-        sections: [{ type: 'expertise', heading: 'Why our coaching works', bodyPattern: 'Every coach at {{businessName}} is certified and trained specifically in {{services}} — not generic programming.' }],
+        sections: [{ type: 'expertise', heading: 'Why our coaching works', bodyPattern: 'Every coach at {{businessName}} is certified and trained specifically in {{services}}, not generic programming.' }],
       }),
       page({
         slug: 'results', name: 'Results', purpose: 'Prove the program works with real outcomes',
@@ -106,12 +106,12 @@ const TEMPLATES: TemplateSpec[] = [
     pages: [
       page({
         slug: 'home', name: 'Home', purpose: 'Convert first-time visitors into shoppers',
-        heroHeadlinePattern: '{{businessName}} — {{industry}} for {{targetAudience}}', heroSubheadlinePattern: 'Shop {{services}} with fast, reliable delivery.',
+        heroHeadlinePattern: '{{businessName}}: {{industry}} for {{targetAudience}}', heroSubheadlinePattern: 'Shop {{services}} with fast, reliable delivery.',
         ctaLabel: 'Shop now', hasLeadForm: true,
         sections: [
           { type: 'featured-products', heading: 'Featured products', bodyPattern: '' },
           { type: 'trust-placeholder', heading: 'What customers say', bodyPattern: '' },
-          { type: 'benefits', heading: 'Why shop with us', bodyPattern: 'Free shipping over a threshold, easy returns, and real support — {{businessName}} makes buying {{services}} simple.' },
+          { type: 'benefits', heading: 'Why shop with us', bodyPattern: 'Free shipping over a threshold, easy returns, and real support. {{businessName}} makes buying {{services}} simple.' },
         ],
       }),
       page({
@@ -133,7 +133,7 @@ const TEMPLATES: TemplateSpec[] = [
         slug: 'cart', name: 'Cart', purpose: 'Recover carts before checkout drop-off',
         heroHeadlinePattern: 'Your cart', heroSubheadlinePattern: 'Review your order before checkout.',
         ctaLabel: 'Checkout', hasLeadForm: false,
-        sections: [{ type: 'offers', heading: 'Complete the look', bodyPattern: "Shoppers who buy {{services}} from {{businessName}} often add one more item — a real opportunity to increase order value here." }],
+        sections: [{ type: 'offers', heading: 'Complete the look', bodyPattern: "Shoppers who buy {{services}} from {{businessName}} often add one more item, a real opportunity to increase order value here." }],
       }),
       page({
         slug: 'checkout', name: 'Checkout', purpose: 'Complete the sale with minimal friction',
@@ -205,10 +205,10 @@ const TEMPLATES: TemplateSpec[] = [
     pages: [
       page({
         slug: 'home', name: 'Home', purpose: 'Establish authority and convert to a booked call',
-        heroHeadlinePattern: '{{businessName}} — {{industry}} consulting for {{targetAudience}}', heroSubheadlinePattern: 'Practical help with {{services}}.',
+        heroHeadlinePattern: '{{businessName}}: {{industry}} consulting for {{targetAudience}}', heroSubheadlinePattern: 'Practical help with {{services}}.',
         ctaLabel: 'Book a consultation', hasLeadForm: true,
         sections: [
-          { type: 'expertise', heading: 'How we help', bodyPattern: '{{businessName}} brings hands-on {{industry}} experience to {{targetAudience}} — direct implementation of {{services}}, not theory.' },
+          { type: 'expertise', heading: 'How we help', bodyPattern: '{{businessName}} brings hands-on {{industry}} experience to {{targetAudience}}: direct implementation of {{services}}, not theory.' },
           { type: 'trust-placeholder', heading: 'What clients say', bodyPattern: '' },
         ],
       }),
@@ -223,7 +223,7 @@ const TEMPLATES: TemplateSpec[] = [
         heroHeadlinePattern: 'Results for {{targetAudience}}', heroSubheadlinePattern: 'Real outcomes from real engagements.',
         ctaLabel: 'Book a consultation', hasLeadForm: false,
         sections: [
-          { type: 'results', heading: 'Results', bodyPattern: 'Clients working with {{businessName}} on {{services}} see measurable change — real case studies appear here once added.' },
+          { type: 'results', heading: 'Results', bodyPattern: 'Clients working with {{businessName}} on {{services}} see measurable change. Real case studies appear here once added.' },
           { type: 'trust-placeholder', heading: 'What clients say', bodyPattern: '' },
         ],
       }),
@@ -231,11 +231,11 @@ const TEMPLATES: TemplateSpec[] = [
         slug: 'about', name: 'About', purpose: 'Build trust and credibility',
         heroHeadlinePattern: 'Why {{targetAudience}} choose {{businessName}}', heroSubheadlinePattern: 'Our story and approach.',
         ctaLabel: 'Book a consultation', hasLeadForm: false,
-        sections: [{ type: 'expertise', heading: 'Background & approach', bodyPattern: '{{businessName}} has focused specifically on {{industry}} for {{targetAudience}} — deep, not broad.' }],
+        sections: [{ type: 'expertise', heading: 'Background & approach', bodyPattern: '{{businessName}} has focused specifically on {{industry}} for {{targetAudience}}: deep, not broad.' }],
       }),
       page({
         slug: 'book-a-call', name: 'Book a Call', purpose: 'Convert intent into a scheduled call',
-        heroHeadlinePattern: 'Book a call', heroSubheadlinePattern: 'Pick a time that works — no back-and-forth.',
+        heroHeadlinePattern: 'Book a call', heroSubheadlinePattern: 'Pick a time that works, no back-and-forth.',
         ctaLabel: 'Schedule now', hasLeadForm: true,
       }),
     ],
@@ -251,7 +251,7 @@ const TEMPLATES: TemplateSpec[] = [
     pages: [
       page({
         slug: 'home', name: 'Home', purpose: 'Convert visitors into project inquiries',
-        heroHeadlinePattern: '{{businessName}} — {{industry}} agency for {{targetAudience}}', heroSubheadlinePattern: 'We deliver {{services}}.',
+        heroHeadlinePattern: '{{businessName}}: {{industry}} agency for {{targetAudience}}', heroSubheadlinePattern: 'We deliver {{services}}.',
         ctaLabel: 'Start a project', hasLeadForm: true,
         sections: [
           { type: 'benefits', heading: 'What we do', bodyPattern: '' },
@@ -300,7 +300,7 @@ const TEMPLATES: TemplateSpec[] = [
     pages: [
       page({
         slug: 'home', name: 'Home', purpose: 'Convert visitors into a reservation',
-        heroHeadlinePattern: '{{businessName}} — {{industry}}', heroSubheadlinePattern: 'Serving {{targetAudience}} with {{services}}.',
+        heroHeadlinePattern: '{{businessName}}: {{industry}}', heroSubheadlinePattern: 'Serving {{targetAudience}} with {{services}}.',
         ctaLabel: 'Reserve a table', hasLeadForm: true,
         sections: [
           { type: 'benefits', heading: 'Why guests love us', bodyPattern: '' },
@@ -336,7 +336,7 @@ const TEMPLATES: TemplateSpec[] = [
     pages: [
       page({
         slug: 'home', name: 'Home', purpose: 'Convert visitors into community members',
-        heroHeadlinePattern: '{{businessName}} — {{industry}} for {{targetAudience}}', heroSubheadlinePattern: 'Explore {{services}}.',
+        heroHeadlinePattern: '{{businessName}}: {{industry}} for {{targetAudience}}', heroSubheadlinePattern: 'Explore {{services}}.',
         ctaLabel: 'Join the community', hasLeadForm: true,
         sections: [
           { type: 'benefits', heading: 'What you get', bodyPattern: '' },
@@ -372,7 +372,7 @@ const TEMPLATES: TemplateSpec[] = [
     pages: [
       page({
         slug: 'home', name: 'Home', purpose: 'Convert first-time visitors into a quote request',
-        heroHeadlinePattern: '{{businessName}} — trusted {{industry}} serving {{targetAudience}}', heroSubheadlinePattern: 'Local, reliable, and ready to help with {{services}}.',
+        heroHeadlinePattern: '{{businessName}}: trusted {{industry}} serving {{targetAudience}}', heroSubheadlinePattern: 'Local, reliable, and ready to help with {{services}}.',
         ctaLabel: 'Get a free quote', hasLeadForm: true,
         sections: [
           { type: 'benefits', heading: 'Why locals choose us', bodyPattern: '' },
@@ -395,7 +395,7 @@ const TEMPLATES: TemplateSpec[] = [
         slug: 'gallery', name: 'Gallery', purpose: 'Showcase past work',
         heroHeadlinePattern: 'Our work', heroSubheadlinePattern: 'A look at recent jobs for {{targetAudience}}.',
         ctaLabel: 'Get a free quote', hasLeadForm: false,
-        sections: [{ type: 'results', heading: 'Recent work', bodyPattern: 'Examples of {{services}} completed for {{targetAudience}} — real jobs, once added here.' }],
+        sections: [{ type: 'results', heading: 'Recent work', bodyPattern: 'Examples of {{services}} completed for {{targetAudience}}. Real jobs, once added here.' }],
       }),
       page({
         slug: 'contact', name: 'Contact', purpose: 'Capture a direct inquiry',
@@ -415,7 +415,7 @@ const TEMPLATES: TemplateSpec[] = [
     pages: [
       page({
         slug: 'home', name: 'Home', purpose: 'Convert visitors into subscribers',
-        heroHeadlinePattern: '{{businessName}} — {{industry}} for {{targetAudience}}', heroSubheadlinePattern: 'Ideas and work on {{services}}.',
+        heroHeadlinePattern: '{{businessName}}: {{industry}} for {{targetAudience}}', heroSubheadlinePattern: 'Ideas and work on {{services}}.',
         ctaLabel: 'Subscribe', hasLeadForm: true,
         sections: [
           { type: 'benefits', heading: "What you'll find here", bodyPattern: '' },
@@ -435,7 +435,7 @@ const TEMPLATES: TemplateSpec[] = [
       }),
       page({
         slug: 'newsletter', name: 'Newsletter', purpose: 'Convert intent into a subscriber',
-        heroHeadlinePattern: 'Join the newsletter', heroSubheadlinePattern: 'No spam — just {{services}}, occasionally.',
+        heroHeadlinePattern: 'Join the newsletter', heroSubheadlinePattern: 'No spam, just {{services}}, occasionally.',
         ctaLabel: 'Subscribe now', hasLeadForm: true,
       }),
       page({
@@ -456,7 +456,7 @@ const TEMPLATES: TemplateSpec[] = [
     pages: [
       page({
         slug: 'home', name: 'Home', purpose: 'Convert visitors into a scheduled consultation',
-        heroHeadlinePattern: '{{businessName}} — {{industry}} for {{targetAudience}}', heroSubheadlinePattern: 'Trusted help with {{services}}.',
+        heroHeadlinePattern: '{{businessName}}: {{industry}} for {{targetAudience}}', heroSubheadlinePattern: 'Trusted help with {{services}}.',
         ctaLabel: 'Schedule a consultation', hasLeadForm: true,
         sections: [
           { type: 'benefits', heading: 'Why clients choose us', bodyPattern: '' },
@@ -480,7 +480,7 @@ const TEMPLATES: TemplateSpec[] = [
         heroHeadlinePattern: 'Client outcomes', heroSubheadlinePattern: 'Real results for {{targetAudience}}.',
         ctaLabel: 'Schedule a consultation', hasLeadForm: false,
         sections: [
-          { type: 'results', heading: 'Outcomes', bodyPattern: 'Clients working with {{businessName}} on {{services}} resolve real, specific problems — case studies added here build that proof.' },
+          { type: 'results', heading: 'Outcomes', bodyPattern: 'Clients working with {{businessName}} on {{services}} resolve real, specific problems. Case studies added here build that proof.' },
           { type: 'trust-placeholder', heading: 'What clients say', bodyPattern: '' },
         ],
       }),
@@ -495,13 +495,61 @@ const TEMPLATES: TemplateSpec[] = [
 
 async function main() {
   let created = 0;
-  let skipped = 0;
+  let updated = 0;
 
   for (const spec of TEMPLATES) {
     const existing = await prisma.template.findFirst({ where: { key: spec.key as never } });
+
+    // A template with this key already exists — refresh its copy in place
+    // (name, patterns, section bodies) rather than skipping, so wording
+    // fixes made here reach templates that were seeded before the fix.
+    // Sites already generated from this template keep their own copied
+    // text untouched; only the reusable template patterns change.
     if (existing) {
-      skipped += 1;
-      console.log(`  Skipped ${spec.name} (${spec.key}) — a template with this key already exists.`);
+      await prisma.template.update({
+        where: { id: existing.id },
+        data: {
+          name: spec.name,
+          industry: spec.industry,
+          primaryGoal: spec.primaryGoal,
+          complexity: spec.complexity,
+          description: spec.description,
+          recommendedUseCase: spec.recommendedUseCase,
+          isEcommerce: spec.isEcommerce ?? false,
+        },
+      });
+
+      for (const [i, p] of spec.pages.entries()) {
+        const pageData = {
+          name: p.name,
+          order: i,
+          purpose: p.purpose,
+          heroHeadlinePattern: p.heroHeadlinePattern,
+          heroSubheadlinePattern: p.heroSubheadlinePattern,
+          ctaLabel: p.ctaLabel,
+          hasLeadForm: p.hasLeadForm,
+          seoTitlePattern: seoTitlePattern(),
+          seoDescriptionPattern: seoDescriptionPattern(),
+        };
+        const page = await prisma.templatePage.upsert({
+          where: { templateId_slug: { templateId: existing.id, slug: p.slug } },
+          update: pageData,
+          create: { ...pageData, templateId: existing.id, slug: p.slug },
+        });
+
+        // Sections have no natural key to diff against, so the simplest
+        // correct move is a full replace rather than trying to match old
+        // rows to new ones.
+        await prisma.templateSection.deleteMany({ where: { templatePageId: page.id } });
+        if (p.sections.length) {
+          await prisma.templateSection.createMany({
+            data: p.sections.map((s, j) => ({ templatePageId: page.id, type: s.type, heading: s.heading, bodyPattern: s.bodyPattern, order: j })),
+          });
+        }
+      }
+
+      updated += 1;
+      console.log(`  Updated ${spec.name} (${spec.key}) with refreshed copy for ${spec.pages.length} pages.`);
       continue;
     }
 
@@ -540,7 +588,7 @@ async function main() {
     console.log(`  Created and published ${template.name} (${template.key}) with ${spec.pages.length} pages.`);
   }
 
-  console.log(`Template Library seed complete: ${created} created, ${skipped} skipped.`);
+  console.log(`Template Library seed complete: ${created} created, ${updated} updated.`);
 }
 
 main()

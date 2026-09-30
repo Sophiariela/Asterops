@@ -23,7 +23,7 @@ export default function PublicSitePage() {
   useEffect(() => {
     if (!site) return;
     const page = site.pages.find((p) => p.slug === pageSlug) ?? site.pages.find((p) => p.slug === 'home') ?? site.pages[0];
-    document.title = page?.seoTitle || `${site.businessName}${page ? ` — ${page.name}` : ''}`;
+    document.title = page?.seoTitle || `${site.businessName}${page ? ` | ${page.name}` : ''}`;
   }, [site, pageSlug]);
 
   if (notFound) {

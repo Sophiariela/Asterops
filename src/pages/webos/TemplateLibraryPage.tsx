@@ -268,7 +268,7 @@ export default function TemplateLibraryPage() {
                     </div>
                   </div>
                 )}
-                <p className="text-[11px] text-slate-400 mt-3">Live preview with example copy and photos — your generated site uses your real business name, services and content instead.</p>
+                <p className="text-[11px] text-slate-400 mt-3">Live preview with example copy and photos. Your generated site uses your real business name, services and content instead.</p>
               </div>
             </div>
           </div>

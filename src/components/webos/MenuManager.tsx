@@ -131,8 +131,8 @@ export default function MenuManager({ siteId, currency }: { siteId: string; curr
   return (
     <div className="space-y-6">
       <p className="text-sm text-slate-500">
-        Build your menu the way you'd stock a shelf: add a category, then add items to it — each with a name, price, description, and photo.
-        Prices display in <strong>{currency}</strong> — change this in Settings → Business Settings.
+        Build your menu the way you'd stock a shelf: add a category, then add items to it, each with a name, price, description, and photo.
+        Prices display in <strong>{currency}</strong>. Change this in Settings → Business Settings.
       </p>
 
       <div className="flex items-center justify-between">
@@ -191,7 +191,7 @@ export default function MenuManager({ siteId, currency }: { siteId: string; curr
         </div>
       ))}
       {categories.length === 0 && (
-        <p className="text-sm text-slate-400">No menu categories yet — add one to start building the menu.</p>
+        <p className="text-sm text-slate-400">No menu categories yet. Add one to start building the menu.</p>
       )}
 
       {showCategoryForm && (
@@ -210,7 +210,7 @@ export default function MenuManager({ siteId, currency }: { siteId: string; curr
       )}
 
       {itemModal && (
-        <Modal title={itemModal.item ? `Edit item — ${itemModal.categoryName}` : `Add item — ${itemModal.categoryName}`} onClose={() => setItemModal(null)}>
+        <Modal title={itemModal.item ? `Edit item: ${itemModal.categoryName}` : `Add item: ${itemModal.categoryName}`} onClose={() => setItemModal(null)}>
           <form onSubmit={saveItem} className="space-y-4">
             <div>
               <label className="text-[13px] font-bold text-ink-900 block mb-1.5">Image</label>
@@ -238,7 +238,7 @@ export default function MenuManager({ siteId, currency }: { siteId: string; curr
               <label className="text-[13px] font-bold text-ink-900 block mb-1.5">Price ({currency})</label>
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-[15px] font-semibold pointer-events-none">{currencySymbol(currency)}</span>
-                <input value={itemForm.price} onChange={(e) => setItemForm((f) => ({ ...f, price: e.target.value }))} placeholder="12.50 — leave blank to set later" className="w-full border-2 border-ASTER-100 focus:border-ASTER-600 rounded-2xl pl-11 pr-4 py-3 text-[15px] outline-none transition-colors" />
+                <input value={itemForm.price} onChange={(e) => setItemForm((f) => ({ ...f, price: e.target.value }))} placeholder="12.50, leave blank to set later" className="w-full border-2 border-ASTER-100 focus:border-ASTER-600 rounded-2xl pl-11 pr-4 py-3 text-[15px] outline-none transition-colors" />
               </div>
             </div>
             <div>

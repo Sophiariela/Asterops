@@ -81,7 +81,7 @@ export default function Dashboard() {
               </span>
               <div>
                 <p className="font-display font-bold text-lg">WebOS</p>
-                <p className="text-white/60 text-sm">Generate a site, then grow it — health score, leads, trust.</p>
+                <p className="text-white/60 text-sm">Generate a site, then grow it: health score, leads, trust.</p>
               </div>
             </div>
             <ArrowRight size={20} className="text-white/60 shrink-0" />

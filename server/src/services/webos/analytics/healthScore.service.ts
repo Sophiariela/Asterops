@@ -39,7 +39,7 @@ export async function getWebsiteHealth(ownerId: string, siteId: string): Promise
     { key: 'performance', label: 'Performance', available: false, score: null, detail: 'Needs a live, publicly-hosted page to measure (not yet available)' },
     { key: 'seo', label: 'SEO', available: true, score: seoScore, detail: `${seo.complete} of ${pages.length} pages have both an SEO title and description` },
     { key: 'accessibility', label: 'Accessibility', available: false, score: null, detail: 'Needs a live rendered page to audit (not yet available)' },
-    { key: 'mobile', label: 'Mobile responsiveness', available: true, score: 100, detail: "Guaranteed — every page uses ASTER's responsive template system" },
+    { key: 'mobile', label: 'Mobile responsiveness', available: true, score: 100, detail: "Guaranteed: every page uses ASTER's responsive template system" },
     { key: 'conversion', label: 'Conversion readiness', available: true, score: conversionScore, detail: `${strongHeadlines}/${pages.length} pages have a strong headline; ${hasAnyLeadForm ? 'has' : 'missing'} a lead capture form` },
     { key: 'trust', label: 'Trust signals', available: true, score: trust, detail: `${site.testimonials.length} testimonial(s) on this site` },
   ];
@@ -56,7 +56,7 @@ export async function getWebsiteHealth(ownerId: string, siteId: string): Promise
   if (strongHeadlines === pages.length && pages.length > 0) strengths.push('Headlines are clear across all pages');
   else if (pages.length - strongHeadlines > 0) issues.push(`${pages.length - strongHeadlines} page(s) have a weak or generic headline`);
   if (trust >= 100) strengths.push('Has enough testimonials to build trust');
-  else issues.push(site.testimonials.length === 0 ? 'Missing testimonials' : `Only ${site.testimonials.length} testimonial(s) — add more`);
+  else issues.push(site.testimonials.length === 0 ? 'Missing testimonials' : `Only ${site.testimonials.length} testimonial(s), add more`);
   strengths.push("Mobile optimized (template-guaranteed)");
 
   return { siteId, score, factors, strengths, issues };

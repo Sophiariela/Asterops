@@ -1,6 +1,7 @@
 import { Router, type Request } from 'express';
 import { authenticate, requireRole } from '../../middleware/auth.js';
 import { getWebsiteHealth } from '../../services/webos/analytics/healthScore.service.js';
+import { getBusinessScore } from '../../services/webos/analytics/businessScore.service.js';
 import { runConversionAudit } from '../../services/webos/analytics/conversionAudit.service.js';
 import { getTrustGaps } from '../../services/webos/analytics/trustEngine.service.js';
 import { getTrustMap } from '../../services/webos/analytics/trustMap.service.js';
@@ -21,6 +22,11 @@ webosAnalyticsRouter.use(authenticate, requireRole('CUSTOMER'));
 webosAnalyticsRouter.get('/health-score', async (req: Request<SiteParams>, res) => {
   const health = await getWebsiteHealth(req.user!.userId, req.params.siteId);
   res.json({ health });
+});
+
+webosAnalyticsRouter.get('/business-score', async (req: Request<SiteParams>, res) => {
+  const businessScore = await getBusinessScore(req.user!.userId, req.params.siteId);
+  res.json({ businessScore });
 });
 
 webosAnalyticsRouter.post('/conversion-audit', async (req: Request<SiteParams>, res) => {

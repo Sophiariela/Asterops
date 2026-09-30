@@ -71,7 +71,7 @@ export default function SitesPage() {
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div>
           <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-ink-900">WebOS</h1>
-          <p className="text-slate-500 mt-2 text-sm">Your business acquisition infrastructure — generate a site, then let WebOS help it attract, convert and build trust.</p>
+          <p className="text-slate-500 mt-2 text-sm">Your business acquisition infrastructure. Generate a site, then let WebOS help it attract, convert and build trust.</p>
         </div>
         <div className="flex items-center gap-3">
           <Link

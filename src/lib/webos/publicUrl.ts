@@ -48,6 +48,15 @@ async function isOriginReachable(origin: string): Promise<boolean> {
   }
 }
 
+// Gates the Publish action itself, independent of any one site's slug or
+// custom domain: if the production origin that public sites are served
+// from can't be reached at all, publishing would hand the merchant a dead
+// link, so the UI should refuse up front rather than let them believe
+// they're live.
+export async function checkPublishingAvailable(): Promise<boolean> {
+  return isOriginReachable(PRODUCTION_ORIGIN);
+}
+
 export type ResolvedPublicUrl = {
   url: string | null;
   domainStatus: DomainStatus;
