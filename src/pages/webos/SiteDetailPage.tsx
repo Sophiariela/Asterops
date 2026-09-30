@@ -2,9 +2,9 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
   ArrowLeft, Sparkles, Pencil, Trash2, Plus, PlayCircle,
-  CheckCircle2, XCircle, ExternalLink, Copy, Loader2, AlertTriangle,
+  CheckCircle2, XCircle, ExternalLink, Loader2, AlertTriangle, Eye,
 } from 'lucide-react';
-import { api, ApiError } from '../../lib/api';
+import { api, ApiError, resolveUploadUrl } from '../../lib/api';
 import Modal from '../../components/commerce/Modal';
 import BlueprintCard from '../../components/webos/BlueprintCard';
 import WebsiteEditor from '../../components/webos/WebsiteEditor';
@@ -14,10 +14,14 @@ import BusinessSettingsPanel from '../../components/webos/BusinessSettingsPanel'
 import LeadsDashboard from '../../components/webos/LeadsDashboard';
 import ReviewsPanel from '../../components/webos/ReviewsPanel';
 import OwnerDashboardCards from '../../components/webos/OwnerDashboardCards';
+import PublicLinkCard from '../../components/webos/PublicLinkCard';
+import LunaQuickActions from '../../components/webos/LunaQuickActions';
+import { SiteDetailSkeleton } from '../../components/webos/Skeleton';
 import { computeBlueprint } from '../../lib/webos/blueprint';
 import { CURRENCIES } from '../../lib/webos/currency';
 import { getPublicSiteUrl, resolvePublicSiteUrl, checkPublishingAvailable, type DomainStatus } from '../../lib/webos/publicUrl';
 import { formatRelativeTime } from '../../lib/webos/time';
+import { titleCase } from '../../lib/webos/locale';
 import type {
   Site, Page, Testimonial, TrustElement, TrustElementType, Playbook, WebsiteHealth, ConversionAudit, TrustGap,
   RecommendedAction, Lead, LeadStatus, ConversionPathsResult, PageInventoryItem,
@@ -98,7 +102,6 @@ export default function SiteDetailPage() {
   const [settingsSaved, setSettingsSaved] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [toast, setToast] = useState('');
   const [confirmingUnpublish, setConfirmingUnpublish] = useState(false);
   const [unpublishing, setUnpublishing] = useState(false);
   const [reservationsCount, setReservationsCount] = useState<number | null>(null);
@@ -198,20 +201,6 @@ export default function SiteDetailPage() {
     } finally {
       setUnpublishing(false);
     }
-  };
-
-  const showToast = (message: string) => {
-    setToast(message);
-    setTimeout(() => setToast(''), 2400);
-  };
-
-  const copyPublicLink = async (url: string) => {
-    try {
-      await navigator.clipboard.writeText(url);
-    } catch {
-      // Clipboard API unavailable — the URL is still visible and selectable for manual copy.
-    }
-    showToast('Link copied.');
   };
 
   const openEditPage = (page: Page) => {
@@ -374,7 +363,7 @@ export default function SiteDetailPage() {
   };
 
   if (!site) {
-    return <p className="text-slate-400">Loading site…</p>;
+    return <SiteDetailSkeleton />;
   }
 
   const playbookLabel = playbooks.find((p) => p.key === site.playbook)?.label ?? site.playbook;
@@ -386,6 +375,13 @@ export default function SiteDetailPage() {
   const publishedOnLabel = site.publishedAt
     ? new Date(site.publishedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
     : null;
+
+  // Mirrors the OG/Twitter tag logic PublicSitePage sets on the live page,
+  // so this card shows exactly what a shared link will actually look like.
+  const homePage = site.pages.find((p) => p.slug === 'home') ?? site.pages[0];
+  const socialPreviewTitle = homePage?.seoTitle || `${site.businessName} | ${homePage?.name ?? 'Home'}`;
+  const socialPreviewDescription = homePage?.seoDescription || site.industry;
+  const socialPreviewImage = resolveUploadUrl(homePage?.heroImageUrl ?? site.logoUrl);
 
   const domainStatusBadge = (() => {
     if (domainStatus === 'checking') {
@@ -422,6 +418,14 @@ export default function SiteDetailPage() {
           <span className="inline-block mt-2 text-[11px] font-bold text-ASTER-600 bg-ASTER-50 px-2.5 py-1 rounded-full">{playbookLabel}</span>
         </div>
         <div className="flex items-center gap-3">
+          <Link
+            to={`/webos/${site.id}/preview`}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1.5 text-sm font-bold text-slate-500 hover:text-ASTER-600 transition-colors"
+          >
+            <Eye size={15} /> Preview
+          </Link>
           <span className={`text-xs font-bold px-3 py-1.5 rounded-full ${site.status === 'PUBLISHED' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-500'}`}>
             {site.status === 'PUBLISHED' ? 'Published' : 'Draft'}
           </span>
@@ -498,29 +502,9 @@ export default function SiteDetailPage() {
             </div>
 
             {publicUrl ? (
-              <div className="bg-slate-50 border border-ASTER-100 rounded-2xl px-4 py-3 mb-5">
-                <div className="flex items-center justify-between gap-3 flex-wrap">
-                  <a href={publicUrl} target="_blank" rel="noreferrer" className="text-sm font-semibold text-ASTER-600 hover:underline truncate">
-                    {publicUrl.replace(/^https:\/\//, '')}
-                  </a>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <a
-                      href={publicUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-1.5 bg-ASTER-600 hover:bg-ASTER-700 text-white font-bold text-xs px-3 py-1.5 rounded-full transition-all"
-                    >
-                      <ExternalLink size={12} /> Open Site
-                    </a>
-                    <button
-                      onClick={() => copyPublicLink(publicUrl)}
-                      className="inline-flex items-center gap-1.5 border-2 border-ASTER-100 hover:border-ASTER-600 text-ink-900 font-bold text-xs px-3 py-1.5 rounded-full transition-all"
-                    >
-                      <Copy size={12} /> Copy Link
-                    </button>
-                  </div>
-                </div>
-                <div className="mt-2">{domainStatusBadge}</div>
+              <div className="bg-slate-50 border border-ASTER-100 rounded-2xl px-4 py-4 mb-5">
+                <PublicLinkCard businessName={site.businessName} publicUrl={publicUrl} />
+                <div className="mt-3">{domainStatusBadge}</div>
               </div>
             ) : (
               <p className="text-sm text-slate-400 mb-5">Publish this site to get a public URL.</p>
@@ -658,12 +642,14 @@ export default function SiteDetailPage() {
             )}
           </div>
 
+          <LunaQuickActions siteId={site.id} isRestaurant={site.playbook === 'RESTAURANT'} onChanged={loadCore} />
+
           {/* Luna Blueprint Strategist */}
           <div className="bg-gradient-to-br from-ASTER-700 to-ASTER-500 rounded-[28px] card-shadow p-6 text-white">
             <div className="flex items-center justify-between gap-4 flex-wrap">
               <p className="font-display font-bold text-lg flex items-center gap-2"><Sparkles size={18} /> Luna, Website Strategist</p>
               <button onClick={askLunaBlueprint} disabled={lunaBlueprintLoading} className="text-xs font-bold bg-white/15 hover:bg-white/25 px-4 py-2 rounded-full transition-colors disabled:opacity-60">
-                {lunaBlueprintLoading ? 'Thinking…' : 'Review the whole blueprint'}
+                {lunaBlueprintLoading ? 'Thinking…' : 'Review my whole site'}
               </button>
             </div>
             {lunaBlueprint && (
@@ -685,7 +671,7 @@ export default function SiteDetailPage() {
             <div className="space-y-2">
               {(conversionPaths?.funnel ?? []).map((f) => (
                 <div key={f.status} className="flex items-center gap-3">
-                  <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full w-24 text-center shrink-0 ${LEAD_STATUS_STYLE[f.status]}`}>{f.status}</span>
+                  <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full w-24 text-center shrink-0 ${LEAD_STATUS_STYLE[f.status]}`}>{titleCase(f.status)}</span>
                   <div className="flex-1 bg-slate-100 rounded-full h-2.5 overflow-hidden">
                     <div className="h-full bg-ASTER-600 rounded-full" style={{ width: `${(f.count / maxFunnelCount) * 100}%` }} />
                   </div>
@@ -952,27 +938,28 @@ export default function SiteDetailPage() {
                 {publicUrl && (
                   <div className="mt-5 pt-5 border-t border-ASTER-100">
                     <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wide mb-1.5">Live URL</p>
-                    <div className="flex items-center gap-2 bg-slate-50 border-2 border-ASTER-100 rounded-2xl px-4 py-3">
-                      <a href={publicUrl} target="_blank" rel="noreferrer" className="text-sm font-semibold text-ASTER-600 hover:underline truncate">
-                        {publicUrl.replace(/^https:\/\//, '')}
-                      </a>
-                    </div>
-                    <div className="mt-2">{domainStatusBadge}</div>
-                    <div className="flex items-center gap-3 mt-3 flex-wrap">
-                      <a
-                        href={publicUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-1.5 bg-ASTER-600 hover:bg-ASTER-700 text-white font-bold text-sm px-4 py-2 rounded-full transition-all"
-                      >
-                        <ExternalLink size={14} /> Open Site
-                      </a>
-                      <button
-                        onClick={() => copyPublicLink(publicUrl)}
-                        className="inline-flex items-center gap-1.5 border-2 border-ASTER-100 hover:border-ASTER-600 text-ink-900 font-bold text-sm px-4 py-2 rounded-full transition-all"
-                      >
-                        <Copy size={14} /> Copy Link
-                      </button>
+                    <PublicLinkCard businessName={site.businessName} publicUrl={publicUrl} />
+                    <div className="mt-3">{domainStatusBadge}</div>
+                  </div>
+                )}
+
+                {publicUrl && (
+                  <div className="mt-5 pt-5 border-t border-ASTER-100">
+                    <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wide mb-1.5">Social Preview</p>
+                    <p className="text-xs text-slate-400 mb-3">How this link looks when shared on iMessage, WhatsApp, Facebook or X.</p>
+                    <div className="border-2 border-ASTER-100 rounded-2xl overflow-hidden max-w-sm">
+                      <div className="aspect-[1.91/1] bg-ASTER-50 overflow-hidden">
+                        {socialPreviewImage ? (
+                          <img src={socialPreviewImage} alt="" className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-ASTER-300 text-xs font-bold">No image set</div>
+                        )}
+                      </div>
+                      <div className="bg-slate-50 px-3.5 py-2.5">
+                        <p className="text-[10px] text-slate-400 uppercase tracking-wide truncate">{publicUrl.replace(/^https:\/\//, '')}</p>
+                        <p className="text-sm font-bold text-ink-900 truncate mt-0.5">{socialPreviewTitle}</p>
+                        <p className="text-xs text-slate-500 truncate">{socialPreviewDescription}</p>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -1136,11 +1123,6 @@ export default function SiteDetailPage() {
         </Modal>
       )}
 
-      {toast && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 bg-ink-950 text-white text-sm font-semibold px-4 py-2.5 rounded-full shadow-lg">
-          <CheckCircle2 size={16} className="text-emerald-400" /> {toast}
-        </div>
-      )}
     </div>
   );
 }

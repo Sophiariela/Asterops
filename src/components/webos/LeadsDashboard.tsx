@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Search, Download, ArrowUpDown } from 'lucide-react';
 import { api } from '../../lib/api';
+import { titleCase } from '../../lib/webos/locale';
 import type { Lead, LeadStatus } from '../../lib/webos/types';
 
 const STATUSES: LeadStatus[] = ['NEW', 'CONTACTED', 'QUALIFIED', 'CLOSED'];
@@ -83,7 +84,7 @@ export default function LeadsDashboard({ siteId, onChanged }: { siteId: string; 
             className={`bg-white rounded-2xl card-shadow-sm border p-4 text-left transition-colors ${statusFilter === s ? 'border-ASTER-400' : 'border-ASTER-100'}`}
           >
             <p className="font-display font-extrabold text-2xl text-ink-900">{s === 'ALL' ? leads.length : leads.filter((l) => l.status === s).length}</p>
-            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wide mt-1">{s === 'ALL' ? 'All leads' : s}</p>
+            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wide mt-1">{s === 'ALL' ? 'All leads' : titleCase(s)}</p>
           </button>
         ))}
       </div>
@@ -139,7 +140,7 @@ export default function LeadsDashboard({ siteId, onChanged }: { siteId: string; 
                     onChange={(e) => updateStatus(l.id, e.target.value as LeadStatus)}
                     className={`text-xs font-bold px-2.5 py-1.5 rounded-full outline-none border-0 ${STATUS_STYLE[l.status]}`}
                   >
-                    {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+                    {STATUSES.map((s) => <option key={s} value={s}>{titleCase(s)}</option>)}
                   </select>
                 </td>
                 <td className="px-6 py-4 text-slate-400 text-xs">{new Date(l.createdAt).toLocaleDateString()}</td>

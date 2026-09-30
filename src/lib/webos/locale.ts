@@ -13,6 +13,12 @@ const LOCALE_BY_COUNTRY: Record<string, string> = {
   AU: 'en-AU',
 };
 
+// "PENDING" / "CONTACTED" read as raw database values, not product copy.
+// Used anywhere a status enum reaches the UI (dropdowns, badges, labels).
+export function titleCase(value: string): string {
+  return value.charAt(0) + value.slice(1).toLowerCase();
+}
+
 export function formatDateTime(iso: string, country: string | null, timezone: string | null): string {
   const locale = (country && LOCALE_BY_COUNTRY[country]) || undefined;
   return new Date(iso).toLocaleString(locale, {

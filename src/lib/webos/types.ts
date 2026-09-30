@@ -88,6 +88,7 @@ export type Site = {
   industry: string;
   targetAudience: string;
   logoUrl: string | null;
+  primaryColor: string | null;
   currency: Currency;
   country: string | null;
   timezone: string | null;
@@ -132,6 +133,7 @@ export type PublicSite = {
   businessName: string;
   industry: string;
   logoUrl: string | null;
+  primaryColor: string | null;
   currency: Currency;
   playbook: PlaybookKey;
   status: SiteStatus;

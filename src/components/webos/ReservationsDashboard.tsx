@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { Plus, Trash2, Users, ChevronLeft, ChevronRight, List as ListIcon, Calendar as CalendarIcon, Columns } from 'lucide-react';
 import { api, ApiError } from '../../lib/api';
 import Modal from '../commerce/Modal';
-import { formatDateTime, formatTime, localDateKey } from '../../lib/webos/locale';
+import { formatDateTime, formatTime, localDateKey, titleCase } from '../../lib/webos/locale';
 import type { Reservation, ReservationStatus, Table } from '../../lib/webos/types';
 
 const STATUSES: ReservationStatus[] = ['PENDING', 'CONFIRMED', 'SEATED', 'COMPLETED', 'CANCELLED'];
@@ -135,7 +135,7 @@ export default function ReservationsDashboard({ siteId, timezone, country }: { s
         onChange={(e) => updateStatus(r.id, e.target.value as ReservationStatus)}
         className={`text-[10px] font-bold px-2 py-1 rounded-full outline-none border-0 shrink-0 ${STATUS_STYLE[r.status]}`}
       >
-        {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+        {STATUSES.map((s) => <option key={s} value={s}>{titleCase(s)}</option>)}
       </select>
     </div>
   );
@@ -220,7 +220,7 @@ export default function ReservationsDashboard({ siteId, timezone, country }: { s
                       onChange={(e) => updateStatus(r.id, e.target.value as ReservationStatus)}
                       className={`text-xs font-bold px-2.5 py-1.5 rounded-full outline-none border-0 ${STATUS_STYLE[r.status]}`}
                     >
-                      {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+                      {STATUSES.map((s) => <option key={s} value={s}>{titleCase(s)}</option>)}
                     </select>
                   </td>
                 </tr>

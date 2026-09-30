@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { Plus, Trash2, Star, Image as ImageIcon, Pencil } from 'lucide-react';
+import { Plus, Trash2, Star, Image as ImageIcon, Pencil, GripVertical } from 'lucide-react';
 import { api, ApiError, resolveUploadUrl } from '../../lib/api';
 import Modal from '../commerce/Modal';
 import { formatMoney, currencySymbol } from '../../lib/webos/currency';
@@ -9,6 +9,13 @@ function dollarsToCents(v: string): number | undefined {
   const n = Number(v);
   if (!v || Number.isNaN(n) || n < 0) return undefined;
   return Math.round(n * 100);
+}
+
+function reordered<T>(list: T[], fromIndex: number, toIndex: number): T[] {
+  const next = list.slice();
+  const [moved] = next.splice(fromIndex, 1);
+  next.splice(toIndex, 0, moved);
+  return next;
 }
 
 type ItemModalState = { categoryId: string; categoryName: string; item: MenuItem | null };
@@ -29,10 +36,43 @@ export default function MenuManager({ siteId, currency }: { siteId: string; curr
   const [itemSaving, setItemSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [draggedCategory, setDraggedCategory] = useState<number | null>(null);
+  const [draggedItem, setDraggedItem] = useState<{ categoryId: string; index: number } | null>(null);
+
   const load = () => {
     api.get<{ categories: MenuCategory[] }>(`/webos/sites/${siteId}/menu`).then((d) => setCategories(d.categories)).catch(() => setCategories([]));
   };
   useEffect(load, [siteId]);
+
+  // Optimistic reorder: the list updates instantly on drop, then each
+  // affected row's new order is persisted — a failed save just means a
+  // stale order on the next page load, never a stuck or reverting UI.
+  const moveCategory = (fromIndex: number, toIndex: number) => {
+    if (fromIndex === toIndex) return;
+    setCategories((prev) => {
+      if (!prev) return prev;
+      const next = reordered(prev, fromIndex, toIndex);
+      next.forEach((cat, i) => {
+        if (cat.order !== i) api.patch(`/webos/sites/${siteId}/menu/categories/${cat.id}`, { order: i }).catch(() => {});
+      });
+      return next;
+    });
+  };
+
+  const moveItem = (categoryId: string, fromIndex: number, toIndex: number) => {
+    if (fromIndex === toIndex) return;
+    setCategories((prev) => {
+      if (!prev) return prev;
+      return prev.map((cat) => {
+        if (cat.id !== categoryId) return cat;
+        const next = reordered(cat.items, fromIndex, toIndex);
+        next.forEach((item, i) => {
+          if (item.order !== i) api.patch(`/webos/sites/${siteId}/menu/items/${item.id}`, { order: i }).catch(() => {});
+        });
+        return { ...cat, items: next };
+      });
+    });
+  };
 
   const addCategory = async (e: FormEvent) => {
     e.preventDefault();
@@ -142,10 +182,25 @@ export default function MenuManager({ siteId, currency }: { siteId: string; curr
         </button>
       </div>
 
-      {categories.map((cat) => (
-        <div key={cat.id} className="bg-white rounded-[28px] card-shadow border border-ASTER-100 p-6">
+      {categories.map((cat, catIndex) => (
+        <div
+          key={cat.id}
+          draggable
+          onDragStart={() => setDraggedCategory(catIndex)}
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={(e) => {
+            e.preventDefault();
+            if (draggedCategory !== null) moveCategory(draggedCategory, catIndex);
+            setDraggedCategory(null);
+          }}
+          onDragEnd={() => setDraggedCategory(null)}
+          className={`bg-white rounded-[28px] card-shadow border border-ASTER-100 p-6 transition-opacity ${draggedCategory === catIndex ? 'opacity-40' : ''}`}
+        >
           <div className="flex items-center justify-between mb-4">
-            <p className="font-display font-bold text-lg text-ink-900">{cat.name}</p>
+            <div className="flex items-center gap-2 cursor-grab active:cursor-grabbing" title="Drag to reorder">
+              <GripVertical size={16} className="text-slate-300" />
+              <p className="font-display font-bold text-lg text-ink-900">{cat.name}</p>
+            </div>
             <div className="flex items-center gap-3">
               <button onClick={() => openAddItem(cat.id, cat.name)} className="flex items-center gap-1.5 text-xs font-bold text-ASTER-600 hover:text-ASTER-700">
                 <Plus size={13} /> Add item
@@ -156,10 +211,24 @@ export default function MenuManager({ siteId, currency }: { siteId: string; curr
             </div>
           </div>
           <div className="space-y-2">
-            {cat.items.map((item) => {
+            {cat.items.map((item, itemIndex) => {
               const thumb = resolveUploadUrl(item.imageUrl);
+              const isDragging = draggedItem?.categoryId === cat.id && draggedItem.index === itemIndex;
               return (
-                <div key={item.id} className="flex items-center gap-3 bg-slate-50 rounded-2xl p-3">
+                <div
+                  key={item.id}
+                  draggable
+                  onDragStart={() => setDraggedItem({ categoryId: cat.id, index: itemIndex })}
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    if (draggedItem && draggedItem.categoryId === cat.id) moveItem(cat.id, draggedItem.index, itemIndex);
+                    setDraggedItem(null);
+                  }}
+                  onDragEnd={() => setDraggedItem(null)}
+                  className={`flex items-center gap-3 bg-slate-50 rounded-2xl p-3 transition-opacity ${isDragging ? 'opacity-40' : ''}`}
+                >
+                  <span className="shrink-0 cursor-grab active:cursor-grabbing" title="Drag to reorder"><GripVertical size={14} className="text-slate-300" /></span>
                   <button onClick={() => openEditItem(cat.id, cat.name, item)} className="w-12 h-12 shrink-0 rounded-xl overflow-hidden bg-white border border-ASTER-100 flex items-center justify-center text-slate-300">
                     {thumb ? <img src={thumb} alt="" className="w-full h-full object-cover" /> : <ImageIcon size={18} />}
                   </button>

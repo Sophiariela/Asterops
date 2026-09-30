@@ -1,4 +1,4 @@
-import { useState, type FormEvent, type ReactNode } from 'react';
+import { useState, type CSSProperties, type FormEvent, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { Star, UtensilsCrossed, CalendarCheck, CheckCircle2 } from 'lucide-react';
 import { api, ApiError, resolveUploadUrl } from '../../lib/api';
@@ -159,6 +159,17 @@ function PageLink({
   );
 }
 
+// Darkens a #rrggbb hex by a flat percentage — used to derive the button
+// hover shade from a custom brand color the same way ASTER-700 relates to
+// ASTER-600 in the default palette.
+function darken(hex: string, amount: number): string {
+  const n = parseInt(hex.slice(1), 16);
+  const r = Math.max(0, Math.round(((n >> 16) & 255) * (1 - amount)));
+  const g = Math.max(0, Math.round(((n >> 8) & 255) * (1 - amount)));
+  const b = Math.max(0, Math.round((n & 255) * (1 - amount)));
+  return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+}
+
 export default function PublicSiteRenderer({
   site, page, siteSlug, onNavigate, previewMode,
 }: {
@@ -178,8 +189,16 @@ export default function PublicSiteRenderer({
 
   const pageHref = (slug: string) => (slug === 'home' ? `/site/${siteSlug}` : `/site/${siteSlug}/${slug}`);
 
+  // Overriding these two CSS custom properties re-themes every bg-ASTER-600
+  // / text-ASTER-600 / border-ASTER-700 utility already used throughout this
+  // renderer — Tailwind v4 resolves them from the theme variable at paint
+  // time, so no per-class changes are needed to support a brand color.
+  const themeStyle = site.primaryColor
+    ? ({ '--color-ASTER-600': site.primaryColor, '--color-ASTER-700': darken(site.primaryColor, 0.18) } as CSSProperties)
+    : undefined;
+
   return (
-    <div className="bg-white">
+    <div className="bg-white" style={themeStyle}>
       {/* Navbar */}
       <div className="flex items-center justify-between gap-4 px-6 sm:px-10 py-4 border-b border-ASTER-100 flex-wrap sticky top-0 bg-white/95 backdrop-blur z-10">
         <PageLink to={pageHref('home')} slug="home" onNavigate={onNavigate} className="flex items-center gap-3 min-w-0">

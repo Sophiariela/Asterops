@@ -27,6 +27,9 @@ import OrderDetailPage from './pages/commerce/OrderDetailPage';
 import CustomersPage from './pages/commerce/CustomersPage';
 import CustomerDetailPage from './pages/commerce/CustomerDetailPage';
 import WebOSLayout from './pages/webos/WebOSLayout';
+import WebOSWizard from './pages/webos/WebOSWizard';
+import DraftPreviewPage from './pages/webos/DraftPreviewPage';
+import TemplatePreviewPage from './pages/webos/TemplatePreviewPage';
 import SitesPage from './pages/webos/SitesPage';
 import SiteDetailPage from './pages/webos/SiteDetailPage';
 import TemplateLibraryPage from './pages/webos/TemplateLibraryPage';
@@ -68,6 +71,9 @@ export default function App() {
             <Route path="audit" element={<AuditPage />} />
           </Route>
 
+          <Route path="/webos/new" element={<WebOSWizard />} />
+          <Route path="/webos/:id/preview" element={<DraftPreviewPage />} />
+          <Route path="/webos/templates/:id/preview" element={<TemplatePreviewPage />} />
           <Route path="/webos" element={<WebOSLayout />}>
             <Route index element={<SitesPage />} />
             <Route path="templates" element={<TemplateLibraryPage />} />

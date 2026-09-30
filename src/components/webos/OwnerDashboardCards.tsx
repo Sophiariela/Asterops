@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react';
-import { CalendarCheck, Inbox, MailWarning, TrendingUp, Star } from 'lucide-react';
+import { CalendarCheck, Inbox, MailWarning, TrendingUp, Star, Eye } from 'lucide-react';
 import { api } from '../../lib/api';
 import { formatDateTime } from '../../lib/webos/locale';
 import type { Lead, Reservation, Review, BusinessScore } from '../../lib/webos/types';
+import { StatCardSkeleton } from './Skeleton';
+
+type ViewStats = { total: number; last30Days: number; topPages: { slug: string; views: number }[] };
 
 function scoreColor(score: number) {
   if (score >= 70) return 'text-emerald-600';
@@ -28,16 +31,22 @@ export default function OwnerDashboardCards({ siteId, timezone, country }: { sit
   const [reservations, setReservations] = useState<Reservation[] | null>(null);
   const [reviews, setReviews] = useState<Review[] | null>(null);
   const [businessScore, setBusinessScore] = useState<BusinessScore | null>(null);
+  const [viewStats, setViewStats] = useState<ViewStats | null>(null);
 
   useEffect(() => {
     api.get<{ leads: Lead[] }>(`/webos/sites/${siteId}/leads`).then((d) => setLeads(d.leads)).catch(() => setLeads([]));
     api.get<{ reservations: Reservation[] }>(`/webos/sites/${siteId}/reservations`).then((d) => setReservations(d.reservations)).catch(() => setReservations([]));
     api.get<{ reviews: Review[] }>(`/webos/sites/${siteId}/reviews`).then((d) => setReviews(d.reviews)).catch(() => setReviews([]));
     api.get<{ businessScore: BusinessScore }>(`/webos/sites/${siteId}/analytics/business-score`).then((d) => setBusinessScore(d.businessScore)).catch(() => setBusinessScore(null));
+    api.get<{ views: ViewStats }>(`/webos/sites/${siteId}/analytics/views`).then((d) => setViewStats(d.views)).catch(() => setViewStats(null));
   }, [siteId]);
 
   if (!leads || !reservations || !reviews) {
-    return <p className="text-slate-400">Loading dashboard…</p>;
+    return (
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+        {Array.from({ length: 5 }).map((_, i) => <StatCardSkeleton key={i} />)}
+      </div>
+    );
   }
 
   const todayReservations = reservations.filter((r) => {
@@ -55,7 +64,8 @@ export default function OwnerDashboardCards({ siteId, timezone, country }: { sit
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+        <Card icon={Eye} label="Site Views" value={viewStats?.last30Days ?? 0} caption={viewStats ? `${viewStats.total} all time` : 'Last 30 days'} />
         <Card icon={CalendarCheck} label="Today's Reservations" value={todayReservations.length} caption={todayReservations.length ? `${todayReservations.reduce((a, r) => a + r.partySize, 0)} guests expected` : 'Nothing booked today'} />
         <Card icon={Inbox} label="New Leads" value={newLeadsCount} caption="Not yet contacted" />
         <Card icon={MailWarning} label="Unread Messages" value={unreadCount} caption="Leads awaiting a first response" />
@@ -89,6 +99,26 @@ export default function OwnerDashboardCards({ siteId, timezone, country }: { sit
           )}
         </div>
       </div>
+
+      {viewStats && viewStats.topPages.length > 0 && (
+        <div className="bg-white rounded-[28px] card-shadow border border-ASTER-100 p-6">
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-4 flex items-center gap-1.5"><Eye size={13} /> Top Pages (30 days)</p>
+          <div className="space-y-2">
+            {viewStats.topPages.map((p) => {
+              const pct = Math.round((p.views / viewStats.topPages[0].views) * 100);
+              return (
+                <div key={p.slug} className="flex items-center gap-3">
+                  <span className="text-sm font-semibold text-ink-900 w-28 truncate capitalize">{p.slug}</span>
+                  <div className="flex-1 bg-slate-100 rounded-full h-2 overflow-hidden">
+                    <div className="h-full bg-ASTER-600 rounded-full" style={{ width: `${pct}%` }} />
+                  </div>
+                  <span className="text-sm font-bold text-ink-900 tabular-nums w-10 text-right">{p.views}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       <div className="bg-white rounded-[28px] card-shadow border border-ASTER-100 p-6">
         <p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-4 flex items-center gap-1.5"><Star size={13} /> Recent Reviews</p>

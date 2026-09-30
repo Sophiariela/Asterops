@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Monitor, Tablet, Smartphone, Sparkles, ArrowRight, Layers, Target } from 'lucide-react';
+import { Search, Sparkles, ArrowRight, Layers, Target, AlertTriangle } from 'lucide-react';
 import { api, ApiError } from '../../lib/api';
-import PublicSiteRenderer from '../../components/webos/PublicSiteRenderer';
-import { buildTemplatePreviewSite } from '../../lib/webos/templatePreview';
-import type { TemplateSummary, TemplateDetail, TemplateComplexity } from '../../lib/webos/types';
+import { titleCase } from '../../lib/webos/locale';
+import { getTemplateThumbnail } from '../../lib/webos/templatePreview';
+import { TemplateCardSkeleton } from '../../components/webos/Skeleton';
+import type { TemplateSummary, TemplateComplexity } from '../../lib/webos/types';
 
 function scoreColor(score: number) {
   if (score >= 70) return 'text-emerald-600';
@@ -18,35 +19,15 @@ const COMPLEXITY_STYLE: Record<TemplateComplexity, string> = {
   ADVANCED: 'bg-violet-50 text-violet-700',
 };
 
-type Device = 'desktop' | 'tablet' | 'mobile';
-const DEVICE_WIDTH: Record<Device, string> = {
-  desktop: 'max-w-full',
-  tablet: 'max-w-[768px]',
-  mobile: 'max-w-[390px]',
-};
-
-type GenerateForm = { businessName: string; industry: string; targetAudience: string; services: string };
-const emptyGenerateForm: GenerateForm = { businessName: '', industry: '', targetAudience: '', services: '' };
-
 export default function TemplateLibraryPage() {
   const navigate = useNavigate();
   const [templates, setTemplates] = useState<TemplateSummary[] | null>(null);
+  const [loadError, setLoadError] = useState('');
   const [q, setQ] = useState('');
   const [industry, setIndustry] = useState('');
   const [goal, setGoal] = useState('');
   const [complexity, setComplexity] = useState<TemplateComplexity | ''>('');
   const [ecommerceOnly, setEcommerceOnly] = useState(false);
-
-  const [detail, setDetail] = useState<TemplateDetail | null>(null);
-  const [detailDevice, setDetailDevice] = useState<Device>('desktop');
-  const [detailPageIndex, setDetailPageIndex] = useState(0);
-  const previewSite = useMemo(() => (detail ? buildTemplatePreviewSite(detail) : null), [detail]);
-
-  const [generatingFor, setGeneratingFor] = useState<TemplateSummary | null>(null);
-  const [form, setForm] = useState<GenerateForm>(emptyGenerateForm);
-  const [formError, setFormError] = useState('');
-  const [generating, setGenerating] = useState(false);
-  const [generatedSiteId, setGeneratedSiteId] = useState<string | null>(null);
 
   const [showLuna, setShowLuna] = useState(false);
   const [lunaForm, setLunaForm] = useState({ industry: '', targetAudience: '', description: '' });
@@ -62,7 +43,13 @@ export default function TemplateLibraryPage() {
     if (goal) params.set('goal', goal);
     if (complexity) params.set('complexity', complexity);
     if (ecommerceOnly) params.set('ecommerce', 'true');
-    api.get<{ templates: TemplateSummary[] }>(`/webos/templates?${params.toString()}`).then((data) => setTemplates(data.templates)).catch(() => setTemplates([]));
+    // A failed request must never render as "no templates match" — that's
+    // indistinguishable from the library actually being empty. Only a
+    // successful response updates the list; any thrown error (network,
+    // timeout, 5xx) leaves it untouched and surfaces a retry instead.
+    api.get<{ templates: TemplateSummary[] }>(`/webos/templates?${params.toString()}`)
+      .then((data) => { setTemplates(data.templates); setLoadError(''); })
+      .catch((err) => setLoadError(err instanceof ApiError ? err.message : 'Could not load the template library. Check your connection and try again.'));
   };
 
   useEffect(() => {
@@ -74,40 +61,8 @@ export default function TemplateLibraryPage() {
   const industries = useMemo(() => Array.from(new Set((templates ?? []).map((t) => t.industry))).sort(), [templates]);
   const goals = useMemo(() => Array.from(new Set((templates ?? []).map((t) => t.primaryGoal))).sort(), [templates]);
 
-  const openDetail = async (t: TemplateSummary) => {
-    setDetailDevice('desktop');
-    setDetailPageIndex(0);
-    const data = await api.get<{ template: TemplateDetail }>(`/webos/templates/${t.id}`);
-    setDetail(data.template);
-  };
-
-  const openGenerate = (t: TemplateSummary) => {
-    setGeneratingFor(t);
-    setForm({ ...emptyGenerateForm, industry: t.industry });
-    setFormError('');
-    setGeneratedSiteId(null);
-    setDetail(null);
-  };
-
-  const submitGenerate = async (e: FormEvent) => {
-    e.preventDefault();
-    if (!generatingFor) return;
-    setFormError('');
-    setGenerating(true);
-    try {
-      const data = await api.post<{ site: { id: string } }>('/webos/templates/generate', {
-        templateId: generatingFor.id,
-        businessName: form.businessName,
-        industry: form.industry,
-        targetAudience: form.targetAudience,
-        services: form.services.split(',').map((s) => s.trim()).filter(Boolean),
-      });
-      setGeneratedSiteId(data.site.id);
-    } catch (err) {
-      setFormError(err instanceof ApiError ? err.message : 'Could not generate this site.');
-    } finally {
-      setGenerating(false);
-    }
+  const openPreview = (t: TemplateSummary) => {
+    navigate(`/webos/templates/${t.id}/preview`);
   };
 
   const askLuna = async (e: FormEvent) => {
@@ -131,7 +86,7 @@ export default function TemplateLibraryPage() {
   const jumpToRecommended = () => {
     const t = templates?.find((x) => x.id === lunaRecommendedId);
     setShowLuna(false);
-    if (t) openDetail(t);
+    if (t) openPreview(t);
   };
 
   return (
@@ -174,26 +129,40 @@ export default function TemplateLibraryPage() {
         </label>
       </div>
 
+      {loadError && (
+        <div className="mt-10 bg-rose-50 border border-rose-200 rounded-[28px] p-8 text-center">
+          <AlertTriangle size={32} className="text-rose-500 mx-auto" />
+          <p className="text-rose-700 font-semibold mt-3">{loadError}</p>
+          <button onClick={load} className="inline-flex items-center gap-2 bg-rose-600 hover:bg-rose-700 text-white font-bold px-5 py-2.5 rounded-full transition-all mt-5">
+            Try again
+          </button>
+        </div>
+      )}
+
       <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        {templates?.map((t) => {
+        {!loadError && templates === null && Array.from({ length: 6 }).map((_, i) => <TemplateCardSkeleton key={i} />)}
+        {!loadError && templates?.map((t) => {
           return (
-            <button key={t.id} onClick={() => openDetail(t)} className="text-left bg-white rounded-[28px] card-shadow border border-ASTER-100 p-6 hover:-translate-y-0.5 transition-transform flex flex-col">
-              <div className="flex items-start justify-between gap-2">
+            <button key={t.id} onClick={() => openPreview(t)} className="text-left bg-white rounded-[28px] card-shadow border border-ASTER-100 overflow-hidden hover:-translate-y-0.5 transition-transform flex flex-col">
+              <div className="relative aspect-[16/10]">
+                <img src={getTemplateThumbnail(t.key)} alt="" className="w-full h-full object-cover" loading="lazy" />
+                <span className={`absolute top-3 right-3 text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap ${COMPLEXITY_STYLE[t.complexity]}`}>{titleCase(t.complexity)}</span>
+              </div>
+              <div className="p-6 flex flex-col flex-1">
                 <p className="font-display font-bold text-lg text-ink-900">{t.name}</p>
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap ${COMPLEXITY_STYLE[t.complexity]}`}>{t.complexity}</span>
-              </div>
-              <p className="text-slate-500 text-xs mt-1">{t.industry}</p>
-              <p className="text-sm text-slate-600 mt-3 flex-1">{t.description}</p>
-              <div className="mt-4 bg-slate-50 rounded-2xl p-3 text-[11px] text-slate-500 italic">
-                {t.recommendedUseCase}
-              </div>
-              <div className="flex items-center gap-4 mt-4 text-xs text-slate-500">
-                <span className="flex items-center gap-1"><Layers size={13} /> {t.pageCount} pages</span>
-                <span className="flex items-center gap-1"><Target size={13} /> {t.primaryGoal}</span>
-              </div>
-              <div className="flex items-center justify-between mt-4 pt-4 border-t border-ASTER-100">
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-wide">Lead-gen score</span>
-                <span className={`font-display font-extrabold text-xl ${scoreColor(t.leadGenerationScore)}`}>{t.leadGenerationScore}</span>
+                <p className="text-slate-500 text-xs mt-1">{t.industry}</p>
+                <p className="text-sm text-slate-600 mt-3 flex-1">{t.description}</p>
+                <div className="mt-4 bg-slate-50 rounded-2xl p-3 text-[11px] text-slate-500 italic">
+                  {t.recommendedUseCase}
+                </div>
+                <div className="flex items-center gap-4 mt-4 text-xs text-slate-500">
+                  <span className="flex items-center gap-1"><Layers size={13} /> {t.pageCount} pages</span>
+                  <span className="flex items-center gap-1"><Target size={13} /> {t.primaryGoal}</span>
+                </div>
+                <div className="flex items-center justify-between mt-4 pt-4 border-t border-ASTER-100">
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-wide">Estimated conversion</span>
+                  <span className={`font-display font-extrabold text-xl ${scoreColor(t.leadGenerationScore)}`}>{t.leadGenerationScore}</span>
+                </div>
               </div>
             </button>
           );
@@ -202,78 +171,6 @@ export default function TemplateLibraryPage() {
           <p className="col-span-full text-center text-slate-400 py-10">No templates match these filters.</p>
         )}
       </div>
-
-      {/* Template detail modal */}
-      {detail && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-950/40" onClick={() => setDetail(null)}>
-          <div className="bg-white rounded-[28px] card-shadow border border-ASTER-100 w-full max-w-5xl max-h-[90vh] overflow-y-auto p-7" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <h2 className="font-display font-extrabold text-xl text-ink-900">{detail.name}</h2>
-                <p className="text-slate-500 text-sm mt-1">{detail.industry} · {detail.recommendedUseCase}</p>
-              </div>
-              <button onClick={() => openGenerate(detail)} className="bg-ASTER-600 hover:bg-ASTER-700 text-white font-bold text-sm px-4 py-2.5 rounded-full transition-all whitespace-nowrap flex items-center gap-1.5">
-                Use this template <ArrowRight size={15} />
-              </button>
-            </div>
-
-            <div className="flex items-center gap-4 mt-4 flex-wrap">
-              <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full ${COMPLEXITY_STYLE[detail.complexity]}`}>{detail.complexity}</span>
-              <span className="text-xs text-slate-500">{detail.pageCount} pages</span>
-              <span className="text-xs text-slate-500">Goal: {detail.primaryGoal}</span>
-              <span className={`text-xs font-bold ${scoreColor(detail.leadGenerationScore)}`}>Lead-gen score {detail.leadGenerationScore}/100</span>
-            </div>
-
-            <div className="mt-3 flex flex-wrap gap-1.5">
-              {detail.scoreFactors.map((f) => (
-                <span key={f.key} className="text-[10px] font-semibold text-slate-500 bg-slate-50 px-2 py-1 rounded-full">{f.detail}</span>
-              ))}
-            </div>
-
-            <div className="grid sm:grid-cols-[160px_1fr] gap-5 mt-6">
-              <div className="space-y-1.5">
-                {detail.pages.map((p, i) => (
-                  <button
-                    key={p.id}
-                    onClick={() => setDetailPageIndex(i)}
-                    className={`w-full text-left px-3 py-2 rounded-xl text-sm font-semibold transition-colors ${detailPageIndex === i ? 'bg-ASTER-50 text-ASTER-600' : 'text-slate-500 hover:bg-slate-50'}`}
-                  >
-                    {p.name}
-                    {p.hasLeadForm && <span className="ml-1.5 text-[9px] font-bold text-emerald-600">●</span>}
-                  </button>
-                ))}
-              </div>
-
-              <div className="min-w-0">
-                <div className="flex items-center justify-end gap-1 bg-slate-100 rounded-full p-1 mb-3 w-fit ml-auto">
-                  {([{ key: 'desktop' as Device, icon: Monitor }, { key: 'tablet' as Device, icon: Tablet }, { key: 'mobile' as Device, icon: Smartphone }]).map(({ key, icon: Icon }) => (
-                    <button key={key} onClick={() => setDetailDevice(key)} className={`p-2 rounded-full transition-colors ${detailDevice === key ? 'bg-white text-ASTER-600 card-shadow-sm' : 'text-slate-400'}`} aria-label={key}>
-                      <Icon size={15} />
-                    </button>
-                  ))}
-                </div>
-                {previewSite && previewSite.pages[detailPageIndex] && (
-                  <div className="border border-ASTER-100 rounded-2xl overflow-hidden bg-slate-50">
-                    <div className={`mx-auto max-h-[60vh] overflow-y-auto transition-all ${DEVICE_WIDTH[detailDevice]}`}>
-                      <PublicSiteRenderer
-                        site={previewSite}
-                        page={previewSite.pages[detailPageIndex]}
-                        siteSlug="preview"
-                        previewMode
-                        onNavigate={(slug) => {
-                          const idx = previewSite.pages.findIndex((p) => p.slug === slug);
-                          if (idx >= 0) setDetailPageIndex(idx);
-                        }}
-                      />
-                    </div>
-                  </div>
-                )}
-                <p className="text-[11px] text-slate-400 mt-3">Live preview with example copy and photos. Your generated site uses your real business name, services and content instead.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Luna recommend modal */}
       {showLuna && (
@@ -315,50 +212,6 @@ export default function TemplateLibraryPage() {
                 )}
                 <button onClick={() => setLunaLines(null)} className="w-full mt-3 text-sm font-semibold text-slate-500 hover:text-ink-900">Ask again</button>
               </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Generate form modal */}
-      {generatingFor && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-950/40" onClick={() => setGeneratingFor(null)}>
-          <div className="bg-white rounded-[28px] card-shadow border border-ASTER-100 w-full max-w-lg max-h-[85vh] overflow-y-auto p-7" onClick={(e) => e.stopPropagation()}>
-            {generatedSiteId ? (
-              <div>
-                <h2 className="font-display font-extrabold text-xl text-ink-900 mb-1">Site generated</h2>
-                <p className="text-slate-500 text-sm mb-5">{form.businessName} is scaffolded from {generatingFor.name} and ready to build on.</p>
-                <button onClick={() => navigate(`/webos/${generatedSiteId}`)} className="w-full bg-ASTER-600 hover:bg-ASTER-700 text-white font-bold py-3.5 rounded-full transition-all flex items-center justify-center gap-2">
-                  Continue to site <ArrowRight size={16} />
-                </button>
-              </div>
-            ) : (
-              <>
-                <h2 className="font-display font-extrabold text-xl text-ink-900 mb-1">Generate from {generatingFor.name}</h2>
-                <p className="text-slate-500 text-sm mb-5">{generatingFor.pageCount} pages, built for {generatingFor.primaryGoal.toLowerCase()}.</p>
-                <form onSubmit={submitGenerate} className="space-y-4">
-                  <div>
-                    <label className="text-[13px] font-bold text-ink-900 block mb-1.5">Business name *</label>
-                    <input required value={form.businessName} onChange={(e) => setForm((f) => ({ ...f, businessName: e.target.value }))} className="w-full border-2 border-ASTER-100 focus:border-ASTER-600 rounded-2xl px-4 py-3 text-[15px] outline-none transition-colors" />
-                  </div>
-                  <div>
-                    <label className="text-[13px] font-bold text-ink-900 block mb-1.5">Industry *</label>
-                    <input required value={form.industry} onChange={(e) => setForm((f) => ({ ...f, industry: e.target.value }))} className="w-full border-2 border-ASTER-100 focus:border-ASTER-600 rounded-2xl px-4 py-3 text-[15px] outline-none transition-colors" />
-                  </div>
-                  <div>
-                    <label className="text-[13px] font-bold text-ink-900 block mb-1.5">Services (comma-separated) *</label>
-                    <input required value={form.services} onChange={(e) => setForm((f) => ({ ...f, services: e.target.value }))} className="w-full border-2 border-ASTER-100 focus:border-ASTER-600 rounded-2xl px-4 py-3 text-[15px] outline-none transition-colors" />
-                  </div>
-                  <div>
-                    <label className="text-[13px] font-bold text-ink-900 block mb-1.5">Target audience *</label>
-                    <input required value={form.targetAudience} onChange={(e) => setForm((f) => ({ ...f, targetAudience: e.target.value }))} className="w-full border-2 border-ASTER-100 focus:border-ASTER-600 rounded-2xl px-4 py-3 text-[15px] outline-none transition-colors" />
-                  </div>
-                  {formError && <p className="text-rose-500 text-sm font-semibold">{formError}</p>}
-                  <button type="submit" disabled={generating} className="w-full bg-ASTER-600 hover:bg-ASTER-700 disabled:opacity-60 text-white font-bold py-3.5 rounded-full transition-all">
-                    {generating ? 'Generating…' : 'Generate site'}
-                  </button>
-                </form>
-              </>
             )}
           </div>
         </div>

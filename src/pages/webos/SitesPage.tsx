@@ -1,70 +1,26 @@
-import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Plus, Globe2, ArrowRight, LayoutTemplate } from 'lucide-react';
+import { Plus, Globe2, ArrowRight, LayoutTemplate, AlertTriangle } from 'lucide-react';
 import { api, ApiError } from '../../lib/api';
-import type { Playbook, PlaybookKey, Site } from '../../lib/webos/types';
-import { computeBlueprint } from '../../lib/webos/blueprint';
-import BlueprintCard from '../../components/webos/BlueprintCard';
-
-type FormState = {
-  businessName: string;
-  industry: string;
-  services: string;
-  targetAudience: string;
-  playbook: PlaybookKey | '';
-};
-
-const emptyForm: FormState = { businessName: '', industry: '', services: '', targetAudience: '', playbook: '' };
+import { SiteCardSkeleton } from '../../components/webos/Skeleton';
+import type { Site } from '../../lib/webos/types';
 
 export default function SitesPage() {
   const navigate = useNavigate();
   const [sites, setSites] = useState<Site[] | null>(null);
-  const [playbooks, setPlaybooks] = useState<Playbook[]>([]);
-  const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState<FormState>(emptyForm);
-  const [error, setError] = useState('');
-  const [generating, setGenerating] = useState(false);
-  const [generatedSite, setGeneratedSite] = useState<Site | null>(null);
+  const [loadError, setLoadError] = useState('');
 
+  // A failed request must never render as "you have no sites" — that's
+  // indistinguishable from real data loss. Only an actually-empty response
+  // clears loadError; any thrown error (network, timeout, 5xx) keeps the
+  // previous list on screen and surfaces a retry instead.
   const load = () => {
-    api.get<{ sites: Site[] }>('/webos/sites').then((data) => setSites(data.sites)).catch(() => setSites([]));
+    api.get<{ sites: Site[] }>('/webos/sites')
+      .then((data) => { setSites(data.sites); setLoadError(''); })
+      .catch((err) => setLoadError(err instanceof ApiError ? err.message : 'Could not load your sites. Check your connection and try again.'));
   };
 
   useEffect(load, []);
-  useEffect(() => {
-    api.get<{ playbooks: Playbook[] }>('/webos/sites/playbooks').then((data) => setPlaybooks(data.playbooks)).catch(() => {});
-  }, []);
-
-  const openCreate = () => {
-    setForm(emptyForm);
-    setError('');
-    setGeneratedSite(null);
-    setShowForm(true);
-  };
-
-  const onSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setError('');
-    if (!form.playbook) {
-      setError('Choose a playbook.');
-      return;
-    }
-    setGenerating(true);
-    try {
-      const data = await api.post<{ site: Site }>('/webos/sites/generate', {
-        businessName: form.businessName,
-        industry: form.industry,
-        targetAudience: form.targetAudience,
-        playbook: form.playbook,
-        services: form.services.split(',').map((s) => s.trim()).filter(Boolean),
-      });
-      setGeneratedSite(data.site);
-    } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Could not generate this site.');
-    } finally {
-      setGenerating(false);
-    }
-  };
 
   return (
     <div>
@@ -80,23 +36,40 @@ export default function SitesPage() {
           >
             <LayoutTemplate size={16} /> Browse Template Library
           </Link>
-          <button
-            onClick={openCreate}
+          <Link
+            to="/webos/new"
             className="flex items-center gap-2 bg-ASTER-600 hover:bg-ASTER-700 text-white font-bold px-5 py-2.5 rounded-full transition-all whitespace-nowrap"
           >
             <Plus size={16} /> Generate a site
-          </button>
+          </Link>
         </div>
       </div>
 
-      {sites && sites.length === 0 && (
+      {loadError && (
+        <div className="mt-10 bg-rose-50 border border-rose-200 rounded-[28px] p-8 text-center">
+          <AlertTriangle size={32} className="text-rose-500 mx-auto" />
+          <p className="text-rose-700 font-semibold mt-3">{loadError}</p>
+          <button onClick={load} className="inline-flex items-center gap-2 bg-rose-600 hover:bg-rose-700 text-white font-bold px-5 py-2.5 rounded-full transition-all mt-5">
+            Try again
+          </button>
+        </div>
+      )}
+
+      {!loadError && sites && sites.length === 0 && (
         <div className="mt-10 bg-white rounded-[28px] card-shadow border border-ASTER-100 p-10 text-center">
           <Globe2 size={40} className="text-ASTER-600 mx-auto" />
-          <p className="text-slate-600 mt-4">No sites yet. Generate your first one from a playbook.</p>
+          <p className="text-slate-600 mt-4">No sites yet. Generate your first one in under 3 minutes.</p>
+          <Link
+            to="/webos/new"
+            className="inline-flex items-center gap-2 bg-ASTER-600 hover:bg-ASTER-700 text-white font-bold px-5 py-2.5 rounded-full transition-all mt-5"
+          >
+            <Plus size={16} /> Generate a site
+          </Link>
         </div>
       )}
 
       <div className="mt-8 grid sm:grid-cols-2 gap-5">
+        {!loadError && sites === null && Array.from({ length: 4 }).map((_, i) => <SiteCardSkeleton key={i} />)}
         {sites?.map((s) => (
           <button
             key={s.id}
@@ -109,7 +82,7 @@ export default function SitesPage() {
                 <p className="text-slate-500 text-sm mt-1">{s.industry}</p>
               </div>
               <span className={`text-xs font-bold px-3 py-1.5 rounded-full whitespace-nowrap ${s.status === 'PUBLISHED' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
-                {s.status}
+                {s.status === 'PUBLISHED' ? 'Published' : 'Draft'}
               </span>
             </div>
             <p className="text-xs text-slate-400 mt-4">{s._count?.pages ?? 0} pages · {s._count?.testimonials ?? 0} testimonials · {s._count?.leads ?? 0} leads</p>
@@ -119,68 +92,6 @@ export default function SitesPage() {
           </button>
         ))}
       </div>
-
-      {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-950/40" onClick={() => setShowForm(false)}>
-          <div className="bg-white rounded-[28px] card-shadow border border-ASTER-100 w-full max-w-lg max-h-[85vh] overflow-y-auto p-7" onClick={(e) => e.stopPropagation()}>
-            {generatedSite ? (
-              <div>
-                <h2 className="font-display font-extrabold text-xl text-ink-900 mb-1">Website Blueprint</h2>
-                <p className="text-slate-500 text-sm mb-5">{generatedSite.businessName} is scaffolded and ready to build on.</p>
-                <BlueprintCard blueprint={computeBlueprint(generatedSite)} />
-                <button
-                  onClick={() => navigate(`/webos/${generatedSite.id}`)}
-                  className="w-full mt-5 bg-ASTER-600 hover:bg-ASTER-700 text-white font-bold py-3.5 rounded-full transition-all flex items-center justify-center gap-2"
-                >
-                  Continue to site <ArrowRight size={16} />
-                </button>
-              </div>
-            ) : (
-              <>
-            <h2 className="font-display font-extrabold text-xl text-ink-900 mb-5">Generate a site</h2>
-            <form onSubmit={onSubmit} className="space-y-4">
-              <div>
-                <label className="text-[13px] font-bold text-ink-900 block mb-1.5">Business name *</label>
-                <input required value={form.businessName} onChange={(e) => setForm((f) => ({ ...f, businessName: e.target.value }))} className="w-full border-2 border-ASTER-100 focus:border-ASTER-600 rounded-2xl px-4 py-3 text-[15px] outline-none transition-colors" />
-              </div>
-              <div>
-                <label className="text-[13px] font-bold text-ink-900 block mb-1.5">Industry *</label>
-                <input required value={form.industry} onChange={(e) => setForm((f) => ({ ...f, industry: e.target.value }))} placeholder="e.g. bakery, SaaS analytics, personal training" className="w-full border-2 border-ASTER-100 focus:border-ASTER-600 rounded-2xl px-4 py-3 text-[15px] outline-none transition-colors" />
-              </div>
-              <div>
-                <label className="text-[13px] font-bold text-ink-900 block mb-1.5">Services (comma-separated) *</label>
-                <input required value={form.services} onChange={(e) => setForm((f) => ({ ...f, services: e.target.value }))} placeholder="e.g. Bread, Cakes, Coffee bar" className="w-full border-2 border-ASTER-100 focus:border-ASTER-600 rounded-2xl px-4 py-3 text-[15px] outline-none transition-colors" />
-              </div>
-              <div>
-                <label className="text-[13px] font-bold text-ink-900 block mb-1.5">Target audience *</label>
-                <input required value={form.targetAudience} onChange={(e) => setForm((f) => ({ ...f, targetAudience: e.target.value }))} placeholder="e.g. families in the neighborhood" className="w-full border-2 border-ASTER-100 focus:border-ASTER-600 rounded-2xl px-4 py-3 text-[15px] outline-none transition-colors" />
-              </div>
-              <div>
-                <label className="text-[13px] font-bold text-ink-900 block mb-1.5">Playbook *</label>
-                <div className="grid grid-cols-2 gap-2">
-                  {playbooks.map((p) => (
-                    <button
-                      type="button"
-                      key={p.key}
-                      onClick={() => setForm((f) => ({ ...f, playbook: p.key }))}
-                      className={`text-left border-2 rounded-2xl px-3.5 py-3 transition-colors ${form.playbook === p.key ? 'border-ASTER-600 bg-ASTER-50' : 'border-ASTER-100 hover:border-ASTER-300'}`}
-                    >
-                      <p className="text-sm font-bold text-ink-900">{p.label}</p>
-                      <p className="text-[11px] text-slate-500 mt-0.5">{p.description}</p>
-                    </button>
-                  ))}
-                </div>
-              </div>
-              {error && <p className="text-rose-500 text-sm font-semibold">{error}</p>}
-              <button type="submit" disabled={generating} className="w-full bg-ASTER-600 hover:bg-ASTER-700 disabled:opacity-60 text-white font-bold py-3.5 rounded-full transition-all">
-                {generating ? 'Generating…' : 'Generate site'}
-              </button>
-            </form>
-            </>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

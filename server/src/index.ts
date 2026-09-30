@@ -29,6 +29,7 @@ import { reservationsRouter, publicReservationsRouter } from './routes/webos/res
 import { tablesRouter } from './routes/webos/tables.routes.js';
 import { menuRouter, publicMenuRouter } from './routes/webos/menu.routes.js';
 import { reviewsRouter, publicReviewsRouter } from './routes/webos/reviews.routes.js';
+import { publicPageViewsRouter } from './routes/webos/pageViews.routes.js';
 import { googleCalendarRouter, googleCalendarCallbackRouter } from './routes/webos/googleCalendar.routes.js';
 import { CommerceError } from './lib/commerceError.js';
 import { UPLOAD_ROOT } from './middleware/upload.js';
@@ -83,6 +84,7 @@ app.use('/api/webos/public/leads', publicLeadsRouter);
 app.use('/api/webos/public/reservations', publicReservationsRouter);
 app.use('/api/webos/public/menu', publicMenuRouter);
 app.use('/api/webos/public/reviews', publicReviewsRouter);
+app.use('/api/webos/public/views', publicPageViewsRouter);
 app.use('/api/webos/sites/:siteId/testimonials', testimonialsRouter);
 app.use('/api/webos/sites/:siteId/trust-elements', trustElementsRouter);
 app.use('/api/webos/sites/:siteId/leads', leadsRouter);

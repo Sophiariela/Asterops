@@ -2,6 +2,7 @@ import { Router, type Request } from 'express';
 import { authenticate, requireRole } from '../../middleware/auth.js';
 import { getWebsiteHealth } from '../../services/webos/analytics/healthScore.service.js';
 import { getBusinessScore } from '../../services/webos/analytics/businessScore.service.js';
+import { getViewStats } from '../../services/webos/pageViews.service.js';
 import { runConversionAudit } from '../../services/webos/analytics/conversionAudit.service.js';
 import { getTrustGaps } from '../../services/webos/analytics/trustEngine.service.js';
 import { getTrustMap } from '../../services/webos/analytics/trustMap.service.js';
@@ -12,7 +13,9 @@ import { getPageInventory } from '../../services/webos/analytics/pageInventory.s
 import { getSectionInventory } from '../../services/webos/analytics/sectionInventory.service.js';
 import { getLeadCaptureMap } from '../../services/webos/analytics/leadCaptureMap.service.js';
 import { getDeploymentReadiness } from '../../services/webos/analytics/deploymentReadiness.service.js';
-import { reviewPage, reviewBlueprint } from '../../services/webos/analytics/lunaStrategist.service.js';
+import {
+  reviewPage, reviewBlueprint, improveHomepage, generateMenuDescriptions, improveSeo, reservationsAdvice,
+} from '../../services/webos/analytics/lunaStrategist.service.js';
 
 type SiteParams = { siteId: string };
 
@@ -22,6 +25,11 @@ webosAnalyticsRouter.use(authenticate, requireRole('CUSTOMER'));
 webosAnalyticsRouter.get('/health-score', async (req: Request<SiteParams>, res) => {
   const health = await getWebsiteHealth(req.user!.userId, req.params.siteId);
   res.json({ health });
+});
+
+webosAnalyticsRouter.get('/views', async (req: Request<SiteParams>, res) => {
+  const views = await getViewStats(req.user!.userId, req.params.siteId);
+  res.json({ views });
 });
 
 webosAnalyticsRouter.get('/business-score', async (req: Request<SiteParams>, res) => {
@@ -81,6 +89,28 @@ webosAnalyticsRouter.get('/deployment-readiness', async (req: Request<SiteParams
 
 webosAnalyticsRouter.post('/luna/blueprint', async (req: Request<SiteParams>, res) => {
   const data = await reviewBlueprint(req.user!.userId, req.params.siteId);
+  res.json(data);
+});
+
+// Quick Actions — these apply Luna's output directly rather than just
+// returning advice. Registered before the /luna/:pageId catch-all below.
+webosAnalyticsRouter.post('/luna/actions/improve-homepage', async (req: Request<SiteParams>, res) => {
+  const data = await improveHomepage(req.user!.userId, req.params.siteId);
+  res.json(data);
+});
+
+webosAnalyticsRouter.post('/luna/actions/generate-menu-descriptions', async (req: Request<SiteParams>, res) => {
+  const data = await generateMenuDescriptions(req.user!.userId, req.params.siteId);
+  res.json(data);
+});
+
+webosAnalyticsRouter.post('/luna/actions/improve-seo', async (req: Request<SiteParams>, res) => {
+  const data = await improveSeo(req.user!.userId, req.params.siteId);
+  res.json(data);
+});
+
+webosAnalyticsRouter.post('/luna/actions/increase-reservations', async (req: Request<SiteParams>, res) => {
+  const data = await reservationsAdvice(req.user!.userId, req.params.siteId);
   res.json(data);
 });
 

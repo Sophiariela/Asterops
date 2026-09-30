@@ -37,6 +37,7 @@ export const updateSiteSchema = z.object({
   reviewEmail: optionalEmail,
   phone: z.union([z.string().max(40), z.literal('')]).optional(),
   whatsappNumber: z.union([z.string().max(40), z.literal('')]).optional(),
+  primaryColor: z.union([z.string().regex(/^#[0-9a-fA-F]{6}$/), z.literal('')]).optional(),
 });
 
 export const generateFromTemplateSchema = z.object({

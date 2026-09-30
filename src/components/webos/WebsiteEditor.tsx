@@ -1,10 +1,20 @@
-import { useEffect, useState } from 'react';
-import { Monitor, Tablet, Smartphone, Plus, Star, UtensilsCrossed, CalendarCheck, ArrowUpRight, ArrowRight } from 'lucide-react';
+import { useEffect, useState, type CSSProperties } from 'react';
+import { Monitor, Tablet, Smartphone, Plus, Star, UtensilsCrossed, CalendarCheck, ArrowUpRight, ArrowRight, Palette } from 'lucide-react';
 import { api } from '../../lib/api';
 import { EditableText, EditableImage } from './editable';
 import ReservationBookingForm from './ReservationBookingForm';
 import { formatMoney } from '../../lib/webos/currency';
 import type { Site, Page, MenuItem, Currency } from '../../lib/webos/types';
+
+// Mirrors PublicSiteRenderer's darken() — keeps the editor's live preview
+// in sync with how the published site actually renders a custom brand color.
+function darken(hex: string, amount: number): string {
+  const n = parseInt(hex.slice(1), 16);
+  const r = Math.max(0, Math.round(((n >> 16) & 255) * (1 - amount)));
+  const g = Math.max(0, Math.round(((n >> 8) & 255) * (1 - amount)));
+  const b = Math.max(0, Math.round((n & 255) * (1 - amount)));
+  return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+}
 
 type Device = 'desktop' | 'tablet' | 'mobile';
 const DEVICE_WIDTH: Record<Device, string> = {
@@ -83,7 +93,7 @@ export default function WebsiteEditor({
 
   const page = site.pages.find((p) => p.id === activePageId) ?? site.pages[0];
 
-  const patchSite = (data: Partial<{ businessName: string }>) => api.patch(`/webos/sites/${site.id}`, data).then(onRefresh);
+  const patchSite = (data: Partial<{ businessName: string; primaryColor: string }>) => api.patch(`/webos/sites/${site.id}`, data).then(onRefresh);
   const patchPage = (pageId: string, data: Record<string, unknown>) => api.patch(`/webos/pages/${pageId}`, data).then(onRefresh);
   const patchMenuItem = (id: string, data: Partial<Pick<MenuItem, 'name' | 'priceCents'>>) =>
     api.patch(`/webos/sites/${site.id}/menu/items/${id}`, data).then(onRefresh);
@@ -145,6 +155,20 @@ export default function WebsiteEditor({
           ))}
         </div>
         <div className="flex items-center gap-3">
+          <label
+            className="relative w-8 h-8 rounded-full border-2 border-ASTER-100 hover:border-ASTER-400 cursor-pointer transition-colors overflow-hidden shrink-0"
+            title="Brand color"
+            style={{ backgroundColor: site.primaryColor ?? '#5b2ee5' }}
+          >
+            <Palette size={13} className="absolute inset-0 m-auto text-white/90 pointer-events-none mix-blend-difference" />
+            <input
+              type="color"
+              value={site.primaryColor ?? '#5b2ee5'}
+              onChange={(e) => patchSite({ primaryColor: e.target.value })}
+              className="absolute inset-0 opacity-0 cursor-pointer"
+              aria-label="Choose brand color"
+            />
+          </label>
           <div className="flex items-center gap-1 bg-slate-100 rounded-full p-1">
             {([{ key: 'desktop' as Device, icon: Monitor }, { key: 'tablet' as Device, icon: Tablet }, { key: 'mobile' as Device, icon: Smartphone }]).map(({ key, icon: Icon }) => (
               <button key={key} onClick={() => setDevice(key)} className={`p-2 rounded-full transition-colors ${device === key ? 'bg-white text-ASTER-600 card-shadow-sm' : 'text-slate-400'}`} aria-label={key}>
@@ -174,7 +198,10 @@ export default function WebsiteEditor({
 
       <p className="text-[11px] text-slate-400 mb-3">Click any text, price or photo below to edit it directly. This is what the finished site will contain once published.</p>
 
-      <div className={`mx-auto bg-white border border-ASTER-100 rounded-[28px] card-shadow overflow-hidden transition-all ${DEVICE_WIDTH[device]}`}>
+      <div
+        className={`mx-auto bg-white border border-ASTER-100 rounded-[28px] card-shadow overflow-hidden transition-all ${DEVICE_WIDTH[device]}`}
+        style={site.primaryColor ? ({ '--color-ASTER-600': site.primaryColor, '--color-ASTER-700': darken(site.primaryColor, 0.18) } as CSSProperties) : undefined}
+      >
         {/* Navbar */}
         <div className="flex items-center justify-between gap-4 px-6 py-4 border-b border-ASTER-100 flex-wrap">
           <div className="flex items-center gap-3 min-w-0">

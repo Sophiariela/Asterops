@@ -52,6 +52,13 @@ const PREVIEW_IMAGES: Record<PlaybookKey, { hero: string; sections: string[] }> 
   },
 };
 
+// A real, curated hero photo for a template's Template Library card —
+// same image the preview itself opens with, so the thumbnail never
+// misleads about what clicking through actually shows.
+export function getTemplateThumbnail(key: PlaybookKey): string {
+  return PREVIEW_IMAGES[key].hero;
+}
+
 export function fillVars(pattern: string, vars: Record<string, string>): string {
   return pattern.replace(/\{\{(\w+)\}\}/g, (m, k) => (k in vars ? vars[k] : m));
 }
@@ -128,6 +135,7 @@ export function buildTemplatePreviewSite(detail: TemplateDetail): PublicSite {
     businessName: 'Your Business',
     industry: detail.industry,
     logoUrl: null,
+    primaryColor: null,
     currency: 'USD',
     playbook: detail.key,
     status: 'PUBLISHED',

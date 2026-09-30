@@ -66,6 +66,7 @@ export async function getPublicSiteBySlug(slug: string) {
       businessName: true,
       industry: true,
       logoUrl: true,
+      primaryColor: true,
       currency: true,
       playbook: true,
       status: true,
@@ -201,7 +202,7 @@ export async function updateSite(
   id: string,
   data: Partial<{
     businessName: string; industry: string; targetAudience: string; currency: SiteCurrency; country: string; timezone: string;
-    contactEmail: string; reservationEmail: string; reviewEmail: string; phone: string; whatsappNumber: string;
+    contactEmail: string; reservationEmail: string; reviewEmail: string; phone: string; whatsappNumber: string; primaryColor: string;
   }>,
 ) {
   const existing = await prisma.site.findFirst({ where: { id, ownerId } });
@@ -210,7 +211,7 @@ export async function updateSite(
   // A Business Settings field submitted as '' means "clear this" (fall
   // back to the owner's account email / no notification), not "set it to
   // an empty string" — normalize before writing.
-  const CLEARABLE_FIELDS = ['contactEmail', 'reservationEmail', 'reviewEmail', 'phone', 'whatsappNumber'] as const;
+  const CLEARABLE_FIELDS = ['contactEmail', 'reservationEmail', 'reviewEmail', 'phone', 'whatsappNumber', 'primaryColor'] as const;
   const normalized = { ...data };
   for (const field of CLEARABLE_FIELDS) {
     if (normalized[field] === '') (normalized as Record<string, unknown>)[field] = null;

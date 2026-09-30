@@ -359,6 +359,7 @@ model Site {
   industry          String
   targetAudience    String
   logoUrl           String?
+  primaryColor      String?
   currency          SiteCurrency   @default(USD)
   country           String?
   timezone          String?
@@ -396,11 +397,25 @@ model Site {
   tables            Table[]
   reservations      Reservation[]
   menuCategories    MenuCategory[]
+  pageViews         PageView[]
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
 
   @@index([ownerId])
   @@index([templateId])
+}
+
+// One row per page load on a published public site. Deliberately minimal
+// (no IP, no user agent, no session stitching) — this powers a view count
+// and a top-pages breakdown, not an analytics product.
+model PageView {
+  id        String   @id @default(cuid())
+  site      Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  siteId    String
+  pageSlug  String
+  createdAt DateTime @default(now())
+
+  @@index([siteId, createdAt])
 }
 
 // ---------------------------------------------------------------------
