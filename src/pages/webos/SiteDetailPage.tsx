@@ -35,12 +35,12 @@ function scoreColor(score: number) {
   return 'text-rose-600';
 }
 
-const LEAD_STATUSES: LeadStatus[] = ['NEW', 'CONTACTED', 'QUALIFIED', 'CLOSED'];
+const LEAD_STATUSES: LeadStatus[] = ['LEAD', 'CONSULTATION', 'PROPOSAL', 'CLIENT'];
 const LEAD_STATUS_STYLE: Record<LeadStatus, string> = {
-  NEW: 'bg-amber-100 text-amber-700',
-  CONTACTED: 'bg-blue-100 text-blue-700',
-  QUALIFIED: 'bg-violet-100 text-violet-700',
-  CLOSED: 'bg-slate-200 text-slate-500',
+  LEAD: 'bg-amber-100 text-amber-700',
+  CONSULTATION: 'bg-blue-100 text-blue-700',
+  PROPOSAL: 'bg-violet-100 text-violet-700',
+  CLIENT: 'bg-slate-200 text-slate-500',
 };
 
 type Tab = 'overview' | 'pages' | 'menu' | 'reservations' | 'trust' | 'forms' | 'analytics' | 'settings';

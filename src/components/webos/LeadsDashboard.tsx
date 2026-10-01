@@ -4,12 +4,12 @@ import { api } from '../../lib/api';
 import { titleCase } from '../../lib/webos/locale';
 import type { Lead, LeadStatus } from '../../lib/webos/types';
 
-const STATUSES: LeadStatus[] = ['NEW', 'CONTACTED', 'QUALIFIED', 'CLOSED'];
+const STATUSES: LeadStatus[] = ['LEAD', 'CONSULTATION', 'PROPOSAL', 'CLIENT'];
 const STATUS_STYLE: Record<LeadStatus, string> = {
-  NEW: 'bg-amber-100 text-amber-700',
-  CONTACTED: 'bg-blue-100 text-blue-700',
-  QUALIFIED: 'bg-violet-100 text-violet-700',
-  CLOSED: 'bg-slate-200 text-slate-500',
+  LEAD: 'bg-amber-100 text-amber-700',
+  CONSULTATION: 'bg-blue-100 text-blue-700',
+  PROPOSAL: 'bg-violet-100 text-violet-700',
+  CLIENT: 'bg-slate-200 text-slate-500',
 };
 
 function toCsvValue(value: string): string {

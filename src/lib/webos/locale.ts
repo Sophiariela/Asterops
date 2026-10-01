@@ -13,7 +13,7 @@ const LOCALE_BY_COUNTRY: Record<string, string> = {
   AU: 'en-AU',
 };
 
-// "PENDING" / "CONTACTED" read as raw database values, not product copy.
+// "PENDING" / "CONSULTATION" read as raw database values, not product copy.
 // Used anywhere a status enum reaches the UI (dropdowns, badges, labels).
 export function titleCase(value: string): string {
   return value.charAt(0) + value.slice(1).toLowerCase();

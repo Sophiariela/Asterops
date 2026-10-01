@@ -48,8 +48,8 @@ export async function getBusinessScore(ownerId: string, siteId: string): Promise
   const reviewCount = site._count.reviews;
 
   // 1. Response time — average hours-to-first-action across leads that
-  // have moved past NEW (updatedAt then reflects the status change).
-  const respondedLeads = leads.filter((l) => l.status !== 'NEW');
+  // have moved past Lead (updatedAt then reflects the status change).
+  const respondedLeads = leads.filter((l) => l.status !== 'LEAD');
   const responseFactor: Factor = respondedLeads.length
     ? (() => {
         const avgHours = respondedLeads.reduce((sum, l) => sum + (l.updatedAt.getTime() - l.createdAt.getTime()), 0) / respondedLeads.length / 3_600_000;
@@ -57,7 +57,7 @@ export async function getBusinessScore(ownerId: string, siteId: string): Promise
       })()
     : { key: 'responseTime', label: 'Response time', available: false, score: null, detail: 'No leads have been responded to yet' };
 
-  // 2. Lead follow-up rate — share of all leads moved out of NEW.
+  // 2. Lead follow-up rate — share of all leads moved out of Lead.
   const followUpFactor: Factor = leads.length
     ? { key: 'followUpRate', label: 'Lead follow-up rate', available: true, score: Math.round((respondedLeads.length / leads.length) * 100), detail: `${respondedLeads.length} of ${leads.length} leads followed up on` }
     : { key: 'followUpRate', label: 'Lead follow-up rate', available: false, score: null, detail: 'No leads yet' };
@@ -73,11 +73,11 @@ export async function getBusinessScore(ownerId: string, siteId: string): Promise
   // 4. Reviews collected — raw submission volume against a floor target.
   const reviewFactor: Factor = { key: 'reviewsCollected', label: 'Reviews collected', available: true, score: Math.min(100, Math.round((reviewCount / REVIEW_TARGET) * 100)), detail: `${reviewCount} review(s) collected (target: ${REVIEW_TARGET})` };
 
-  // 5. Conversion rate — proxy: share of leads that reached Qualified or
-  // Closed (moved meaningfully through the pipeline, not just touched).
-  const progressedCount = leads.filter((l) => l.status === 'QUALIFIED' || l.status === 'CLOSED').length;
+  // 5. Conversion rate — proxy: share of leads that reached Proposal or
+  // Client (moved meaningfully through the pipeline, not just touched).
+  const progressedCount = leads.filter((l) => l.status === 'PROPOSAL' || l.status === 'CLIENT').length;
   const conversionFactor: Factor = leads.length
-    ? { key: 'conversionRate', label: 'Conversion rate', available: true, score: Math.round((progressedCount / leads.length) * 100), detail: `${progressedCount} of ${leads.length} leads reached Qualified or Closed` }
+    ? { key: 'conversionRate', label: 'Conversion rate', available: true, score: Math.round((progressedCount / leads.length) * 100), detail: `${progressedCount} of ${leads.length} leads reached Proposal or Client` }
     : { key: 'conversionRate', label: 'Conversion rate', available: false, score: null, detail: 'No leads yet' };
 
   const factors = [responseFactor, followUpFactor, reservationFactor, reviewFactor, conversionFactor];

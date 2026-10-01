@@ -13,7 +13,7 @@ export async function getRecommendedActions(ownerId: string, siteId: string): Pr
   const [audit, trust, newLeadCount] = await Promise.all([
     runConversionAudit(ownerId, siteId),
     getTrustGaps(ownerId, siteId),
-    prisma.lead.count({ where: { siteId, status: 'NEW' } }),
+    prisma.lead.count({ where: { siteId, status: 'LEAD' } }),
   ]);
 
   const actions: RecommendedAction[] = [];

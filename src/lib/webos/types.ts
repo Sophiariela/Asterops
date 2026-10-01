@@ -2,7 +2,7 @@ export type PlaybookKey =
   | 'LOCAL_BUSINESS' | 'SAAS' | 'ECOMMERCE' | 'CONSULTANT' | 'AGENCY' | 'RESTAURANT' | 'FITNESS' | 'CREATOR'
   | 'PERSONAL_BRAND' | 'PROFESSIONAL_SERVICES';
 export type SiteStatus = 'DRAFT' | 'PUBLISHED';
-export type LeadStatus = 'NEW' | 'CONTACTED' | 'QUALIFIED' | 'CLOSED';
+export type LeadStatus = 'LEAD' | 'CONSULTATION' | 'PROPOSAL' | 'CLIENT';
 export type TrustElementType = 'CASE_STUDY' | 'CLIENT_LOGO' | 'CERTIFICATION';
 export type ReservationStatus = 'PENDING' | 'CONFIRMED' | 'SEATED' | 'COMPLETED' | 'CANCELLED';
 export type ReviewStatus = 'NEW' | 'PUBLISHED' | 'HIDDEN';

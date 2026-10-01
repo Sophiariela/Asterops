@@ -5,7 +5,7 @@ export const playbookValues = [
   'PERSONAL_BRAND', 'PROFESSIONAL_SERVICES',
 ] as const;
 export const trustElementTypeValues = ['CASE_STUDY', 'CLIENT_LOGO', 'CERTIFICATION'] as const;
-export const leadStatusValues = ['NEW', 'CONTACTED', 'QUALIFIED', 'CLOSED'] as const;
+export const leadStatusValues = ['LEAD', 'CONSULTATION', 'PROPOSAL', 'CLIENT'] as const;
 export const templateComplexityValues = ['SIMPLE', 'STANDARD', 'ADVANCED'] as const;
 export const reservationStatusValues = ['PENDING', 'CONFIRMED', 'SEATED', 'COMPLETED', 'CANCELLED'] as const;
 export const siteCurrencyValues = ['USD', 'BRL', 'EUR', 'GBP', 'INR', 'CAD', 'AUD'] as const;

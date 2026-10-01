@@ -60,12 +60,12 @@ export default function OwnerDashboardCards({ siteId, timezone, country, playboo
     const now = new Date();
     return at.toDateString() === now.toDateString() && r.status !== 'CANCELLED';
   });
-  const newLeadsCount = leads.filter((l) => l.status === 'NEW').length;
+  const newLeadsCount = leads.filter((l) => l.status === 'LEAD').length;
   // "Unread messages" proxy: leads that haven't been touched at all yet.
   const unreadCount = newLeadsCount;
   // "Revenue opportunities" proxy: warm leads plus reservations still
   // awaiting confirmation — both are real, actionable, pending upside.
-  const opportunityCount = leads.filter((l) => l.status === 'QUALIFIED').length + reservations.filter((r) => r.status === 'PENDING').length;
+  const opportunityCount = leads.filter((l) => l.status === 'PROPOSAL').length + reservations.filter((r) => r.status === 'PENDING').length;
   const recentReviews = reviews.slice(0, 3);
 
   return (

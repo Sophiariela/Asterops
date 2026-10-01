@@ -110,10 +110,10 @@ enum SiteStatus {
 }
 
 enum LeadStatus {
-  NEW
-  CONTACTED
-  QUALIFIED
-  CLOSED
+  LEAD
+  CONSULTATION
+  PROPOSAL
+  CLIENT
 }
 
 model User {
@@ -568,7 +568,7 @@ model Lead {
   phone     String?
   message   String?
   source    String?
-  status    LeadStatus @default(NEW)
+  status    LeadStatus @default(LEAD)
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
 

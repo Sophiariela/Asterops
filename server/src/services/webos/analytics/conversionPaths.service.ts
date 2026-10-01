@@ -34,7 +34,7 @@ export async function getConversionPaths(ownerId: string, siteId: string): Promi
     }
   }
 
-  const statuses = ['NEW', 'CONTACTED', 'QUALIFIED', 'CLOSED'];
+  const statuses = ['LEAD', 'CONSULTATION', 'PROPOSAL', 'CLIENT'];
   const funnel = statuses.map((status) => ({
     status,
     count: site.leads.filter((l) => l.status === status).length,
