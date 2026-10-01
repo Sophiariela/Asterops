@@ -181,7 +181,10 @@ export default function PublicSiteRenderer({
 }) {
   const isRestaurant = site.playbook === 'RESTAURANT';
   const isMenuPage = isRestaurant && page.slug === 'menu';
-  const isReservationsPage = isRestaurant && page.slug === 'reservations';
+  // Table reservations and 1:1 consultation bookings share the same
+  // scheduling mechanism — the only difference is table/party-size, which
+  // ReservationBookingForm itself hides for a non-restaurant site.
+  const isReservationsPage = page.slug === 'reservations' || page.slug === 'book-a-call';
   const isHomePage = page.slug === 'home';
   const featuredItems = isRestaurant ? site.menuCategories.flatMap((c) => c.items).filter((i) => i.featured) : [];
   const ctaTargetSlug = page.ctaHref?.replace(/^\//, '');
@@ -349,10 +352,11 @@ export default function PublicSiteRenderer({
       {/* Reservation booking */}
       {isReservationsPage && (
         <div id="contact" className="p-6 sm:p-10 bg-slate-50 border-t border-ASTER-100">
-          <p className="font-display font-bold text-lg text-ink-900 mb-4 flex items-center gap-2"><CalendarCheck size={18} className="text-ASTER-600" /> Reserve a table</p>
+          <p className="font-display font-bold text-lg text-ink-900 mb-4 flex items-center gap-2"><CalendarCheck size={18} className="text-ASTER-600" /> {isRestaurant ? 'Reserve a table' : 'Book a time'}</p>
           {previewMode ? <PreviewContactForm /> : (
             <ReservationBookingForm
               siteId={site.id}
+              showPartySize={isRestaurant}
               maxPartySize={site.maxPartySize}
               reservationIntervalMinutes={site.reservationIntervalMinutes}
               openingTime={site.openingTime}

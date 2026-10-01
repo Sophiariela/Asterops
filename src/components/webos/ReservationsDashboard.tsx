@@ -39,9 +39,9 @@ function startOfMonthGrid(date: Date): Date {
   return startOfWeek(first);
 }
 
-export default function ReservationsDashboard({ siteId, timezone, country }: { siteId: string; timezone: string | null; country: string | null }) {
+export default function ReservationsDashboard({ siteId, timezone, country, isRestaurant = true }: { siteId: string; timezone: string | null; country: string | null; isRestaurant?: boolean }) {
   const [reservations, setReservations] = useState<Reservation[] | null>(null);
-  const [tables, setTables] = useState<Table[] | null>(null);
+  const [tables, setTables] = useState<Table[] | null>(isRestaurant ? null : []);
   const [filter, setFilter] = useState<'upcoming' | ReservationStatus>('upcoming');
   const [view, setView] = useState<ViewMode>('list');
   const [cursor, setCursor] = useState(() => new Date());
@@ -56,9 +56,11 @@ export default function ReservationsDashboard({ siteId, timezone, country }: { s
     api.get<{ reservations: Reservation[] }>(`/webos/sites/${siteId}/reservations`)
       .then((d) => { setReservations(d.reservations); setLoadError(''); })
       .catch((err) => setLoadError(err instanceof ApiError ? err.message : 'Could not load reservations. Check your connection and try again.'));
-    api.get<{ tables: Table[] }>(`/webos/sites/${siteId}/tables`)
-      .then((d) => { setTables(d.tables); setLoadError(''); })
-      .catch((err) => setLoadError(err instanceof ApiError ? err.message : 'Could not load tables. Check your connection and try again.'));
+    if (isRestaurant) {
+      api.get<{ tables: Table[] }>(`/webos/sites/${siteId}/tables`)
+        .then((d) => { setTables(d.tables); setLoadError(''); })
+        .catch((err) => setLoadError(err instanceof ApiError ? err.message : 'Could not load tables. Check your connection and try again.'));
+    }
   };
   useEffect(load, [siteId]);
 
@@ -146,7 +148,7 @@ export default function ReservationsDashboard({ siteId, timezone, country }: { s
       <span className="text-xs font-bold text-ink-900 tabular-nums w-16 shrink-0">{formatTime(r.reservationAt, country, timezone)}</span>
       <div className="min-w-0 flex-1">
         <p className="text-sm font-semibold text-ink-900 truncate">{r.customerName}</p>
-        {!compact && <p className="text-xs text-slate-400">{r.partySize} guests{r.table ? ` · ${r.table.name}` : ''}</p>}
+        {!compact && isRestaurant && <p className="text-xs text-slate-400">{r.partySize} guests{r.table ? ` · ${r.table.name}` : ''}</p>}
       </div>
       <select
         value={r.status}
@@ -205,10 +207,10 @@ export default function ReservationsDashboard({ siteId, timezone, country }: { s
             <thead className="bg-slate-50 text-slate-400 text-left">
               <tr>
                 <th className="px-6 py-3 font-semibold">Customer</th>
-                <th className="px-6 py-3 font-semibold">Party</th>
+                {isRestaurant && <th className="px-6 py-3 font-semibold">Party</th>}
                 <th className="px-6 py-3 font-semibold">Date &amp; time</th>
                 <th className="px-6 py-3 font-semibold">Notes</th>
-                <th className="px-6 py-3 font-semibold">Table</th>
+                {isRestaurant && <th className="px-6 py-3 font-semibold">Table</th>}
                 <th className="px-6 py-3 font-semibold">Status</th>
               </tr>
             </thead>
@@ -221,32 +223,34 @@ export default function ReservationsDashboard({ siteId, timezone, country }: { s
                     <p className="font-semibold text-ink-900">{r.customerName}</p>
                     <p className="text-slate-400 text-xs">{r.customerEmail}{r.customerPhone ? ` · ${r.customerPhone}` : ''}</p>
                   </td>
-                  <td className="px-6 py-4 text-slate-600 flex items-center gap-1.5"><Users size={13} /> {r.partySize}</td>
+                  {isRestaurant && <td className="px-6 py-4 text-slate-600 flex items-center gap-1.5"><Users size={13} /> {r.partySize}</td>}
                   <td className="px-6 py-4 text-slate-600 text-xs">{formatDateTime(r.reservationAt, country, timezone)}</td>
                   <td className="px-6 py-4 text-slate-500 text-xs max-w-[180px] truncate">{r.notes ?? '—'}</td>
-                  <td className="px-6 py-4">
-                    <select
-                      value={r.tableId ?? ''}
-                      onChange={(e) => assignTable(r.id, e.target.value)}
-                      className="border-2 border-ASTER-100 rounded-full px-2.5 py-1.5 text-xs font-semibold outline-none"
-                    >
-                      <option value="">Unassigned</option>
-                      {(tables ?? []).map((t) => (
-                        <option key={t.id} value={t.id} disabled={!t.active}>
-                          {t.name} ({t.capacity}){t.id === suggested?.id ? ' — suggested' : ''}{!t.active ? ' — closed' : ''}
-                        </option>
-                      ))}
-                    </select>
-                    {suggested && (
-                      <button
-                        type="button"
-                        onClick={() => assignTable(r.id, suggested.id)}
-                        className="block mt-1 text-[10px] font-bold text-ASTER-600 hover:text-ASTER-700"
+                  {isRestaurant && (
+                    <td className="px-6 py-4">
+                      <select
+                        value={r.tableId ?? ''}
+                        onChange={(e) => assignTable(r.id, e.target.value)}
+                        className="border-2 border-ASTER-100 rounded-full px-2.5 py-1.5 text-xs font-semibold outline-none"
                       >
-                        Use suggested: {suggested.name}
-                      </button>
-                    )}
-                  </td>
+                        <option value="">Unassigned</option>
+                        {(tables ?? []).map((t) => (
+                          <option key={t.id} value={t.id} disabled={!t.active}>
+                            {t.name} ({t.capacity}){t.id === suggested?.id ? ' — suggested' : ''}{!t.active ? ' — closed' : ''}
+                          </option>
+                        ))}
+                      </select>
+                      {suggested && (
+                        <button
+                          type="button"
+                          onClick={() => assignTable(r.id, suggested.id)}
+                          className="block mt-1 text-[10px] font-bold text-ASTER-600 hover:text-ASTER-700"
+                        >
+                          Use suggested: {suggested.name}
+                        </button>
+                      )}
+                    </td>
+                  )}
                   <td className="px-6 py-4">
                     <select
                       value={r.status}
@@ -260,7 +264,7 @@ export default function ReservationsDashboard({ siteId, timezone, country }: { s
                 );
               })}
               {filtered.length === 0 && (
-                <tr><td colSpan={6} className="px-6 py-10 text-center text-slate-400">No reservations here yet. This needs a live, publicly-hosted reservation form to start filling in.</td></tr>
+                <tr><td colSpan={isRestaurant ? 6 : 4} className="px-6 py-10 text-center text-slate-400">No reservations here yet. This needs a live, publicly-hosted reservation form to start filling in.</td></tr>
               )}
             </tbody>
           </table>
@@ -297,7 +301,7 @@ export default function ReservationsDashboard({ siteId, timezone, country }: { s
                   <p className="text-sm font-bold text-ink-900 mb-2">{d.getDate()}</p>
                   <div className="space-y-1">
                     {dayReservations.slice(0, 4).map((r) => (
-                      <div key={r.id} className={`text-[10px] font-semibold rounded-lg px-1.5 py-1 truncate ${STATUS_STYLE[r.status]}`} title={`${r.customerName} · ${r.partySize} guests`}>
+                      <div key={r.id} className={`text-[10px] font-semibold rounded-lg px-1.5 py-1 truncate ${STATUS_STYLE[r.status]}`} title={isRestaurant ? `${r.customerName} · ${r.partySize} guests` : r.customerName}>
                         {formatTime(r.reservationAt, country, timezone)} {r.customerName}
                       </div>
                     ))}
@@ -339,7 +343,7 @@ export default function ReservationsDashboard({ siteId, timezone, country }: { s
         </div>
       )}
 
-      <TablesManager siteId={siteId} onChanged={load} />
+      {isRestaurant && <TablesManager siteId={siteId} onChanged={load} />}
     </div>
   );
 }

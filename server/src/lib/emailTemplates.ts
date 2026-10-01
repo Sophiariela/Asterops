@@ -40,10 +40,10 @@ export function leadNotificationEmail(businessName: string, lead: { name: string
   `);
 }
 
-export function reservationNotificationEmail(businessName: string, r: { customerName: string; customerEmail: string; customerPhone: string | null; partySize: number; whenLabel: string; notes: string | null }): string {
+export function reservationNotificationEmail(businessName: string, r: { customerName: string; customerEmail: string; customerPhone: string | null; partySize: number; whenLabel: string; notes: string | null; showPartySize?: boolean }): string {
   const rows = [
     row('Guest', r.customerName),
-    row('Party size', String(r.partySize)),
+    ...(r.showPartySize === false ? [] : [row('Party size', String(r.partySize))]),
     row('Date & time', r.whenLabel),
     row('Email', r.customerEmail),
     ...(r.customerPhone ? [row('Phone', r.customerPhone)] : []),
@@ -51,18 +51,18 @@ export function reservationNotificationEmail(businessName: string, r: { customer
   const notes = r.notes
     ? `<p style="font-size: 14px; color: #0f0f14; background: #f8fafc; border-radius: 12px; padding: 12px 16px; margin: 16px 0 0;">${escapeHtml(r.notes)}</p>`
     : '';
-  return shell(businessName, 'New reservation', `
+  return shell(businessName, r.showPartySize === false ? 'New booking' : 'New reservation', `
     <table style="width: 100%; border-collapse: collapse;">${rows}</table>
     ${notes}
   `);
 }
 
-export function reservationConfirmationEmail(businessName: string, r: { partySize: number; whenLabel: string }): string {
-  return shell(businessName, 'Reservation confirmed', `
-    <p style="font-size: 14px; color: #0f0f14; line-height: 1.6;">Thank you for booking with ${escapeHtml(businessName)}. We look forward to seeing you.</p>
+export function reservationConfirmationEmail(businessName: string, r: { partySize: number; whenLabel: string; showPartySize?: boolean }): string {
+  return shell(businessName, r.showPartySize === false ? 'Booking confirmed' : 'Reservation confirmed', `
+    <p style="font-size: 14px; color: #0f0f14; line-height: 1.6;">Thank you for booking with ${escapeHtml(businessName)}. ${r.showPartySize === false ? 'We look forward to speaking with you.' : 'We look forward to seeing you.'}</p>
     <table style="width: 100%; border-collapse: collapse; margin-top: 12px;">
       ${row('Date & time', r.whenLabel)}
-      ${row('Guests', String(r.partySize))}
+      ${r.showPartySize === false ? '' : row('Guests', String(r.partySize))}
     </table>
   `);
 }

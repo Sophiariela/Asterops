@@ -3,9 +3,10 @@ import { CheckCircle2 } from 'lucide-react';
 import { api, ApiError } from '../../lib/api';
 
 export default function ReservationBookingForm({
-  siteId, maxPartySize, reservationIntervalMinutes, openingTime, closingTime,
+  siteId, showPartySize = true, maxPartySize, reservationIntervalMinutes, openingTime, closingTime,
 }: {
   siteId: string;
+  showPartySize?: boolean;
   maxPartySize?: number | null;
   reservationIntervalMinutes?: number;
   openingTime?: string | null;
@@ -31,7 +32,7 @@ export default function ReservationBookingForm({
         customerName: form.name,
         customerEmail: form.email,
         customerPhone: form.phone || undefined,
-        partySize: Number(form.partySize),
+        partySize: showPartySize ? Number(form.partySize) : 1,
         reservationAt,
         notes: form.notes || undefined,
       });
@@ -47,12 +48,12 @@ export default function ReservationBookingForm({
     return (
       <div className="text-center py-8 max-w-lg mx-auto">
         <CheckCircle2 className="mx-auto text-emerald-600" size={32} />
-        <p className="font-display font-bold text-lg text-ink-900 mt-3">Reservation requested!</p>
+        <p className="font-display font-bold text-lg text-ink-900 mt-3">{showPartySize ? 'Reservation requested!' : 'Request received!'}</p>
         <p className="text-sm text-slate-500 mt-1">
-          {confirmed.name}, party of {confirmed.partySize} on {confirmed.date} at {confirmed.time}. We'll confirm shortly.
+          {confirmed.name}, {showPartySize ? `party of ${confirmed.partySize} ` : ''}on {confirmed.date} at {confirmed.time}. We'll confirm shortly.
         </p>
         <button onClick={() => setConfirmed(null)} className="mt-4 text-sm font-bold text-ASTER-600 hover:text-ASTER-700">
-          Make another reservation
+          {showPartySize ? 'Make another reservation' : 'Book another time'}
         </button>
       </div>
     );
@@ -74,20 +75,22 @@ export default function ReservationBookingForm({
         max={closingTime || undefined}
         className="border-2 border-ASTER-100 focus:border-ASTER-600 rounded-xl px-4 py-2.5 text-sm outline-none transition-colors"
       />
-      <select value={form.partySize} onChange={(e) => setForm((f) => ({ ...f, partySize: e.target.value }))} className="sm:col-span-2 border-2 border-ASTER-100 focus:border-ASTER-600 rounded-xl px-4 py-2.5 text-sm outline-none transition-colors">
-        {partyOptions.map((n) => <option key={n} value={n}>{n} {n === 1 ? 'guest' : 'guests'}</option>)}
-        {!maxPartySize && <option value={12}>10+ guests</option>}
-      </select>
+      {showPartySize && (
+        <select value={form.partySize} onChange={(e) => setForm((f) => ({ ...f, partySize: e.target.value }))} className="sm:col-span-2 border-2 border-ASTER-100 focus:border-ASTER-600 rounded-xl px-4 py-2.5 text-sm outline-none transition-colors">
+          {partyOptions.map((n) => <option key={n} value={n}>{n} {n === 1 ? 'guest' : 'guests'}</option>)}
+          {!maxPartySize && <option value={12}>10+ guests</option>}
+        </select>
+      )}
       {openingTime && closingTime && (
-        <p className="sm:col-span-2 text-xs text-slate-400 -mt-1">Open {openingTime}–{closingTime}{maxPartySize ? ` · parties up to ${maxPartySize}, larger by phone` : ''}</p>
+        <p className="sm:col-span-2 text-xs text-slate-400 -mt-1">Open {openingTime}–{closingTime}{showPartySize && maxPartySize ? ` · parties up to ${maxPartySize}, larger by phone` : ''}</p>
       )}
       <input required placeholder="Name" value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} className="border-2 border-ASTER-100 focus:border-ASTER-600 rounded-xl px-4 py-2.5 text-sm outline-none transition-colors" />
       <input required type="email" placeholder="Email" value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} className="border-2 border-ASTER-100 focus:border-ASTER-600 rounded-xl px-4 py-2.5 text-sm outline-none transition-colors" />
       <input placeholder="Phone (optional)" value={form.phone} onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))} className="sm:col-span-2 border-2 border-ASTER-100 focus:border-ASTER-600 rounded-xl px-4 py-2.5 text-sm outline-none transition-colors" />
-      <textarea placeholder="Special requests (optional)" rows={2} value={form.notes} onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))} className="sm:col-span-2 border-2 border-ASTER-100 focus:border-ASTER-600 rounded-xl px-4 py-2.5 text-sm outline-none transition-colors resize-none" />
+      <textarea placeholder={showPartySize ? 'Special requests (optional)' : 'What would you like to discuss? (optional)'} rows={2} value={form.notes} onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))} className="sm:col-span-2 border-2 border-ASTER-100 focus:border-ASTER-600 rounded-xl px-4 py-2.5 text-sm outline-none transition-colors resize-none" />
       {error && <p className="sm:col-span-2 text-rose-500 text-sm font-semibold">{error}</p>}
       <button type="submit" disabled={submitting} className="sm:col-span-2 bg-ASTER-600 hover:bg-ASTER-700 disabled:opacity-60 text-white font-bold text-sm py-2.5 rounded-full transition-all">
-        {submitting ? 'Submitting…' : 'Request reservation'}
+        {submitting ? 'Submitting…' : showPartySize ? 'Request reservation' : 'Request this time'}
       </button>
     </form>
   );

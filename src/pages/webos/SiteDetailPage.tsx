@@ -368,6 +368,11 @@ export default function SiteDetailPage() {
   }
 
   const playbookLabel = playbooks.find((p) => p.key === site.playbook)?.label ?? site.playbook;
+  const isRestaurant = site.playbook === 'RESTAURANT';
+  // Table reservations and 1:1 consultation booking share the same
+  // scheduling mechanism (see ReservationsDashboard/PublicSiteRenderer).
+  const isBookable = isRestaurant || site.playbook === 'CONSULTANT';
+  const bookingsLabel = isRestaurant ? 'Reservations' : 'Bookings';
   const maxFunnelCount = conversionPaths ? Math.max(1, ...conversionPaths.funnel.map((f) => f.count)) : 1;
   // Instant best-guess from known data, upgraded to the verified/fallback
   // result the moment resolvePublicSiteUrl() finishes checking.
@@ -472,9 +477,8 @@ export default function SiteDetailPage() {
         {[
           { key: 'overview' as Tab, label: 'Overview' },
           { key: 'pages' as Tab, label: 'Pages' },
-          ...(site.playbook === 'RESTAURANT'
-            ? ([{ key: 'menu', label: 'Menu' }, { key: 'reservations', label: 'Reservations' }] as { key: Tab; label: string }[])
-            : []),
+          ...(isRestaurant ? ([{ key: 'menu', label: 'Menu' }] as { key: Tab; label: string }[]) : []),
+          ...(isBookable ? ([{ key: 'reservations', label: bookingsLabel }] as { key: Tab; label: string }[]) : []),
           { key: 'trust' as Tab, label: 'Trust' },
           { key: 'forms' as Tab, label: 'Forms' },
           { key: 'analytics' as Tab, label: 'Analytics' },
@@ -523,9 +527,9 @@ export default function SiteDetailPage() {
                 <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wide">Leads</p>
                 <p className="font-display font-extrabold text-xl text-ink-900 mt-1">{leads.length}</p>
               </div>
-              {site.playbook === 'RESTAURANT' && (
+              {isBookable && (
                 <div>
-                  <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wide">Reservations</p>
+                  <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wide">{bookingsLabel}</p>
                   <p className="font-display font-extrabold text-xl text-ink-900 mt-1">{reservationsCount ?? '—'}</p>
                 </div>
               )}
@@ -551,7 +555,7 @@ export default function SiteDetailPage() {
 
       {tab === 'reservations' && (
         <div className="mt-6">
-          <ReservationsDashboard siteId={site.id} timezone={site.timezone} country={site.country} />
+          <ReservationsDashboard siteId={site.id} timezone={site.timezone} country={site.country} isRestaurant={isRestaurant} />
         </div>
       )}
 
@@ -643,7 +647,7 @@ export default function SiteDetailPage() {
             )}
           </div>
 
-          <LunaQuickActions siteId={site.id} isRestaurant={site.playbook === 'RESTAURANT'} onChanged={loadCore} />
+          <LunaQuickActions siteId={site.id} isRestaurant={isRestaurant} onChanged={loadCore} />
 
           {/* Luna Blueprint Strategist */}
           <div className="bg-gradient-to-br from-ASTER-700 to-ASTER-500 rounded-[28px] card-shadow p-6 text-white">
@@ -891,7 +895,7 @@ export default function SiteDetailPage() {
 
           <BusinessSettingsPanel site={site} onRefresh={loadCore} />
 
-          {site.playbook === 'RESTAURANT' && <RestaurantSettingsPanel site={site} onRefresh={loadCore} />}
+          {isRestaurant && <RestaurantSettingsPanel site={site} onRefresh={loadCore} />}
 
           <div className="bg-white rounded-[28px] card-shadow border border-ASTER-100 p-6 space-y-4">
             <p className="text-xs font-bold text-slate-400 uppercase tracking-wide">Regional settings</p>

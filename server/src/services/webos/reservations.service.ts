@@ -59,21 +59,24 @@ async function fireReservationCreatedSideEffects(
   reservation: { id: string; customerName: string; customerEmail: string; customerPhone: string | null; partySize: number; reservationAt: Date; notes: string | null },
 ) {
   const whenLabel = formatWhen(reservation.reservationAt, site.timezone);
+  // Table bookings show party size; 1:1 consultation bookings (any other
+  // playbook reusing this same system) don't have one worth showing.
+  const showPartySize = site.playbook === 'RESTAURANT';
 
   const businessTo = site.reservationEmail ?? site.owner.email;
   await sendEmail({
     to: businessTo,
-    subject: `New reservation: ${reservation.customerName} (${reservation.partySize})`,
+    subject: showPartySize ? `New reservation: ${reservation.customerName} (${reservation.partySize})` : `New booking: ${reservation.customerName}`,
     html: reservationNotificationEmail(site.businessName, {
       customerName: reservation.customerName, customerEmail: reservation.customerEmail, customerPhone: reservation.customerPhone,
-      partySize: reservation.partySize, whenLabel, notes: reservation.notes,
+      partySize: reservation.partySize, whenLabel, notes: reservation.notes, showPartySize,
     }),
   });
 
   await sendEmail({
     to: reservation.customerEmail,
-    subject: 'Reservation Confirmed',
-    html: reservationConfirmationEmail(site.businessName, { partySize: reservation.partySize, whenLabel }),
+    subject: showPartySize ? 'Reservation Confirmed' : 'Booking Confirmed',
+    html: reservationConfirmationEmail(site.businessName, { partySize: reservation.partySize, whenLabel, showPartySize }),
   });
 
   if (site.premiumEnabled) {
