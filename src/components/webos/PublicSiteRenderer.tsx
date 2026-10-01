@@ -350,7 +350,15 @@ export default function PublicSiteRenderer({
       {isReservationsPage && (
         <div id="contact" className="p-6 sm:p-10 bg-slate-50 border-t border-ASTER-100">
           <p className="font-display font-bold text-lg text-ink-900 mb-4 flex items-center gap-2"><CalendarCheck size={18} className="text-ASTER-600" /> Reserve a table</p>
-          {previewMode ? <PreviewContactForm /> : <ReservationBookingForm siteId={site.id} />}
+          {previewMode ? <PreviewContactForm /> : (
+            <ReservationBookingForm
+              siteId={site.id}
+              maxPartySize={site.maxPartySize}
+              reservationIntervalMinutes={site.reservationIntervalMinutes}
+              openingTime={site.openingTime}
+              closingTime={site.closingTime}
+            />
+          )}
         </div>
       )}
 

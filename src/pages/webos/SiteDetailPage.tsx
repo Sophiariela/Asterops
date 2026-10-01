@@ -11,6 +11,7 @@ import WebsiteEditor from '../../components/webos/WebsiteEditor';
 import ReservationsDashboard from '../../components/webos/ReservationsDashboard';
 import MenuManager from '../../components/webos/MenuManager';
 import BusinessSettingsPanel from '../../components/webos/BusinessSettingsPanel';
+import RestaurantSettingsPanel from '../../components/webos/RestaurantSettingsPanel';
 import LeadsDashboard from '../../components/webos/LeadsDashboard';
 import ReviewsPanel from '../../components/webos/ReviewsPanel';
 import OwnerDashboardCards from '../../components/webos/OwnerDashboardCards';
@@ -491,7 +492,7 @@ export default function SiteDetailPage() {
 
       {tab === 'overview' && (
         <div className="mt-6 space-y-6">
-          <OwnerDashboardCards siteId={site.id} timezone={site.timezone} country={site.country} />
+          <OwnerDashboardCards siteId={site.id} timezone={site.timezone} country={site.country} playbook={site.playbook} />
 
           <div className="bg-white rounded-[28px] card-shadow border border-ASTER-100 p-6">
             <div className="flex items-center justify-between gap-4 flex-wrap mb-5">
@@ -889,6 +890,8 @@ export default function SiteDetailPage() {
           </form>
 
           <BusinessSettingsPanel site={site} onRefresh={loadCore} />
+
+          {site.playbook === 'RESTAURANT' && <RestaurantSettingsPanel site={site} onRefresh={loadCore} />}
 
           <div className="bg-white rounded-[28px] card-shadow border border-ASTER-100 p-6 space-y-4">
             <p className="text-xs font-bold text-slate-400 uppercase tracking-wide">Regional settings</p>

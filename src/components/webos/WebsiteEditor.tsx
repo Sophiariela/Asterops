@@ -397,7 +397,13 @@ export default function WebsiteEditor({
               )}
             </div>
             <p className="text-xs text-slate-400 mb-4">Fully functional. Submissions appear in your Reservations dashboard right away.</p>
-            <ReservationBookingForm siteId={site.id} />
+            <ReservationBookingForm
+              siteId={site.id}
+              maxPartySize={site.maxPartySize}
+              reservationIntervalMinutes={site.reservationIntervalMinutes}
+              openingTime={site.openingTime}
+              closingTime={site.closingTime}
+            />
           </div>
         )}
 

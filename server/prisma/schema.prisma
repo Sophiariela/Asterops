@@ -381,6 +381,14 @@ model Site {
   googleCalendarConnected    Boolean  @default(false)
   googleCalendarRefreshToken String?
   googleCalendarId           String?
+  // Restaurant operating settings — all optional so non-restaurant sites
+  // (and restaurants that haven't configured them yet) are unaffected.
+  // openingTime/closingTime are "HH:mm" in the site's own timezone, not
+  // UTC, since that's how an owner thinks about their own hours.
+  maxPartySize                Int?
+  reservationIntervalMinutes  Int      @default(30)
+  openingTime                 String?
+  closingTime                 String?
   playbook          SitePlaybook
   template          Template?      @relation(fields: [templateId], references: [id], onDelete: SetNull)
   templateId        String?
@@ -601,12 +609,27 @@ enum ReservationStatus {
   CANCELLED
 }
 
+enum TableSection {
+  INDOOR
+  OUTDOOR
+  PATIO
+  VIP
+}
+
 model Table {
   id           String        @id @default(cuid())
   site         Site          @relation(fields: [siteId], references: [id], onDelete: Cascade)
   siteId       String
   name         String
   capacity     Int
+  section      TableSection?
+  notes        String?
+  // Owner-controlled "in rotation" switch (e.g. broken, under maintenance).
+  // Deliberately NOT a Available/Reserved/Occupied field — those are
+  // derived live from this table's actual reservations so they can never
+  // drift out of sync with reality; this only covers the one state that
+  // has no reservation to derive from.
+  active       Boolean       @default(true)
   reservations Reservation[]
   createdAt    DateTime      @default(now())
 

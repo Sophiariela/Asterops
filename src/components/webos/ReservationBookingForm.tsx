@@ -2,7 +2,15 @@ import { useState, type FormEvent } from 'react';
 import { CheckCircle2 } from 'lucide-react';
 import { api, ApiError } from '../../lib/api';
 
-export default function ReservationBookingForm({ siteId }: { siteId: string }) {
+export default function ReservationBookingForm({
+  siteId, maxPartySize, reservationIntervalMinutes, openingTime, closingTime,
+}: {
+  siteId: string;
+  maxPartySize?: number | null;
+  reservationIntervalMinutes?: number;
+  openingTime?: string | null;
+  closingTime?: string | null;
+}) {
   const [form, setForm] = useState({ date: '', time: '', partySize: '2', name: '', email: '', phone: '', notes: '' });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -51,15 +59,28 @@ export default function ReservationBookingForm({ siteId }: { siteId: string }) {
   }
 
   const today = new Date().toISOString().slice(0, 10);
+  const partyOptions = Array.from({ length: Math.min(maxPartySize ?? 10, 20) }, (_, i) => i + 1);
 
   return (
     <form onSubmit={submit} className="grid sm:grid-cols-2 gap-3 max-w-lg">
       <input required type="date" min={today} value={form.date} onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))} className="border-2 border-ASTER-100 focus:border-ASTER-600 rounded-xl px-4 py-2.5 text-sm outline-none transition-colors" />
-      <input required type="time" value={form.time} onChange={(e) => setForm((f) => ({ ...f, time: e.target.value }))} className="border-2 border-ASTER-100 focus:border-ASTER-600 rounded-xl px-4 py-2.5 text-sm outline-none transition-colors" />
+      <input
+        required
+        type="time"
+        value={form.time}
+        onChange={(e) => setForm((f) => ({ ...f, time: e.target.value }))}
+        step={(reservationIntervalMinutes ?? 30) * 60}
+        min={openingTime || undefined}
+        max={closingTime || undefined}
+        className="border-2 border-ASTER-100 focus:border-ASTER-600 rounded-xl px-4 py-2.5 text-sm outline-none transition-colors"
+      />
       <select value={form.partySize} onChange={(e) => setForm((f) => ({ ...f, partySize: e.target.value }))} className="sm:col-span-2 border-2 border-ASTER-100 focus:border-ASTER-600 rounded-xl px-4 py-2.5 text-sm outline-none transition-colors">
-        {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => <option key={n} value={n}>{n} {n === 1 ? 'guest' : 'guests'}</option>)}
-        <option value={12}>10+ guests</option>
+        {partyOptions.map((n) => <option key={n} value={n}>{n} {n === 1 ? 'guest' : 'guests'}</option>)}
+        {!maxPartySize && <option value={12}>10+ guests</option>}
       </select>
+      {openingTime && closingTime && (
+        <p className="sm:col-span-2 text-xs text-slate-400 -mt-1">Open {openingTime}–{closingTime}{maxPartySize ? ` · parties up to ${maxPartySize}, larger by phone` : ''}</p>
+      )}
       <input required placeholder="Name" value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} className="border-2 border-ASTER-100 focus:border-ASTER-600 rounded-xl px-4 py-2.5 text-sm outline-none transition-colors" />
       <input required type="email" placeholder="Email" value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} className="border-2 border-ASTER-100 focus:border-ASTER-600 rounded-xl px-4 py-2.5 text-sm outline-none transition-colors" />
       <input placeholder="Phone (optional)" value={form.phone} onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))} className="sm:col-span-2 border-2 border-ASTER-100 focus:border-ASTER-600 rounded-xl px-4 py-2.5 text-sm outline-none transition-colors" />

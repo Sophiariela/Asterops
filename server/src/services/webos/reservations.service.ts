@@ -6,6 +6,7 @@ import { reservationConfirmationEmail, reservationNotificationEmail } from '../.
 import { sendSms, smsConfigured } from '../../lib/sms.js';
 import { sendWhatsAppMessage, whatsappConfigured } from '../../lib/whatsapp.js';
 import { createCalendarEvent, updateCalendarEvent, deleteCalendarEvent } from '../../lib/googleCalendar.js';
+import { isTableFree } from './tables.service.js';
 
 async function assertSiteOwned(ownerId: string, siteId: string) {
   const site = await prisma.site.findFirst({ where: { id: siteId, ownerId } });
@@ -17,6 +18,34 @@ function formatWhen(at: Date, timezone: string | null): string {
     weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit',
     timeZone: timezone ?? 'UTC',
   }).format(at);
+}
+
+// "HH:mm" in the site's own timezone, not UTC — openingTime/closingTime
+// are stored the same way, since that's how an owner set them.
+function timeOfDayIn(at: Date, timezone: string | null): string {
+  const parts = new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: timezone ?? 'UTC' }).formatToParts(at);
+  const hour = parts.find((p) => p.type === 'hour')?.value ?? '00';
+  const minute = parts.find((p) => p.type === 'minute')?.value ?? '00';
+  return `${hour}:${minute}`;
+}
+
+// Enforces the restaurant's own party-size cap and opening/closing hours
+// (both optional — unset means unrestricted). Hours that wrap past
+// midnight (closingTime < openingTime, e.g. 18:00-01:00) are supported.
+function assertWithinRestaurantRules(site: Pick<Site, 'maxPartySize' | 'openingTime' | 'closingTime' | 'timezone'>, partySize: number, reservationAt: Date) {
+  if (site.maxPartySize && partySize > site.maxPartySize) {
+    throw new CommerceError(400, `Parties larger than ${site.maxPartySize} aren't supported online. Please call us.`);
+  }
+  if (site.openingTime && site.closingTime) {
+    const time = timeOfDayIn(reservationAt, site.timezone);
+    const wrapsMidnight = site.closingTime < site.openingTime;
+    const withinHours = wrapsMidnight
+      ? time >= site.openingTime || time <= site.closingTime
+      : time >= site.openingTime && time <= site.closingTime;
+    if (!withinHours) {
+      throw new CommerceError(400, `We're open ${site.openingTime}–${site.closingTime}. Please pick a time in that window.`);
+    }
+  }
 }
 
 // Fires every side-effect a brand-new reservation should have: notify the
@@ -99,6 +128,7 @@ export async function submitPublicReservation(data: {
   const reservationAt = new Date(data.reservationAt);
   if (Number.isNaN(reservationAt.getTime())) throw new CommerceError(400, 'Invalid reservation date/time.');
   if (reservationAt.getTime() < Date.now()) throw new CommerceError(400, 'Reservation time must be in the future.');
+  assertWithinRestaurantRules(site, data.partySize, reservationAt);
 
   const reservation = await prisma.reservation.create({
     data: {
@@ -177,34 +207,9 @@ export async function assignTable(ownerId: string, siteId: string, id: string, t
 
     const start = reservation.reservationAt;
     const end = new Date(start.getTime() + reservation.durationMinutes * 60_000);
-
-    const conflicting = await prisma.reservation.findMany({
-      where: { siteId, tableId, status: { not: 'CANCELLED' }, id: { not: id } },
-    });
-    const overlaps = conflicting.some((r) => {
-      const rStart = r.reservationAt;
-      const rEnd = new Date(rStart.getTime() + r.durationMinutes * 60_000);
-      return start < rEnd && rStart < end;
-    });
-    if (overlaps) throw new CommerceError(409, 'That table is already booked for an overlapping time.');
+    const free = await isTableFree(siteId, tableId, start, end, id);
+    if (!free) throw new CommerceError(409, 'That table is already booked for an overlapping time.');
   }
 
   return prisma.reservation.update({ where: { id }, data: { tableId } });
-}
-
-export async function listTables(ownerId: string, siteId: string) {
-  await assertSiteOwned(ownerId, siteId);
-  return prisma.table.findMany({ where: { siteId }, orderBy: { name: 'asc' } });
-}
-
-export async function createTable(ownerId: string, siteId: string, data: { name: string; capacity: number }) {
-  await assertSiteOwned(ownerId, siteId);
-  return prisma.table.create({ data: { siteId, ...data } });
-}
-
-export async function deleteTable(ownerId: string, siteId: string, id: string) {
-  await assertSiteOwned(ownerId, siteId);
-  const existing = await prisma.table.findFirst({ where: { id, siteId } });
-  if (!existing) throw new CommerceError(404, 'Table not found.');
-  await prisma.table.delete({ where: { id } });
 }

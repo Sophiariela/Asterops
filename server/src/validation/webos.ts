@@ -10,6 +10,9 @@ export const templateComplexityValues = ['SIMPLE', 'STANDARD', 'ADVANCED'] as co
 export const reservationStatusValues = ['PENDING', 'CONFIRMED', 'SEATED', 'COMPLETED', 'CANCELLED'] as const;
 export const siteCurrencyValues = ['USD', 'BRL', 'EUR', 'GBP', 'INR', 'CAD', 'AUD'] as const;
 export const reviewStatusValues = ['NEW', 'PUBLISHED', 'HIDDEN'] as const;
+export const tableSectionValues = ['INDOOR', 'OUTDOOR', 'PATIO', 'VIP'] as const;
+
+const timeOfDay = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, 'Use 24-hour HH:mm, e.g. 09:00.');
 
 export const generateSiteSchema = z.object({
   businessName: z.string().min(1).max(120),
@@ -38,6 +41,12 @@ export const updateSiteSchema = z.object({
   phone: z.union([z.string().max(40), z.literal('')]).optional(),
   whatsappNumber: z.union([z.string().max(40), z.literal('')]).optional(),
   primaryColor: z.union([z.string().regex(/^#[0-9a-fA-F]{6}$/), z.literal('')]).optional(),
+  // Restaurant operating settings — all optional, non-restaurant sites
+  // never send these.
+  maxPartySize: z.number().int().min(1).max(200).nullable().optional(),
+  reservationIntervalMinutes: z.number().int().min(5).max(240).optional(),
+  openingTime: z.union([timeOfDay, z.literal('')]).optional(),
+  closingTime: z.union([timeOfDay, z.literal('')]).optional(),
 });
 
 export const generateFromTemplateSchema = z.object({
@@ -171,6 +180,16 @@ export const assignTableSchema = z.object({ tableId: z.string().min(1).nullable(
 export const createTableSchema = z.object({
   name: z.string().min(1).max(60),
   capacity: z.number().int().min(1).max(50),
+  section: z.enum(tableSectionValues).nullable().optional(),
+  notes: z.string().max(500).optional(),
+});
+
+export const updateTableSchema = z.object({
+  name: z.string().min(1).max(60).optional(),
+  capacity: z.number().int().min(1).max(50).optional(),
+  section: z.enum(tableSectionValues).nullable().optional(),
+  notes: z.string().max(500).nullable().optional(),
+  active: z.boolean().optional(),
 });
 
 export const createReviewPublicSchema = z.object({

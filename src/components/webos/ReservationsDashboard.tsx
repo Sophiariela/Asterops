@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useState, type FormEvent } from 'react';
-import { Plus, Trash2, Users, ChevronLeft, ChevronRight, List as ListIcon, Calendar as CalendarIcon, Columns } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { Users, ChevronLeft, ChevronRight, List as ListIcon, Calendar as CalendarIcon, Columns, AlertTriangle } from 'lucide-react';
 import { api, ApiError } from '../../lib/api';
-import Modal from '../commerce/Modal';
 import { formatDateTime, formatTime, localDateKey, titleCase } from '../../lib/webos/locale';
+import TablesManager from './TablesManager';
 import type { Reservation, ReservationStatus, Table } from '../../lib/webos/types';
 
 const STATUSES: ReservationStatus[] = ['PENDING', 'CONFIRMED', 'SEATED', 'COMPLETED', 'CANCELLED'];
@@ -45,15 +45,20 @@ export default function ReservationsDashboard({ siteId, timezone, country }: { s
   const [filter, setFilter] = useState<'upcoming' | ReservationStatus>('upcoming');
   const [view, setView] = useState<ViewMode>('list');
   const [cursor, setCursor] = useState(() => new Date());
+  const [loadError, setLoadError] = useState('');
 
-  const [showTableForm, setShowTableForm] = useState(false);
-  const [tableForm, setTableForm] = useState({ name: '', capacity: '4' });
-  const [tableError, setTableError] = useState('');
-  const [tableSaving, setTableSaving] = useState(false);
-
+  // A failed request must never render as "no reservations" / "no tables" —
+  // that's indistinguishable from a real empty state and is exactly why
+  // assigned tables could silently read back as Unassigned. Only an actually
+  // -empty response clears loadError; any thrown error keeps the previous
+  // lists on screen and surfaces a retry instead.
   const load = () => {
-    api.get<{ reservations: Reservation[] }>(`/webos/sites/${siteId}/reservations`).then((d) => setReservations(d.reservations)).catch(() => setReservations([]));
-    api.get<{ tables: Table[] }>(`/webos/sites/${siteId}/tables`).then((d) => setTables(d.tables)).catch(() => setTables([]));
+    api.get<{ reservations: Reservation[] }>(`/webos/sites/${siteId}/reservations`)
+      .then((d) => { setReservations(d.reservations); setLoadError(''); })
+      .catch((err) => setLoadError(err instanceof ApiError ? err.message : 'Could not load reservations. Check your connection and try again.'));
+    api.get<{ tables: Table[] }>(`/webos/sites/${siteId}/tables`)
+      .then((d) => { setTables(d.tables); setLoadError(''); })
+      .catch((err) => setLoadError(err instanceof ApiError ? err.message : 'Could not load tables. Check your connection and try again.'));
   };
   useEffect(load, [siteId]);
 
@@ -73,25 +78,27 @@ export default function ReservationsDashboard({ siteId, timezone, country }: { s
     }
   };
 
-  const addTable = async (e: FormEvent) => {
-    e.preventDefault();
-    setTableError('');
-    setTableSaving(true);
-    try {
-      await api.post(`/webos/sites/${siteId}/tables`, { name: tableForm.name, capacity: Number(tableForm.capacity) });
-      setShowTableForm(false);
-      setTableForm({ name: '', capacity: '4' });
-      load();
-    } catch (err) {
-      setTableError(err instanceof ApiError ? err.message : 'Could not add this table.');
-    } finally {
-      setTableSaving(false);
+  // Best-fit, non-conflicting table for a reservation — mirrors the
+  // server's own overlap rule (reservationAt/durationMinutes windows on
+  // non-cancelled reservations) so the hint matches what assignTable will
+  // actually accept. UI hint only; the server is still the final say.
+  const suggestTableFor = (r: Reservation): Table | null => {
+    if (!tables) return null;
+    const start = new Date(r.reservationAt).getTime();
+    const end = start + 90 * 60_000;
+    const candidates = tables
+      .filter((t) => t.active && t.capacity >= r.partySize)
+      .sort((a, b) => a.capacity - b.capacity);
+    for (const t of candidates) {
+      const conflict = (reservations ?? []).some((other) => {
+        if (other.id === r.id || other.tableId !== t.id || other.status === 'CANCELLED') return false;
+        const oStart = new Date(other.reservationAt).getTime();
+        const oEnd = oStart + 90 * 60_000;
+        return start < oEnd && oStart < end;
+      });
+      if (!conflict) return t;
     }
-  };
-
-  const deleteTable = async (id: string) => {
-    await api.del(`/webos/sites/${siteId}/tables/${id}`);
-    load();
+    return null;
   };
 
   // Grouped by the business's own local day (timezone-aware), not the
@@ -108,6 +115,17 @@ export default function ReservationsDashboard({ siteId, timezone, country }: { s
     return map;
   }, [reservations, timezone]);
 
+  if ((!reservations || !tables) && loadError) {
+    return (
+      <div className="bg-rose-50 border border-rose-200 rounded-[28px] p-8 text-center">
+        <AlertTriangle size={32} className="text-rose-500 mx-auto" />
+        <p className="text-rose-700 font-semibold mt-3">{loadError}</p>
+        <button onClick={load} className="inline-flex items-center gap-2 bg-rose-600 hover:bg-rose-700 text-white font-bold px-5 py-2.5 rounded-full transition-all mt-5">
+          Try again
+        </button>
+      </div>
+    );
+  }
   if (!reservations || !tables) return <p className="text-slate-400">Loading reservations…</p>;
 
   const now = Date.now();
@@ -195,7 +213,9 @@ export default function ReservationsDashboard({ siteId, timezone, country }: { s
               </tr>
             </thead>
             <tbody className="divide-y divide-ASTER-100">
-              {filtered.map((r) => (
+              {filtered.map((r) => {
+                const suggested = !r.tableId ? suggestTableFor(r) : null;
+                return (
                 <tr key={r.id}>
                   <td className="px-6 py-4">
                     <p className="font-semibold text-ink-900">{r.customerName}</p>
@@ -211,8 +231,21 @@ export default function ReservationsDashboard({ siteId, timezone, country }: { s
                       className="border-2 border-ASTER-100 rounded-full px-2.5 py-1.5 text-xs font-semibold outline-none"
                     >
                       <option value="">Unassigned</option>
-                      {tables.map((t) => <option key={t.id} value={t.id}>{t.name} ({t.capacity})</option>)}
+                      {(tables ?? []).map((t) => (
+                        <option key={t.id} value={t.id} disabled={!t.active}>
+                          {t.name} ({t.capacity}){t.id === suggested?.id ? ' — suggested' : ''}{!t.active ? ' — closed' : ''}
+                        </option>
+                      ))}
                     </select>
+                    {suggested && (
+                      <button
+                        type="button"
+                        onClick={() => assignTable(r.id, suggested.id)}
+                        className="block mt-1 text-[10px] font-bold text-ASTER-600 hover:text-ASTER-700"
+                      >
+                        Use suggested: {suggested.name}
+                      </button>
+                    )}
                   </td>
                   <td className="px-6 py-4">
                     <select
@@ -224,7 +257,8 @@ export default function ReservationsDashboard({ siteId, timezone, country }: { s
                     </select>
                   </td>
                 </tr>
-              ))}
+                );
+              })}
               {filtered.length === 0 && (
                 <tr><td colSpan={6} className="px-6 py-10 text-center text-slate-400">No reservations here yet. This needs a live, publicly-hosted reservation form to start filling in.</td></tr>
               )}
@@ -305,45 +339,7 @@ export default function ReservationsDashboard({ siteId, timezone, country }: { s
         </div>
       )}
 
-      <div className="bg-white rounded-[28px] card-shadow border border-ASTER-100 p-6">
-        <div className="flex items-center justify-between mb-4">
-          <p className="text-xs font-bold text-slate-400 uppercase tracking-wide">Tables ({tables.length})</p>
-          <button onClick={() => setShowTableForm(true)} className="flex items-center gap-1.5 text-xs font-bold text-ASTER-600 hover:text-ASTER-700">
-            <Plus size={14} /> Add table
-          </button>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {tables.map((t) => (
-            <span key={t.id} className="flex items-center gap-2 bg-slate-50 rounded-full pl-3 pr-1.5 py-1.5 text-sm">
-              <span className="font-semibold text-ink-900">{t.name}</span>
-              <span className="text-xs text-slate-400">seats {t.capacity}</span>
-              <button onClick={() => deleteTable(t.id)} className="p-1 text-slate-400 hover:text-rose-500 transition-colors" aria-label={`Delete ${t.name}`}>
-                <Trash2 size={12} />
-              </button>
-            </span>
-          ))}
-          {tables.length === 0 && <p className="text-sm text-slate-400">No tables yet.</p>}
-        </div>
-      </div>
-
-      {showTableForm && (
-        <Modal title="Add table" onClose={() => setShowTableForm(false)}>
-          <form onSubmit={addTable} className="space-y-4">
-            <div>
-              <label className="text-[13px] font-bold text-ink-900 block mb-1.5">Name *</label>
-              <input required value={tableForm.name} onChange={(e) => setTableForm((f) => ({ ...f, name: e.target.value }))} placeholder="e.g. Table 4, Patio 2" className="w-full border-2 border-ASTER-100 focus:border-ASTER-600 rounded-2xl px-4 py-3 text-[15px] outline-none transition-colors" />
-            </div>
-            <div>
-              <label className="text-[13px] font-bold text-ink-900 block mb-1.5">Capacity *</label>
-              <input required type="number" min={1} value={tableForm.capacity} onChange={(e) => setTableForm((f) => ({ ...f, capacity: e.target.value }))} className="w-full border-2 border-ASTER-100 focus:border-ASTER-600 rounded-2xl px-4 py-3 text-[15px] outline-none transition-colors" />
-            </div>
-            {tableError && <p className="text-rose-500 text-sm font-semibold">{tableError}</p>}
-            <button type="submit" disabled={tableSaving} className="w-full bg-ASTER-600 hover:bg-ASTER-700 disabled:opacity-60 text-white font-bold py-3.5 rounded-full transition-all">
-              {tableSaving ? 'Saving…' : 'Add table'}
-            </button>
-          </form>
-        </Modal>
-      )}
+      <TablesManager siteId={siteId} onChanged={load} />
     </div>
   );
 }

@@ -6,6 +6,8 @@ export type LeadStatus = 'NEW' | 'CONTACTED' | 'QUALIFIED' | 'CLOSED';
 export type TrustElementType = 'CASE_STUDY' | 'CLIENT_LOGO' | 'CERTIFICATION';
 export type ReservationStatus = 'PENDING' | 'CONFIRMED' | 'SEATED' | 'COMPLETED' | 'CANCELLED';
 export type ReviewStatus = 'NEW' | 'PUBLISHED' | 'HIDDEN';
+export type TableSection = 'INDOOR' | 'OUTDOOR' | 'PATIO' | 'VIP';
+export type TableLiveStatus = 'AVAILABLE' | 'RESERVED' | 'OCCUPIED' | 'CLOSED';
 export type Currency = 'USD' | 'BRL' | 'EUR' | 'GBP' | 'INR' | 'CAD' | 'AUD';
 export type CountryPreset = { code: string; name: string; currency: Currency; timezone: string };
 
@@ -101,6 +103,12 @@ export type Site = {
   premiumEnabled: boolean;
   googleCalendarConnected: boolean;
   googleCalendarId: string | null;
+  // Restaurant operating settings — present on every site, meaningful
+  // only for RESTAURANT ones.
+  maxPartySize: number | null;
+  reservationIntervalMinutes: number;
+  openingTime: string | null;
+  closingTime: string | null;
   playbook: PlaybookKey;
   status: SiteStatus;
   slug: string | null;
@@ -140,6 +148,10 @@ export type PublicSite = {
   slug: string | null;
   customDomain: string | null;
   publishedAt: string | null;
+  maxPartySize: number | null;
+  reservationIntervalMinutes: number;
+  openingTime: string | null;
+  closingTime: string | null;
   pages: PublicPage[];
   testimonials: PublicTestimonial[];
   menuCategories: PublicMenuCategory[];
@@ -150,7 +162,22 @@ export type Table = {
   siteId: string;
   name: string;
   capacity: number;
+  section: TableSection | null;
+  notes: string | null;
+  active: boolean;
   createdAt: string;
+};
+
+export type TableWithStatus = Table & { liveStatus: TableLiveStatus };
+
+export type TableOccupancy = {
+  totalTables: number;
+  occupied: number;
+  reserved: number;
+  available: number;
+  closed: number;
+  occupancyRate: number;
+  upcomingReservations: number;
 };
 
 export type Reservation = {

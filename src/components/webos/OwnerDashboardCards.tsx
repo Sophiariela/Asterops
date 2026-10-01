@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { CalendarCheck, Inbox, MailWarning, TrendingUp, Star, Eye } from 'lucide-react';
+import { CalendarCheck, Inbox, MailWarning, TrendingUp, Star, Eye, UtensilsCrossed, DoorOpen, Gauge } from 'lucide-react';
 import { api } from '../../lib/api';
 import { formatDateTime } from '../../lib/webos/locale';
-import type { Lead, Reservation, Review, BusinessScore } from '../../lib/webos/types';
+import type { Lead, Reservation, Review, BusinessScore, PlaybookKey, TableOccupancy } from '../../lib/webos/types';
 import { StatCardSkeleton } from './Skeleton';
 
 type ViewStats = { total: number; last30Days: number; topPages: { slug: string; views: number }[] };
@@ -26,12 +26,14 @@ function Card({ icon: Icon, label, value, caption }: { icon: typeof CalendarChec
   );
 }
 
-export default function OwnerDashboardCards({ siteId, timezone, country }: { siteId: string; timezone: string | null; country: string | null }) {
+export default function OwnerDashboardCards({ siteId, timezone, country, playbook }: { siteId: string; timezone: string | null; country: string | null; playbook: PlaybookKey }) {
   const [leads, setLeads] = useState<Lead[] | null>(null);
   const [reservations, setReservations] = useState<Reservation[] | null>(null);
   const [reviews, setReviews] = useState<Review[] | null>(null);
   const [businessScore, setBusinessScore] = useState<BusinessScore | null>(null);
   const [viewStats, setViewStats] = useState<ViewStats | null>(null);
+  const [occupancy, setOccupancy] = useState<TableOccupancy | null>(null);
+  const isRestaurant = playbook === 'RESTAURANT';
 
   useEffect(() => {
     api.get<{ leads: Lead[] }>(`/webos/sites/${siteId}/leads`).then((d) => setLeads(d.leads)).catch(() => setLeads([]));
@@ -39,6 +41,10 @@ export default function OwnerDashboardCards({ siteId, timezone, country }: { sit
     api.get<{ reviews: Review[] }>(`/webos/sites/${siteId}/reviews`).then((d) => setReviews(d.reviews)).catch(() => setReviews([]));
     api.get<{ businessScore: BusinessScore }>(`/webos/sites/${siteId}/analytics/business-score`).then((d) => setBusinessScore(d.businessScore)).catch(() => setBusinessScore(null));
     api.get<{ views: ViewStats }>(`/webos/sites/${siteId}/analytics/views`).then((d) => setViewStats(d.views)).catch(() => setViewStats(null));
+    if (isRestaurant) {
+      api.get<{ occupancy: TableOccupancy }>(`/webos/sites/${siteId}/tables/occupancy`).then((d) => setOccupancy(d.occupancy)).catch(() => setOccupancy(null));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [siteId]);
 
   if (!leads || !reservations || !reviews) {
@@ -71,6 +77,15 @@ export default function OwnerDashboardCards({ siteId, timezone, country }: { sit
         <Card icon={MailWarning} label="Unread Messages" value={unreadCount} caption="Leads awaiting a first response" />
         <Card icon={TrendingUp} label="Revenue Opportunities" value={opportunityCount} caption="Qualified leads + pending reservations" />
       </div>
+
+      {isRestaurant && occupancy && (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <Card icon={UtensilsCrossed} label="Tables Occupied" value={occupancy.occupied} caption={`of ${occupancy.totalTables - occupancy.closed} in rotation`} />
+          <Card icon={DoorOpen} label="Tables Available" value={occupancy.available} caption={occupancy.closed ? `${occupancy.closed} closed` : 'All tables in rotation'} />
+          <Card icon={CalendarCheck} label="Upcoming Reservations" value={occupancy.upcomingReservations} caption="Later today" />
+          <Card icon={Gauge} label="Current Occupancy Rate" value={`${occupancy.occupancyRate}%`} caption="Of tables in rotation" />
+        </div>
+      )}
 
       <div className="grid lg:grid-cols-[220px_1fr] gap-6">
         <div className="bg-ink-950 text-white rounded-[28px] card-shadow p-6 text-center flex flex-col justify-center">
