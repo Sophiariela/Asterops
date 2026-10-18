@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { authenticate, requireRole } from '../../middleware/auth.js';
-import { upload, resizeUploadedImage, handleUploadError } from '../../middleware/upload.js';
+import { upload, resizeUploadedImage, persistUpload, getUploadedUrl, handleUploadError } from '../../middleware/upload.js';
 import { generateSiteSchema, updateSiteSchema } from '../../validation/webos.js';
 import * as sitesService from '../../services/webos/sites.service.js';
 import { listPublishedSummariesForLegacyPicker } from '../../services/webos/templates.service.js';
@@ -55,11 +55,11 @@ sitesRouter.patch('/:id', async (req, res) => {
   res.json({ site });
 });
 
-sitesRouter.post('/:id/logo', upload.single('logo'), resizeUploadedImage, async (req, res) => {
+sitesRouter.post('/:id/logo', upload.single('logo'), resizeUploadedImage, persistUpload, async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: 'No file uploaded.' });
   }
-  const site = await sitesService.setSiteLogo(req.user!.userId, req.params.id, `/uploads/${req.file.filename}`);
+  const site = await sitesService.setSiteLogo(req.user!.userId, req.params.id, getUploadedUrl(req));
   res.json({ site });
 });
 

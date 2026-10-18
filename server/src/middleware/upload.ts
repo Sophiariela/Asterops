@@ -4,9 +4,16 @@ import multer from 'multer';
 import sharp from 'sharp';
 import type { Request, Response, NextFunction } from 'express';
 import { CommerceError } from '../lib/commerceError.js';
+import { objectStorageConfigured, uploadToObjectStorage } from '../lib/objectStorage.js';
 
-// UPLOAD_DIR points at a mounted persistent disk in production (Render's
-// filesystem is otherwise ephemeral and wipes /uploads on every deploy).
+// Where multer first writes an upload and resizeUploadedImage operates —
+// now just a scratch location, not the final durable home. persistUpload
+// (below) moves the file into Neon Object Storage and deletes it from
+// here when object storage is configured; UPLOAD_DIR only matters as a
+// genuine storage location for the local-disk fallback path (object
+// storage not configured), where it should point at a mounted
+// persistent disk — Render's own filesystem is otherwise ephemeral and
+// wipes /uploads on every deploy.
 export const UPLOAD_ROOT = process.env.UPLOAD_DIR ?? path.resolve(process.cwd(), 'uploads');
 fs.mkdirSync(UPLOAD_ROOT, { recursive: true });
 
@@ -78,4 +85,38 @@ export async function resizeUploadedImage(req: Request, _res: Response, next: Ne
     // file multer already saved is still a valid, if unresized, result.
     next();
   }
+}
+
+// Runs after resizeUploadedImage. When Neon Object Storage is configured,
+// uploads the (already-resized) file there and deletes the local temp
+// copy, so the image survives a deploy. Without it, the file is left on
+// local disk exactly as before — uploads keep working, just not
+// durably, until object storage is configured (see getUploadedUrl below,
+// and .env.example for the required vars).
+export async function persistUpload(req: Request, _res: Response, next: NextFunction) {
+  const file = req.file;
+  if (!file || !objectStorageConfigured()) return next();
+  try {
+    const buffer = await fs.promises.readFile(file.path);
+    const url = await uploadToObjectStorage(file.filename, buffer, file.mimetype);
+    (req as Request & { uploadedUrl?: string }).uploadedUrl = url;
+    await fs.promises.unlink(file.path).catch(() => {});
+  } catch (err) {
+    // Object storage failed (network, bad credentials) — the local file
+    // multer already saved is still a valid, if non-durable, result;
+    // don't fail the request over it.
+    console.error('Object storage upload failed, falling back to local disk:', err);
+  }
+  next();
+}
+
+// The URL a route handler should store for this request's uploaded file —
+// the object storage URL when persistUpload used it, otherwise the
+// existing local /uploads/ path. Centralized so every route gets the
+// durable path automatically the moment object storage is configured,
+// with no per-route changes.
+export function getUploadedUrl(req: Request): string {
+  const withUrl = req as Request & { uploadedUrl?: string };
+  if (withUrl.uploadedUrl) return withUrl.uploadedUrl;
+  return `/uploads/${req.file!.filename}`;
 }

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { authenticate, requireRole } from '../../middleware/auth.js';
-import { upload, resizeUploadedImage, handleUploadError } from '../../middleware/upload.js';
+import { upload, resizeUploadedImage, persistUpload, getUploadedUrl, handleUploadError } from '../../middleware/upload.js';
 import { updatePageSchema } from '../../validation/webos.js';
 import * as pagesService from '../../services/webos/pages.service.js';
 
@@ -21,15 +21,15 @@ pagesRouter.patch('/:id', async (req, res) => {
   res.json({ page });
 });
 
-pagesRouter.post('/:id/hero-image', upload.single('image'), resizeUploadedImage, async (req, res) => {
+pagesRouter.post('/:id/hero-image', upload.single('image'), resizeUploadedImage, persistUpload, async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: 'No file uploaded.' });
   }
-  const page = await pagesService.setPageHeroImage(req.user!.userId, req.params.id, `/uploads/${req.file.filename}`);
+  const page = await pagesService.setPageHeroImage(req.user!.userId, req.params.id, getUploadedUrl(req));
   res.json({ page });
 });
 
-pagesRouter.post('/:id/sections/:index/image', upload.single('image'), resizeUploadedImage, async (req, res) => {
+pagesRouter.post('/:id/sections/:index/image', upload.single('image'), resizeUploadedImage, persistUpload, async (req, res) => {
   if (!req.file) {
     return res.status(400).json({ error: 'No file uploaded.' });
   }
@@ -37,7 +37,7 @@ pagesRouter.post('/:id/sections/:index/image', upload.single('image'), resizeUpl
   if (!Number.isInteger(index) || index < 0) {
     return res.status(400).json({ error: 'Invalid section index.' });
   }
-  const page = await pagesService.setSectionImage(req.user!.userId, req.params.id, index, `/uploads/${req.file.filename}`);
+  const page = await pagesService.setSectionImage(req.user!.userId, req.params.id, index, getUploadedUrl(req));
   res.json({ page });
 });
 

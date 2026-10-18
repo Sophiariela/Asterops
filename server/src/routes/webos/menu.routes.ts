@@ -1,6 +1,6 @@
 import { Router, type Request } from 'express';
 import { authenticate, requireRole } from '../../middleware/auth.js';
-import { upload, resizeUploadedImage, handleUploadError } from '../../middleware/upload.js';
+import { upload, resizeUploadedImage, persistUpload, getUploadedUrl, handleUploadError } from '../../middleware/upload.js';
 import { createMenuCategorySchema, updateMenuCategorySchema, createMenuItemSchema, updateMenuItemSchema } from '../../validation/webos.js';
 import * as menuService from '../../services/webos/menu.service.js';
 
@@ -60,11 +60,11 @@ menuRouter.delete('/items/:id', async (req: Request<SiteParams & { id: string }>
   res.status(204).send();
 });
 
-menuRouter.post('/items/:id/image', upload.single('image'), resizeUploadedImage, async (req: Request<SiteParams & { id: string }>, res) => {
+menuRouter.post('/items/:id/image', upload.single('image'), resizeUploadedImage, persistUpload, async (req: Request<SiteParams & { id: string }>, res) => {
   if (!req.file) {
     return res.status(400).json({ error: 'No file uploaded.' });
   }
-  const item = await menuService.setItemImage(req.user!.userId, req.params.siteId, req.params.id, `/uploads/${req.file.filename}`);
+  const item = await menuService.setItemImage(req.user!.userId, req.params.siteId, req.params.id, getUploadedUrl(req));
   res.json({ item });
 });
 

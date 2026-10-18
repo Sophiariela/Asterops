@@ -67,3 +67,18 @@ services:
         sync: false
       - key: SEED_ADMIN_PASSWORD
         sync: false
+      # Neon Object Storage — durable uploads (logos, hero/menu photos).
+      # Required in production: Render's own disk is ephemeral and wipes
+      # /uploads on every deploy, so without these, every uploaded image
+      # is lost the next time this service redeploys. See
+      # server/.env.example for where to get these from the Neon console.
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
+      - key: AWS_ENDPOINT_URL_S3
+        sync: false
+      - key: AWS_REGION
+        value: us-east-2
+      - key: UPLOAD_BUCKET
+        value: uploads
