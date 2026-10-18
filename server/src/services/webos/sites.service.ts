@@ -121,6 +121,15 @@ export async function getPublicSiteBySlug(slug: string) {
   return site;
 }
 
+// Guards the window a double-click, a React double-invoke, or a client
+// network retry could land two identical POSTs in: if this owner already
+// generated a site from this exact template with this exact business
+// name in the last 10 seconds, return that site instead of creating a
+// second one. Narrow and cheap (no new column, no client-supplied
+// idempotency key) — a deliberate "create a 2nd site from Fine Dining
+// Restaurant called My Bistro" minutes later is unaffected.
+const DUPLICATE_GUARD_WINDOW_MS = 10_000;
+
 export async function generateSite(
   ownerId: string,
   input: GeneratorInput & { playbook?: SitePlaybook; templateId?: string },
@@ -131,6 +140,19 @@ export async function generateSite(
       ? await getPublishedTemplateByKey(input.playbook)
       : null;
   if (!template) throw new CommerceError(400, 'Template not found or not published.');
+
+  const recentDuplicate = await prisma.site.findFirst({
+    where: {
+      ownerId,
+      templateId: template.id,
+      businessName: input.businessName,
+      createdAt: { gte: new Date(Date.now() - DUPLICATE_GUARD_WINDOW_MS) },
+    },
+    orderBy: { createdAt: 'desc' },
+  });
+  if (recentDuplicate) {
+    return getSite(ownerId, recentDuplicate.id);
+  }
 
   const pageTemplates = buildPagesFromTemplate(template, input);
   const slug = await generateUniqueSiteSlug(input.businessName);
