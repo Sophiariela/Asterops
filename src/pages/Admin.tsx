@@ -176,6 +176,7 @@ export default function Admin() {
             <option value="">All plans</option>
             <option value="starter">Starter</option>
             <option value="growth">Growth</option>
+            <option value="business">Business</option>
             <option value="scale">Scale</option>
           </select>
           <select

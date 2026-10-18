@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronDown, Menu, X, ArrowRight, Truck } from 'lucide-react';
+import { ChevronDown, Menu, X, ArrowRight, Sparkles } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { PRODUCTS, getProduct } from '../data/products';
 import { SOLUTIONS } from '../data/solutions';
@@ -21,10 +21,10 @@ export default function Navbar({ onCta }: { onCta: () => void }) {
       <div className="bg-ink-950 text-white text-center text-[13px] sm:text-sm py-2.5 px-4 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-ASTER-600/40 via-transparent to-volt-400/20" />
         <p className="relative flex items-center justify-center gap-2 flex-wrap">
-          <Truck size={15} className="text-volt-400" />
-          <span>Economize até <strong className="text-volt-400">50% no frete</strong> com Envios da ASTER</span>
+          <Sparkles size={15} className="text-volt-400" />
+          <span>Crie seu site profissional em minutos com a <strong className="text-volt-400">ASTER</strong></span>
           <button onClick={onCta} className="hidden sm:inline-flex items-center gap-1 text-volt-400 font-semibold hover:gap-2 transition-all">
-            Começar agora <ArrowRight size={14} />
+            Ver planos <ArrowRight size={14} />
           </button>
         </p>
       </div>
@@ -98,7 +98,10 @@ export default function Navbar({ onCta }: { onCta: () => void }) {
                         <p.icon size={20} />
                       </span>
                       <span>
-                        <span className="block font-display font-semibold text-[15px] text-ink-900">{p.name}</span>
+                        <span className="flex items-center gap-1.5">
+                          <span className="block font-display font-semibold text-[15px] text-ink-900">{p.name}</span>
+                          {p.earlyAccess && <span className="text-[9px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded-md">EM BREVE</span>}
+                        </span>
                         <span className="block text-[13px] text-slate-500 mt-0.5">{p.tagline}</span>
                       </span>
                     </Link>

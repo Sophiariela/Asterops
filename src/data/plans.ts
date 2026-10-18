@@ -1,77 +1,88 @@
-import type { ProductSlug } from './products';
-
 export type PlanTier = {
-  slug: 'starter' | 'growth' | 'scale';
+  slug: 'starter' | 'growth' | 'business' | 'scale';
   name: string;
   description: string;
   features: string[];
-  includedProducts: ProductSlug[];
   highlight?: boolean;
   cta: string;
 };
 
+// Display config for the real DB-backed plans (see server/prisma/seed.ts).
+// Prices themselves are never hardcoded here — only name/description/
+// features/cta, which are safe presentation concerns. The actual price
+// and annualPrice always come from GET /api/plans.
 export const PLAN_TIERS: PlanTier[] = [
   {
     slug: 'starter',
     name: 'Starter',
-    description: 'Para quem está começando a estruturar a operação digital.',
+    description: 'Para pequenos negócios que estão estruturando a presença digital.',
     features: [
-      'Até 3 usuários',
-      '1 sistema ASTER incluso (WebOS)',
-      'Até 1.000 visitas/mês',
-      'Suporte por chat',
-      'Integrações essenciais (analytics, e-mail)',
+      'Site profissional com WebOS',
+      'Acesso à Biblioteca de Templates',
+      'Personalização de texto, cores e imagens',
+      'Publicação com domínio ASTER',
     ],
-    includedProducts: ['webos'],
-    cta: 'Começar agora',
+    cta: 'Começar com Starter',
   },
   {
     slug: 'growth',
     name: 'Growth',
-    description: 'Para quem já vende e precisa escalar com automação.',
+    description: 'Para negócios que precisam de reservas, agendamentos e mais geração de clientes.',
     features: [
-      'Até 10 usuários',
-      '2 sistemas ASTER inclusos (LaunchOS + CommerceOS)',
-      'Até 10.000 visitas/mês',
-      'Suporte prioritário',
-      'Integrações ilimitadas + API',
+      'Tudo do Starter',
+      'Reservas, agendamentos e pedidos de orçamento',
+      'Captação e gestão de clientes (leads)',
+      'Avaliações de clientes',
+      'Sugestões da Luna AI',
     ],
-    includedProducts: ['launchos', 'commerceos'],
     highlight: true,
     cta: 'Assinar Growth',
   },
   {
+    slug: 'business',
+    name: 'Business',
+    description: 'Para negócios com catálogo de produtos e operação comercial mais robusta.',
+    features: [
+      'Tudo do Growth',
+      'Catálogo de produtos com CommerceOS',
+      'Controle de estoque e pedidos',
+      'Painel de análise do negócio',
+    ],
+    cta: 'Assinar Business',
+  },
+  {
     slug: 'scale',
     name: 'Scale',
-    description: 'Para operações de alto volume e múltiplos canais.',
+    description: 'Para operações maiores, com necessidades específicas de suporte e integração.',
     features: [
-      'Usuários ilimitados',
-      'Todos os sistemas ASTER inclusos (WebOS, LaunchOS, CommerceOS, GrowthOS)',
-      'Visitas ilimitadas',
-      'Agentes de IA inclusos',
-      'Gerente de conta dedicado',
+      'Tudo do Business',
+      'Suporte prioritário',
+      'Onboarding assistido',
+      'Condições sob consulta para necessidades maiores',
     ],
-    includedProducts: ['webos', 'launchos', 'commerceos', 'growthos', 'luna-ai'],
     cta: 'Assinar Scale',
   },
 ];
 
-export const ENTERPRISE_TIER = {
-  name: 'Enterprise',
-  description: 'Para empresas com necessidades específicas de integração e SLA.',
-  features: [
-    'Tudo do Scale',
-    'SLA contratual e ambiente dedicado',
-    'Integrações e automações sob medida',
-    'Onboarding assistido',
-  ],
-  cta: 'Falar com vendas',
-  contactHref: 'mailto:vendas@aster.com.br?subject=Plano%20Enterprise',
+export function findTierForSlug(slug: string | null): PlanTier | undefined {
+  if (!slug) return undefined;
+  return PLAN_TIERS.find((tier) => tier.slug === slug);
+}
+
+// Which plan tier to highlight when a visitor arrives from a specific
+// product page's "Ver planos" CTA (/plans?product=<slug>) — a direct
+// mapping instead of a product-bundling list, since tiers are no longer
+// structured as "N systems included".
+const PRODUCT_TO_TIER: Record<string, PlanTier['slug']> = {
+  webos: 'starter',
+  'luna-ai': 'growth',
+  commerceos: 'business',
 };
 
 export function findTierForProduct(productSlug: string | null): PlanTier | undefined {
   if (!productSlug) return undefined;
-  return PLAN_TIERS.find((tier) => tier.includedProducts.includes(productSlug as ProductSlug));
+  const tierSlug = PRODUCT_TO_TIER[productSlug];
+  return tierSlug ? findTierForSlug(tierSlug) : undefined;
 }
 
 export type BackendPlan = {
@@ -86,54 +97,48 @@ export type BackendPlan = {
 };
 
 // Mirrors server/prisma/seed.ts so the pricing page can render instantly,
-// before /api/plans responds (or if it's ever unavailable).
+// before /api/plans responds (or if it's ever unavailable). Values here
+// are a presentation fallback only — the DB (and Stripe) remain the
+// actual billing source of truth.
 export const FALLBACK_PLANS: BackendPlan[] = [
   {
     id: 'fallback-starter',
     name: 'Starter',
     slug: 'starter',
-    description: 'Para quem está começando a estruturar a operação digital.',
-    features: [
-      'Até 3 usuários',
-      '1 sistema ASTER incluso (WebOS)',
-      'Até 1.000 visitas/mês',
-      'Suporte por chat',
-      'Integrações essenciais (analytics, e-mail)',
-    ],
-    price: 19700,
-    annualPrice: 196800,
+    description: 'Para pequenos negócios que estão estruturando a presença digital.',
+    features: PLAN_TIERS[0].features,
+    price: 9900,
+    annualPrice: 100800,
     status: 'ACTIVE',
   },
   {
     id: 'fallback-growth',
     name: 'Growth',
     slug: 'growth',
-    description: 'Para quem já vende e precisa escalar com automação.',
-    features: [
-      'Até 10 usuários',
-      '2 sistemas ASTER inclusos (LaunchOS + CommerceOS)',
-      'Até 10.000 visitas/mês',
-      'Suporte prioritário',
-      'Integrações ilimitadas + API',
-    ],
-    price: 69700,
-    annualPrice: 697200,
+    description: 'Para negócios que precisam de reservas, agendamentos e mais geração de clientes.',
+    features: PLAN_TIERS[1].features,
+    price: 19900,
+    annualPrice: 202800,
+    status: 'ACTIVE',
+  },
+  {
+    id: 'fallback-business',
+    name: 'Business',
+    slug: 'business',
+    description: 'Para negócios com catálogo de produtos e operação comercial mais robusta.',
+    features: PLAN_TIERS[2].features,
+    price: 39900,
+    annualPrice: 406800,
     status: 'ACTIVE',
   },
   {
     id: 'fallback-scale',
     name: 'Scale',
     slug: 'scale',
-    description: 'Para operações de alto volume e múltiplos canais.',
-    features: [
-      'Usuários ilimitados',
-      'Todos os sistemas ASTER inclusos (WebOS, LaunchOS, CommerceOS, GrowthOS)',
-      'Visitas ilimitadas',
-      'Agentes de IA inclusos',
-      'Gerente de conta dedicado',
-    ],
-    price: 179700,
-    annualPrice: 1796400,
+    description: 'Para operações maiores, com necessidades específicas de suporte e integração.',
+    features: PLAN_TIERS[3].features,
+    price: 79900,
+    annualPrice: 814800,
     status: 'ACTIVE',
   },
 ];

@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ArrowRight, Layers, Globe2, Store, Truck, Wallet, Cpu, Sparkles, Check } from 'lucide-react';
+import { ArrowRight, Layers, Globe2, Store, Sparkles, Check, CalendarCheck } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
 type Product = {
@@ -7,60 +7,35 @@ type Product = {
   tag: string;
   title: string;
   desc: string;
-  lis: string;
+  luna: string;
   cta: string;
   features: string[];
   accent: string;
   bg: string;
-  image?: string;
 };
 
 const products: Product[] = [
   {
-    icon: Layers,
-    tag: 'Sistema ERP',
-    title: 'Toda a sua operação em um sistema só',
-    desc: 'O sistema de gestão completo para emitir notas fiscais, controlar o estoque em todos os canais e fechar as contas, sem trocar de plataforma.',
-    lis: 'Antes da rotina começar, a Lis transforma os dados do ERP em prioridades e próximos passos.',
-    cta: 'Conhecer o Sistema ERP',
-    features: ['NF-e, NFS-e e NFC-e ilimitadas', 'Estoque multicanal unificado', 'Relatórios em tempo real'],
-    accent: 'text-ASTER-600',
-    bg: 'bg-ASTER-50',
-  },
-  {
-    icon: Store,
-    tag: 'Sistema PDV',
-    title: 'Ponto de venda integrado',
-    desc: 'Venda na frente de caixa e na frente do computador com a mesma agilidade: pedidos e estoque integrados, com controle de caixa preciso.',
-    lis: 'Com canais, ecommerce e loja física integrados, a Lis revela o que vende e acelera a criação de produtos com IA.',
-    cta: 'Conhecer Sistema PDV',
-    features: ['Frente de caixa ultrarrápida', 'Controle de caixa e turnos', 'Sincronizado com o ERP'],
-    accent: 'text-amber-500',
-    bg: 'bg-amber-50',
-    image: '/images/pdv.jpg',
-  },
-  {
-    icon: Truck,
-    tag: 'Envios da ASTER',
-    title: 'Da venda à porta do cliente, sem dor de cabeça',
-    desc: 'Logística simples para vendas online sem contrato e com frete até 50% mais barato. Cotação, etiqueta e rastreio em segundos.',
-    lis: 'Antes do prazo apertar, a Lis mostra quais pedidos precisam sair primeiro.',
-    cta: 'Conhecer Envios',
-    features: ['Até 50% de economia no frete', 'Sem contrato, sem fidelidade', 'Coleta e rastreio inclusos'],
+    icon: CalendarCheck,
+    tag: 'Reservas e Agendamentos',
+    title: 'Reservas de restaurante e agendamentos reais',
+    desc: 'Cada site inclui o fluxo certo para o seu negócio: reserva de mesa para restaurantes, agendamento por serviço e duração para salões e profissionais, ou pedido de orçamento para serviços locais.',
+    luna: 'A Luna ajuda a escrever a descrição de cada serviço oferecido.',
+    cta: 'Ver a Biblioteca de Templates',
+    features: ['Confirmação automática por e-mail', 'Bloqueio de horários e folgas', 'Painel de reservas para o dono do negócio'],
     accent: 'text-emerald-500',
     bg: 'bg-emerald-50',
-    image: '/images/expedicao.jpg',
   },
   {
-    icon: Wallet,
-    tag: 'Soluções Financeiras',
-    title: 'Receba, pague e concilie em um só lugar',
-    desc: 'Conta Digital, Pix, boleto, link de pagamento, maquininha no celular e multiadquirentes — tudo direto pelo ERP.',
-    lis: 'A Lis concilia seus recebimentos e projeta o fluxo de caixa automaticamente.',
-    cta: 'Conhecer Conta Digital',
-    features: ['Pix e boleto integrados', 'Link de pagamento', 'Antecipação de recebíveis'],
-    accent: 'text-rose-500',
-    bg: 'bg-rose-50',
+    icon: Sparkles,
+    tag: 'Luna AI',
+    title: 'Conteúdo e SEO com ajuda de IA',
+    desc: 'A Luna revisa o texto do seu site, sugere um título melhor para a página inicial e gera metadados de SEO — você sempre revisa antes de aplicar.',
+    luna: 'Disponível direto no painel do seu site, sem configuração extra.',
+    cta: 'Ver planos',
+    features: ['Sugestão de template por setor', 'Melhoria de título e subtítulo', 'Geração de metadados de SEO'],
+    accent: 'text-ASTER-600',
+    bg: 'bg-ASTER-50',
   },
 ];
 
@@ -73,15 +48,15 @@ export default function Ecosystem({ onCta }: { onCta: () => void }) {
           className="text-center max-w-3xl mx-auto"
         >
           <span className="inline-flex items-center gap-2 bg-ASTER-50 border border-ASTER-200 rounded-full px-4 py-1.5 text-sm font-semibold text-ASTER-700">
-            <Globe2 size={15} /> Ecossistema ASTER
+            <Globe2 size={15} /> Plataforma ASTER
           </span>
           <h2 className="font-display font-extrabold text-3xl sm:text-5xl tracking-tight text-ink-900 mt-5 text-balance">
-            Um ecossistema único, com tudo o que o seu negócio precisa
+            Tudo o que o seu negócio precisa para vender online
           </h2>
-          <p className="text-slate-600 text-base sm:text-lg mt-4">Cada solução funciona sozinha. Juntas, elas vendem por você.</p>
+          <p className="text-slate-600 text-base sm:text-lg mt-4">WebOS cria o seu site. CommerceOS organiza as suas vendas. A Luna ajuda em tudo.</p>
         </motion.div>
 
-        {/* Hub + Ecommerce wide cards */}
+        {/* WebOS + CommerceOS wide cards */}
         <div className="grid lg:grid-cols-2 gap-5 mt-12">
           <motion.div
             initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}
@@ -91,22 +66,22 @@ export default function Ecosystem({ onCta }: { onCta: () => void }) {
             <div className="absolute inset-0 dot-grid opacity-10" />
             <div className="relative">
               <span className="inline-flex items-center gap-2 bg-white/10 border border-white/15 rounded-full px-4 py-1.5 text-[13px] font-bold text-volt-400">
-                <Globe2 size={14} /> Hub de Integração
+                <Layers size={14} /> WebOS
               </span>
               <h3 className="font-display font-extrabold text-2xl sm:text-[34px] leading-tight mt-4 text-balance">
-                Venda em todo canal sem multiplicar o trabalho
+                Mais de 50 templates prontos para o seu setor
               </h3>
               <p className="text-white/65 mt-3 text-[15px] sm:text-base">
-                Conecte-se aos principais marketplaces, plataformas de ecommerce, logística, pagamento e muito mais.
+                Restaurantes, serviços profissionais, beleza e bem-estar, varejo, criadores, educação e serviços locais — cada modelo com a estrutura certa para o negócio.
               </p>
-              <p className="font-display font-bold text-volt-400 mt-4 text-lg">+170 integrações em um só lugar</p>
+              <p className="font-display font-bold text-volt-400 mt-4 text-lg">7 categorias de templates</p>
               <div className="flex flex-wrap gap-2 mt-5">
-                {['Mercado Livre', 'Shopee', 'Amazon', 'TikTok Shop', 'Magalu', 'Nuvemshop', '+164'].map((c) => (
+                {['Restaurantes', 'Serviços profissionais', 'Beleza e bem-estar', 'Varejo', 'Criadores', 'Educação', 'Serviços locais'].map((c) => (
                   <span key={c} className="text-[13px] font-semibold bg-white/10 border border-white/15 rounded-full px-3.5 py-1.5">{c}</span>
                 ))}
               </div>
               <button onClick={onCta} className="mt-7 inline-flex items-center gap-2 font-bold text-white hover:gap-3 transition-all">
-                Ver todas as integrações <ArrowRight size={18} className="text-volt-400" />
+                Ver planos <ArrowRight size={18} className="text-volt-400" />
               </button>
             </div>
           </motion.div>
@@ -118,19 +93,19 @@ export default function Ecosystem({ onCta }: { onCta: () => void }) {
             <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-volt-400/30 blur-[100px] rounded-full group-hover:scale-125 transition-transform duration-700" />
             <div className="relative">
               <span className="inline-flex items-center gap-2 bg-ASTER-600 text-white rounded-full px-4 py-1.5 text-[13px] font-bold">
-                <Cpu size={14} /> Plataforma de Ecommerce
+                <Store size={14} /> CommerceOS
               </span>
               <h3 className="font-display font-extrabold text-2xl sm:text-[34px] leading-tight mt-4 text-ink-900 text-balance">
-                Loja virtual completa para sua marca crescer sem limites
+                Catálogo, estoque e pedidos em um só lugar
               </h3>
               <p className="text-slate-600 mt-3 text-[15px] sm:text-base">
-                Ferramentas de crescimento nativas da plataforma e customização avançada. Sua marca, suas regras.
+                Organize produtos, categorias, clientes e pedidos da sua loja — conectado ao catálogo que aparece no seu site.
               </p>
               <div className="grid grid-cols-3 gap-2 sm:gap-3 mt-5">
                 {[
-                  { v: '0%', l: 'taxa por venda*' },
-                  { v: '100+', l: 'temas prontos' },
-                  { v: 'SEO', l: 'nativo' },
+                  { v: '✓', l: 'catálogo de produtos' },
+                  { v: '✓', l: 'controle de estoque' },
+                  { v: '✓', l: 'gestão de pedidos' },
                 ].map((s) => (
                   <div key={s.l} className="bg-ASTER-50 rounded-2xl p-3 text-center">
                     <p className="font-display font-extrabold text-ASTER-700 text-lg sm:text-xl">{s.v}</p>
@@ -139,7 +114,7 @@ export default function Ecosystem({ onCta }: { onCta: () => void }) {
                 ))}
               </div>
               <button onClick={onCta} className="mt-7 inline-flex items-center gap-2 font-bold text-ASTER-600 hover:gap-3 transition-all">
-                Conhecer Ecommerce <ArrowRight size={18} />
+                Ver planos <ArrowRight size={18} />
               </button>
             </div>
           </motion.div>
@@ -153,12 +128,6 @@ export default function Ecosystem({ onCta }: { onCta: () => void }) {
               initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: (i % 2) * 0.1 }}
               className="bg-white rounded-[28px] card-shadow-sm border border-ASTER-100 overflow-hidden hover:card-shadow hover:-translate-y-1 transition-all duration-300 flex flex-col"
             >
-              {p.image && (
-                <div className="relative h-48 sm:h-56 overflow-hidden">
-                  <img src={p.image} alt={p.tag} className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" loading="lazy" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-ink-950/40 to-transparent" />
-                </div>
-              )}
               <div className="p-7 sm:p-8 flex-1 flex flex-col">
                 <div className="flex items-center gap-3">
                   <span className={`w-12 h-12 rounded-2xl ${p.bg} ${p.accent} flex items-center justify-center`}>
@@ -178,7 +147,7 @@ export default function Ecosystem({ onCta }: { onCta: () => void }) {
                 </ul>
                 <div className="mt-5 bg-gradient-to-r from-ASTER-50 to-volt-400/10 border border-ASTER-100 rounded-2xl p-4 flex gap-3">
                   <Sparkles size={18} className="text-ASTER-600 shrink-0 mt-0.5" />
-                  <p className="text-[13.5px] text-[#2c1a63] leading-relaxed"><strong>Com a Lis:</strong> {p.lis}</p>
+                  <p className="text-[13.5px] text-[#2c1a63] leading-relaxed"><strong>Com a Luna:</strong> {p.luna}</p>
                 </div>
                 <button onClick={onCta} className="mt-6 inline-flex items-center gap-2 font-bold text-ASTER-600 hover:gap-3 transition-all text-[15px]">
                   {p.cta} <ArrowRight size={18} />
@@ -186,22 +155,6 @@ export default function Ecosystem({ onCta }: { onCta: () => void }) {
               </div>
             </motion.div>
           ))}
-        </div>
-
-        {/* Payments marquee strip */}
-        <div id="solucoes" className="mt-12 bg-ink-950 rounded-[28px] py-8 overflow-hidden relative">
-          <p className="text-center text-white/60 font-semibold text-sm uppercase tracking-[0.2em] mb-5 px-4">Meios de pagamento integrados</p>
-          <div className="overflow-hidden" style={{ maskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)' }}>
-            <div className="flex gap-4 w-max animate-marquee-slow">
-              {Array.from({ length: 2 }).flatMap((_, rep) =>
-                ['Pagamento Online', 'Link de Pagamento', 'Maquininha no Celular', 'Multiadquirentes', 'Boleto', 'Pix'].map((m, i) => (
-                  <span key={`${rep}-${i}`} className="bg-white/10 border border-white/15 text-white font-display font-semibold text-sm sm:text-base rounded-2xl px-6 py-3 whitespace-nowrap">
-                    {m}
-                  </span>
-                ))
-              )}
-            </div>
-          </div>
         </div>
       </div>
     </section>

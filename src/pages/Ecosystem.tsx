@@ -3,7 +3,7 @@ import { ArrowLeft, ArrowRight, ChevronDown } from 'lucide-react';
 import { getProduct } from '../data/products';
 import Footer from '../components/Footer';
 
-const FLOW = ['webos', 'commerceos', 'growthos', 'luna-ai'] as const;
+const FLOW = ['webos', 'commerceos', 'luna-ai'] as const;
 
 export default function EcosystemPage() {
   return (

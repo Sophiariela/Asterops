@@ -4,7 +4,8 @@ import { api, ApiError, resolveUploadUrl } from '../../lib/api';
 import PublicSiteRenderer from '../../components/webos/PublicSiteRenderer';
 import type { PublicSite } from '../../lib/webos/types';
 
-const DEFAULT_DESCRIPTION = 'ASTER — O sistema completo do varejo, movido a IA. ERP, Hub de Integração, Ecommerce, PDV, Envios e Soluções Financeiras.';
+const DEFAULT_TITLE = 'ASTER — Crie o site profissional do seu negócio';
+const DEFAULT_DESCRIPTION = 'Sites profissionais, reservas e agendamentos reais, e catálogo de produtos — tudo em uma plataforma, com a ajuda da Luna AI.';
 
 // Sets (or clears, passing null) an og:/twitter: meta tag, creating the
 // element on first use. Social platforms and link-unfurl bots read these
@@ -63,7 +64,7 @@ export default function PublicSitePage() {
     // the app's own defaults when navigating away so the rest of AsterOps
     // doesn't keep a stray business's title/image in its share preview.
     return () => {
-      document.title = 'ASTER — O sistema completo do varejo, movido a IA';
+      document.title = DEFAULT_TITLE;
       setMetaTag('meta[name="description"]', { name: 'description' }, DEFAULT_DESCRIPTION);
       ['og:title', 'og:description', 'og:type', 'og:url', 'og:image'].forEach((p) => setMetaTag(`meta[property="${p}"]`, { property: p }, null));
       ['twitter:card', 'twitter:title', 'twitter:description', 'twitter:image'].forEach((n) => setMetaTag(`meta[name="${n}"]`, { name: n }, null));

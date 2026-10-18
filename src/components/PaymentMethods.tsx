@@ -22,18 +22,6 @@ function MastercardMark() {
   );
 }
 
-function PixMark() {
-  return (
-    <span className="inline-flex items-center gap-1.5">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" className="text-slate-400">
-        <path d="M1 5.5V1h4.5M15 5.5V1h-4.5M1 10.5V15h4.5M15 10.5V15h-4.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-        <rect x="6" y="6" width="4" height="4" rx="1" stroke="currentColor" strokeWidth="1.2" />
-      </svg>
-      <span className="text-[13px] font-bold tracking-wide text-slate-500">Pix</span>
-    </span>
-  );
-}
-
 function BoletoMark() {
   return (
     <span className="inline-flex items-center gap-1.5">
@@ -56,7 +44,6 @@ export default function PaymentMethods() {
         <MastercardMark />
         <CardMark label="Elo" />
         <CardMark label="Amex" />
-        <PixMark />
         <BoletoMark />
       </div>
     </div>

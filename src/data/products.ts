@@ -26,6 +26,8 @@ export type Product = {
   ecosystem?: { title: string; body: string; connects: ProductSlug[] };
   /** Override for the bottom CTA section's headline/description/button (defaults to a generic "Ready to deploy <name>?" / "Deploy <name>"). */
   finalCta?: { headline: string; description: string; buttonLabel?: string };
+  /** True for a product that is still in development — not yet available to subscribe to or use. Renders an honest notice instead of letting the page imply it ships today. */
+  earlyAccess?: boolean;
   icon: LucideIcon;
 };
 
@@ -102,17 +104,10 @@ export const PRODUCTS: Product[] = [
     name: 'LaunchOS',
     tagline: 'Launch products, offers and campaigns with speed.',
     subheadline:
-      'LaunchOS centralizes landing pages, lead capture, automation and campaign tracking so your team can execute launches without assembling multiple tools.',
-    included: [
-      'Landing pages',
-      'Lead capture',
-      'Campaign tracking',
-      'Forms',
-      'Automations',
-      'CRM integrations',
-      'Conversion analytics',
-    ],
-    outcome: 'Move from idea to launch faster while maintaining visibility into results.',
+      'LaunchOS will centralize landing pages, lead capture and campaign tracking so your team can execute launches without assembling multiple tools. It is in development and not yet available to subscribe to or use.',
+    included: [],
+    outcome: 'In development — not yet available. Join the waitlist to be notified when it launches.',
+    earlyAccess: true,
     icon: Cpu,
   },
   {
@@ -120,17 +115,15 @@ export const PRODUCTS: Product[] = [
     name: 'CommerceOS',
     tagline: 'Run your online sales from a single system.',
     subheadline:
-      'CommerceOS connects your store, orders, inventory and integrations into one operational environment designed for growth.',
+      'CommerceOS connects your product catalog, orders, inventory and customers into one operational environment designed for growth.',
     included: [
-      'Ecommerce storefront',
+      'Product catalog and categories',
       'Order management',
-      'Inventory management',
-      'Payment integrations',
-      'Marketplace integrations',
-      'Customer management',
+      'Inventory and stock tracking',
+      'Customer records',
       'Operational reporting',
     ],
-    outcome: 'Sell across channels without increasing operational complexity.',
+    outcome: 'Manage your catalog and orders without juggling spreadsheets.',
     icon: Store,
   },
   {
@@ -138,17 +131,10 @@ export const PRODUCTS: Product[] = [
     name: 'GrowthOS',
     tagline: 'Turn operational data into business growth.',
     subheadline:
-      'GrowthOS brings together analytics, automations and performance visibility so decision-making becomes faster and more predictable.',
-    included: [
-      'Business dashboards',
-      'KPI tracking',
-      'Reports',
-      'Operational analytics',
-      'Automations',
-      'Growth monitoring',
-      'Performance insights',
-    ],
-    outcome: 'Spend less time collecting information and more time acting on it.',
+      'GrowthOS will bring together analytics, automations and performance visibility so decision-making becomes faster and more predictable. It is in development and not yet available to subscribe to or use.',
+    included: [],
+    outcome: 'In development — not yet available. Join the waitlist to be notified when it launches.',
+    earlyAccess: true,
     icon: Globe2,
   },
   {

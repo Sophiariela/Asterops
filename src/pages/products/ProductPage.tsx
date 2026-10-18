@@ -27,6 +27,11 @@ export default function ProductPage() {
           </div>
           <p className="text-xs font-bold text-ASTER-600 uppercase tracking-wide mt-6">{product.name}</p>
           <h1 className="font-display font-extrabold text-4xl sm:text-5xl text-ink-900 mt-2">{product.tagline}</h1>
+          {product.earlyAccess && (
+            <span className="inline-block mt-4 text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-full">
+              Em desenvolvimento — ainda não disponível para assinatura
+            </span>
+          )}
           <div className="mt-4 max-w-2xl space-y-4">
             {subheadlineParagraphs.map((paragraph) => (
               <p key={paragraph} className="text-slate-500 text-base sm:text-lg">
@@ -76,18 +81,20 @@ export default function ProductPage() {
         </section>
       )}
 
-      <section className="px-4 py-14 border-t border-ASTER-100">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="font-display font-extrabold text-2xl text-ink-900">What&apos;s included</h2>
-          <ul className="mt-6 grid sm:grid-cols-2 gap-4">
-            {product.included.map((item) => (
-              <li key={item} className="flex items-start gap-3 bg-ASTER-50/60 rounded-2xl p-4 text-sm text-slate-600">
-                <Check size={18} className="text-ASTER-600 shrink-0 mt-0.5" /> {item}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
+      {product.included.length > 0 && (
+        <section className="px-4 py-14 border-t border-ASTER-100">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="font-display font-extrabold text-2xl text-ink-900">What&apos;s included</h2>
+            <ul className="mt-6 grid sm:grid-cols-2 gap-4">
+              {product.included.map((item) => (
+                <li key={item} className="flex items-start gap-3 bg-ASTER-50/60 rounded-2xl p-4 text-sm text-slate-600">
+                  <Check size={18} className="text-ASTER-600 shrink-0 mt-0.5" /> {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      )}
 
       <section className="px-4 py-14 border-t border-ASTER-100 bg-slate-50">
         <div className="max-w-4xl mx-auto">
@@ -143,16 +150,31 @@ export default function ProductPage() {
 
       <section className="px-4 py-16 border-t border-ASTER-100">
         <div className="max-w-4xl mx-auto text-center bg-gradient-to-br from-ASTER-700 via-ASTER-600 to-ASTER-500 rounded-[32px] p-10 sm:p-14 text-white">
-          <h2 className="font-display font-extrabold text-2xl sm:text-3xl">
-            {product.finalCta?.headline ?? `Ready to deploy ${product.name}?`}
-          </h2>
-          <p className="text-white/75 mt-3">{product.finalCta?.description ?? 'Choose your plan and get started today.'}</p>
-          <Link
-            to={`/plans?product=${product.slug}`}
-            className="inline-flex items-center gap-2 mt-7 bg-white text-ASTER-700 font-bold px-8 py-4 rounded-full hover:shadow-xl transition-all"
-          >
-            {product.finalCta?.buttonLabel ?? `Deploy ${product.name}`} <ArrowRight size={18} />
-          </Link>
+          {product.earlyAccess ? (
+            <>
+              <h2 className="font-display font-extrabold text-2xl sm:text-3xl">Want to know when {product.name} launches?</h2>
+              <p className="text-white/75 mt-3">It's still in development — reach out and we'll let you know when it's ready.</p>
+              <a
+                href={`mailto:contato@aster.com.br?subject=${encodeURIComponent(`${product.name} waitlist`)}`}
+                className="inline-flex items-center gap-2 mt-7 bg-white text-ASTER-700 font-bold px-8 py-4 rounded-full hover:shadow-xl transition-all"
+              >
+                Join the waitlist <ArrowRight size={18} />
+              </a>
+            </>
+          ) : (
+            <>
+              <h2 className="font-display font-extrabold text-2xl sm:text-3xl">
+                {product.finalCta?.headline ?? `Ready to deploy ${product.name}?`}
+              </h2>
+              <p className="text-white/75 mt-3">{product.finalCta?.description ?? 'Choose your plan and get started today.'}</p>
+              <Link
+                to={`/plans?product=${product.slug}`}
+                className="inline-flex items-center gap-2 mt-7 bg-white text-ASTER-700 font-bold px-8 py-4 rounded-full hover:shadow-xl transition-all"
+              >
+                {product.finalCta?.buttonLabel ?? `Deploy ${product.name}`} <ArrowRight size={18} />
+              </Link>
+            </>
+          )}
         </div>
       </section>
 

@@ -4,28 +4,28 @@ import { Plus, Headset } from 'lucide-react';
 
 const faqs = [
   {
-    q: 'Como funciona o teste grátis de 30 dias?',
-    a: 'Você cria sua conta com CNPJ e CEP de coleta e usa todos os recursos do plano escolhido por 30 dias, sem informar cartão de crédito. Se não gostar, é só não assinar — sem multas ou burocracia.',
+    q: 'Como funciona a criação do site?',
+    a: 'Você escolhe um template da Biblioteca de Templates (mais de 50 modelos em 7 categorias), preenche as informações do seu negócio e o site já é gerado com a estrutura completa. Depois é só personalizar textos, imagens e cores no editor.',
   },
   {
-    q: 'O que é a Lis, a agente de IA da ASTER?',
-    a: 'A Lis é a inteligência artificial integrada ao ecossistema ASTER. Ela analisa pedidos, estoque, vendas e financeiro em tempo real, aponta prioridades, automatiza tarefas como emissão de etiquetas e conciliação, e responde em linguagem natural.',
+    q: 'O que é a Luna, a IA da ASTER?',
+    a: 'A Luna é a assistente de IA integrada ao WebOS. Ela recomenda o template certo para o seu negócio, sugere melhorias de texto para a página inicial, gera metadados de SEO e escreve descrições de cardápio — você sempre revisa antes de aplicar.',
   },
   {
-    q: 'Quais marketplaces posso integrar?',
-    a: 'Mercado Livre, Shopee, Amazon, TikTok Shop, Magalu, Shein, Americanas, Netshoes e mais de 170 integrações entre marketplaces, plataformas de ecommerce, logística, pagamentos e contabilidade.',
+    q: 'Posso receber reservas e agendamentos pelo site?',
+    a: 'Sim. Restaurantes recebem reservas de mesa reais, e negócios de serviço (salões, consultorias, academias) recebem agendamentos por horário disponível, com proteção contra conflito de horários. Cada template usa o fluxo certo para o setor.',
   },
   {
-    q: 'Como funciona a economia de até 50% no frete?',
-    a: 'Os Envios da ASTER negociam tabelas corporativas com as principais transportadoras e repassam o desconto para você, sem contrato ou volume mínimo. Você cota, compara e gera etiquetas em segundos, direto do ERP.',
+    q: 'Como funciona o pagamento?',
+    a: 'A assinatura é cobrada no cartão de crédito ou boleto, mensal ou anual. No plano anual, o desconto já está aplicado no valor total cobrado uma vez por ano.',
   },
   {
-    q: 'Posso emitir notas fiscais pelo sistema?',
-    a: 'Sim. NF-e, NFC-e, NFS-e e guias GNRE com emissão em lote, cálculo automático de impostos e atualização para a reforma tributária — tudo integrado aos seus canais de venda.',
+    q: 'Posso trocar de plano depois?',
+    a: 'Sim, você pode mudar de plano quando o seu negócio precisar de mais recursos, como catálogo de produtos com o CommerceOS.',
   },
   {
     q: 'Existe suporte em português?',
-    a: 'Sim! Suporte especializado em português por chat, e-mail e central de ajuda, além de onboarding assistido nos planos Empresas e uma comunidade com mais de 63 mil lojistas.',
+    a: 'Sim, suporte em português por e-mail e chat. Os planos Scale incluem atendimento prioritário e onboarding assistido.',
   },
 ];
 

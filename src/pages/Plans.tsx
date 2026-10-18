@@ -4,7 +4,7 @@ import { Check, ArrowRight, ArrowLeft, AlertCircle } from 'lucide-react';
 import { api } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
 import { formatBRL } from '../lib/currency';
-import { PLAN_TIERS, ENTERPRISE_TIER, FALLBACK_PLANS, findTierForProduct, type BackendPlan } from '../data/plans';
+import { PLAN_TIERS, FALLBACK_PLANS, findTierForProduct, type BackendPlan } from '../data/plans';
 import { readCachedPlans, writeCachedPlans } from '../lib/plansCache';
 import PaymentMethods from '../components/PaymentMethods';
 import Footer from '../components/Footer';
@@ -105,7 +105,7 @@ export default function Plans() {
             <button onClick={() => setAnnual(true)} className={`text-sm font-bold px-2 py-1.5 transition-colors ${annual ? 'text-ASTER-700' : 'text-slate-400'}`}>
               Anual
             </button>
-            <span className="bg-volt-400 text-ink-950 text-xs font-extrabold px-3 py-2 rounded-full">2 meses grátis</span>
+            <span className="bg-volt-400 text-ink-950 text-xs font-extrabold px-3 py-2 rounded-full">-15%</span>
           </div>
         </div>
 
@@ -180,30 +180,17 @@ export default function Plans() {
                 </div>
               );
             })}
-
-            <div className="relative bg-ink-950 text-white rounded-[28px] p-7 sm:p-8 flex flex-col border border-ink-950">
-              <h2 className="font-display font-extrabold text-2xl">{ENTERPRISE_TIER.name}</h2>
-              <p className="text-white/60 text-sm mt-2 min-h-[40px]">{ENTERPRISE_TIER.description}</p>
-              <div className="mt-5">
-                <span className="font-display font-extrabold text-2xl">Personalizado</span>
-              </div>
-              <p className="text-xs font-medium mt-1 text-volt-400">condições sob consulta</p>
-              <ul className="mt-6 space-y-3 flex-1">
-                {ENTERPRISE_TIER.features.map((feature) => (
-                  <li key={feature} className="flex items-start gap-2.5 text-sm text-white/90">
-                    <Check size={16} className="text-volt-400 shrink-0 mt-0.5" />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-              <a
-                href={ENTERPRISE_TIER.contactHref}
-                className="mt-8 w-full bg-volt-400 hover:bg-volt-300 text-ink-950 font-bold py-3.5 rounded-full transition-all flex items-center justify-center gap-2"
-              >
-                {ENTERPRISE_TIER.cta} <ArrowRight size={18} />
-              </a>
-            </div>
           </div>
+        )}
+
+        {backendPlans && (
+          <p className="text-center text-sm text-slate-500 mt-8">
+            Precisa de uma necessidade maior ou condições específicas no plano Scale?{' '}
+            <a href="mailto:vendas@aster.com.br?subject=Plano%20Scale%20personalizado" className="font-bold text-ASTER-600 hover:underline">
+              Fale com vendas
+            </a>
+            .
+          </p>
         )}
 
         <div className="mt-14">
