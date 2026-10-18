@@ -2,8 +2,13 @@ import { z } from 'zod';
 
 export const playbookValues = [
   'LOCAL_BUSINESS', 'SAAS', 'ECOMMERCE', 'CONSULTANT', 'AGENCY', 'RESTAURANT', 'FITNESS', 'CREATOR',
-  'PERSONAL_BRAND', 'PROFESSIONAL_SERVICES',
+  'PERSONAL_BRAND', 'PROFESSIONAL_SERVICES', 'HOTEL', 'CATERING', 'SALON', 'EDUCATION', 'LOCAL_SERVICES',
 ] as const;
+// Playbooks that book a real time slot through the Reservation system
+// instead of RESTAURANT's table-based flow (or a Lead-only inquiry form).
+// Shared by reservations/availability services and routes so "is this
+// site bookable" is defined in exactly one place.
+export const appointmentPlaybookValues = ['CONSULTANT', 'PROFESSIONAL_SERVICES', 'SALON', 'EDUCATION', 'FITNESS'] as const;
 export const trustElementTypeValues = ['CASE_STUDY', 'CLIENT_LOGO', 'CERTIFICATION'] as const;
 export const leadStatusValues = ['LEAD', 'CONSULTATION', 'PROPOSAL', 'CLIENT'] as const;
 export const templateComplexityValues = ['SIMPLE', 'STANDARD', 'ADVANCED'] as const;
@@ -47,6 +52,14 @@ export const updateSiteSchema = z.object({
   reservationIntervalMinutes: z.number().int().min(5).max(240).optional(),
   openingTime: z.union([timeOfDay, z.literal('')]).optional(),
   closingTime: z.union([timeOfDay, z.literal('')]).optional(),
+  // Appointment availability (consultant/professional services/salon/
+  // education/fitness) — see Site.workingDays and friends.
+  workingDays: z.array(z.number().int().min(0).max(6)).max(7).optional(),
+  appointmentDurationMinutes: z.number().int().min(5).max(480).optional(),
+  appointmentBufferMinutes: z.number().int().min(0).max(240).optional(),
+  appointmentCapacity: z.number().int().min(1).max(50).optional(),
+  // Local Services vertical.
+  serviceArea: z.union([z.string().max(200), z.literal('')]).optional(),
 });
 
 export const generateFromTemplateSchema = z.object({
@@ -163,17 +176,37 @@ export const updateLeadStatusSchema = z.object({
   status: z.enum(leadStatusValues),
 });
 
+// reservationAt (a full, already-combined instant) stays how RESTAURANT
+// table reservations have always booked — the visitor's own browser
+// interprets date+time in its local zone when it builds this string.
+// Appointment bookings (non-RESTAURANT) instead send the separate
+// slotDate/slotTime strings the availability endpoint itself returned,
+// so the server can reconstruct the instant in the SITE's own timezone
+// (not the visitor's) via zonedTimeToUtc — the two can disagree, and the
+// business's own hours are what must be honored.
 const reservationFields = {
   customerName: z.string().min(1).max(120),
   customerEmail: z.string().email(),
   customerPhone: z.string().max(40).optional(),
   partySize: z.number().int().min(1).max(30),
-  reservationAt: z.string().min(1),
+  reservationAt: z.string().min(1).optional(),
+  slotDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  slotTime: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/).optional(),
   notes: z.string().max(500).optional(),
+  // Appointment bookings only (non-RESTAURANT sites with a Service
+  // catalog) — which offering was booked, so its own duration (if set)
+  // governs slot length and double-booking checks instead of the site
+  // default.
+  serviceId: z.string().min(1).optional(),
+};
+const reservationRefinement = (data: { reservationAt?: string; slotDate?: string; slotTime?: string }, ctx: z.RefinementCtx) => {
+  if (!data.reservationAt && !(data.slotDate && data.slotTime)) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'reservationAt or slotDate+slotTime is required.' });
+  }
 };
 
-export const publicReservationSchema = z.object({ siteId: z.string().min(1), ...reservationFields });
-export const createReservationSchema = z.object(reservationFields);
+export const publicReservationSchema = z.object({ siteId: z.string().min(1), ...reservationFields }).superRefine(reservationRefinement);
+export const createReservationSchema = z.object(reservationFields).superRefine(reservationRefinement);
 export const updateReservationStatusSchema = z.object({ status: z.enum(reservationStatusValues) });
 export const assignTableSchema = z.object({ tableId: z.string().min(1).nullable() });
 
@@ -224,4 +257,37 @@ export const updateMenuItemSchema = z.object({
   available: z.boolean().optional(),
   featured: z.boolean().optional(),
   order: z.number().int().min(0).optional(),
+});
+
+// --- Services (Salon/Education/Professional Services/Fitness) --------
+
+export const createServiceSchema = z.object({
+  name: z.string().min(1).max(120),
+  description: z.string().max(500).optional(),
+  priceCents: z.number().int().min(0).max(10_000_00).optional(),
+  durationMinutes: z.number().int().min(5).max(480).optional(),
+  active: z.boolean().optional(),
+});
+
+export const updateServiceSchema = z.object({
+  name: z.string().min(1).max(120).optional(),
+  description: z.string().max(500).nullable().optional(),
+  priceCents: z.number().int().min(0).max(10_000_00).nullable().optional(),
+  durationMinutes: z.number().int().min(5).max(480).nullable().optional(),
+  active: z.boolean().optional(),
+  order: z.number().int().min(0).optional(),
+});
+
+// --- Blocked dates (appointment booking) ------------------------------
+
+export const createBlockedDateSchema = z.object({
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Use YYYY-MM-DD.'),
+  reason: z.string().max(200).optional(),
+});
+
+// --- Availability -------------------------------------------------------
+
+export const availabilityQuerySchema = z.object({
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Use YYYY-MM-DD.'),
+  serviceId: z.string().min(1).optional(),
 });

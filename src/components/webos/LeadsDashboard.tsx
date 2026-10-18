@@ -12,6 +12,17 @@ const STATUS_STYLE: Record<LeadStatus, string> = {
   CLIENT: 'bg-slate-200 text-slate-500',
 };
 
+// The new inquiry forms (Hotel/Catering/Local Services/Ecommerce) all
+// persist as a plain Lead with a distinct `source` tag — this is purely a
+// display label so the owner can tell a quote request from a generic
+// contact message at a glance, with zero schema/API duplication.
+const LEAD_TYPE_LABEL: Record<string, string> = {
+  'accommodation-inquiry': 'Stay inquiry',
+  'catering-inquiry': 'Catering inquiry',
+  'quote-request': 'Quote request',
+  'product-inquiry': 'Order request',
+};
+
 function toCsvValue(value: string): string {
   if (/[",\n]/.test(value)) return `"${value.replace(/"/g, '""')}"`;
   return value;
@@ -119,7 +130,7 @@ export default function LeadsDashboard({ siteId, onChanged }: { siteId: string; 
           <thead className="bg-slate-50 text-slate-400 text-left">
             <tr>
               <th className="px-6 py-3 font-semibold">Contact</th>
-              <th className="px-6 py-3 font-semibold">Source Page</th>
+              <th className="px-6 py-3 font-semibold">Type</th>
               <th className="px-6 py-3 font-semibold">Message</th>
               <th className="px-6 py-3 font-semibold">Status</th>
               <th className="px-6 py-3 font-semibold">Date Created</th>
@@ -132,8 +143,14 @@ export default function LeadsDashboard({ siteId, onChanged }: { siteId: string; 
                   <p className="font-semibold text-ink-900">{l.name ?? 'Not provided'}</p>
                   <p className="text-slate-400 text-xs">{l.email}{l.phone ? ` · ${l.phone}` : ''}</p>
                 </td>
-                <td className="px-6 py-4 text-slate-600">{l.page?.name ?? l.source ?? 'Not provided'}</td>
-                <td className="px-6 py-4 text-slate-500 text-xs max-w-[220px] truncate">{l.message ?? 'Not provided'}</td>
+                <td className="px-6 py-4">
+                  {l.source && LEAD_TYPE_LABEL[l.source] ? (
+                    <span className="text-[11px] font-bold text-ASTER-600 bg-ASTER-50 px-2.5 py-1 rounded-full whitespace-nowrap">{LEAD_TYPE_LABEL[l.source]}</span>
+                  ) : (
+                    <span className="text-slate-600">{l.page?.name ?? l.source ?? 'Not provided'}</span>
+                  )}
+                </td>
+                <td className="px-6 py-4 text-slate-500 text-xs max-w-[220px] whitespace-pre-line">{l.message ?? 'Not provided'}</td>
                 <td className="px-6 py-4">
                   <select
                     value={l.status}

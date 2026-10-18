@@ -77,3 +77,10 @@ publicSitesRouter.get('/:slug', async (req, res) => {
   const site = await sitesService.getPublicSiteBySlug(req.params.slug);
   res.json({ site });
 });
+
+// Ecommerce playbook's public product grid, keyed by site id (not slug —
+// the public site payload above already carries its own `id`).
+publicSitesRouter.get('/:id/products', async (req, res) => {
+  const products = await sitesService.getPublicSiteProducts(req.params.id);
+  res.json({ products });
+});

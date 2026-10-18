@@ -72,7 +72,18 @@ export default function OwnerDashboardCards({ siteId, timezone, country, playboo
     <div className="space-y-6">
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         <Card icon={Eye} label="Site Views" value={viewStats?.last30Days ?? 0} caption={viewStats ? `${viewStats.total} all time` : 'Last 30 days'} />
-        <Card icon={CalendarCheck} label="Today's Reservations" value={todayReservations.length} caption={todayReservations.length ? `${todayReservations.reduce((a, r) => a + r.partySize, 0)} guests expected` : 'Nothing booked today'} />
+        <Card
+          icon={CalendarCheck}
+          label={isRestaurant ? "Today's Reservations" : "Today's Bookings"}
+          value={todayReservations.length}
+          caption={
+            todayReservations.length === 0
+              ? 'Nothing booked today'
+              : isRestaurant
+                ? `${todayReservations.reduce((a, r) => a + r.partySize, 0)} guests expected`
+                : `${todayReservations.length} appointment${todayReservations.length === 1 ? '' : 's'} scheduled`
+          }
+        />
         <Card icon={Inbox} label="New Leads" value={newLeadsCount} caption="Not yet contacted" />
         <Card icon={MailWarning} label="Unread Messages" value={unreadCount} caption="Leads awaiting a first response" />
         <Card icon={TrendingUp} label="Revenue Opportunities" value={opportunityCount} caption="Qualified leads + pending reservations" />

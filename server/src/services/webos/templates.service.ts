@@ -165,13 +165,15 @@ export async function createTemplate(input: CreateTemplateInput) {
   return summarize(created);
 }
 
-// Cloning bumps the version within the same template family (all rows
-// sharing `key`) — that family, not a generic lineage tree, is what
-// "version templates" means for this app, since one key maps to one
-// site-generation slot in the picker.
+// Cloning bumps the version within the same template family. A family is
+// rows sharing both `key` AND `name` — the Template Marketplace expansion
+// puts several distinct, independently-published templates on one
+// playbook key (e.g. five different RESTAURANT templates), so key alone
+// no longer identifies "this template" the way it did when each key
+// mapped to exactly one site-generation slot.
 export async function cloneTemplate(id: string) {
   const source = await loadOne(id);
-  const latest = await prisma.template.findFirst({ where: { key: source.key }, orderBy: { version: 'desc' } });
+  const latest = await prisma.template.findFirst({ where: { key: source.key, name: source.name }, orderBy: { version: 'desc' } });
   const nextVersion = (latest?.version ?? source.version) + 1;
 
   const cloned = await prisma.template.create({
@@ -210,10 +212,14 @@ export async function cloneTemplate(id: string) {
   return summarize(cloned);
 }
 
+// Only unpublishes other *versions of this same template* (same key AND
+// name) — not every other template on the playbook. Multiple distinct
+// templates share a key (e.g. five different RESTAURANT templates), and
+// publishing one must never take the others off the Template Library.
 export async function publishTemplate(id: string) {
   const template = await loadOne(id);
   await prisma.$transaction([
-    prisma.template.updateMany({ where: { key: template.key, status: 'PUBLISHED' }, data: { status: 'DRAFT' } }),
+    prisma.template.updateMany({ where: { key: template.key, name: template.name, status: 'PUBLISHED' }, data: { status: 'DRAFT' } }),
     prisma.template.update({ where: { id }, data: { status: 'PUBLISHED' } }),
   ]);
   return summarize(await loadOne(id));

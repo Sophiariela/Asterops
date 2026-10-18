@@ -1,4 +1,4 @@
-import type { TemplateDetail, TemplatePageDef, PublicSite, PublicPage, PublicTestimonial, PlaybookKey } from './types';
+import type { TemplateDetail, TemplatePageDef, PublicSite, PublicPage, PublicTestimonial, PublicService, PlaybookKey } from './types';
 
 // Curated, industry-matched stock photography (Unsplash, free license) —
 // preview-only. A freshly generated real site deliberately keeps its
@@ -50,6 +50,26 @@ const PREVIEW_IMAGES: Record<PlaybookKey, { hero: string; sections: string[] }> 
     hero: unsplash('1521791136064-7986c2920216'),
     sections: [unsplash('1507003211169-0a1dd7228f2d'), unsplash('1556761175-5973dc0f32e7')],
   },
+  HOTEL: {
+    hero: unsplash('1566073771259-6a8506099945'),
+    sections: [unsplash('1582719478250-c89cae4dc85b'), unsplash('1520250497591-112f2f40a3f4')],
+  },
+  CATERING: {
+    hero: unsplash('1555244162-803834f70033'),
+    sections: [unsplash('1555244162-803834f70033'), unsplash('1414235077428-338989a2e8c0')],
+  },
+  SALON: {
+    hero: unsplash('1562322140-8baeececf3df'),
+    sections: [unsplash('1521590832167-7bcbfaa6381f'), unsplash('1487412720507-e7ab37603c6f')],
+  },
+  EDUCATION: {
+    hero: unsplash('1522202176988-66273c2fd55f'),
+    sections: [unsplash('1513258496099-48168024aec0'), unsplash('1509062522246-3755977927d7')],
+  },
+  LOCAL_SERVICES: {
+    hero: unsplash('1581578731548-c64695cc6952'),
+    sections: [unsplash('1521791136064-7986c2920216'), unsplash('1581092160562-40aa08e78837')],
+  },
 };
 
 // A real, curated hero photo for a template's Template Library card —
@@ -77,7 +97,10 @@ function exampleVars(detail: Pick<TemplateDetail, 'industry'>, page: TemplatePag
 // Mirrors server/src/services/webos/templateEngine.ts exactly, so a
 // template's preview and a real generated site render the same way for
 // the same section types.
-const SERVICES_LIST_SECTION_TYPES = new Set(['benefits', 'program-overview', 'featured-products', 'menu-highlights']);
+const SERVICES_LIST_SECTION_TYPES = new Set([
+  'benefits', 'program-overview', 'featured-products', 'menu-highlights',
+  'services-catalog', 'rooms-overview', 'packages-overview', 'courses-overview', 'practice-areas',
+]);
 
 function sectionBody(type: string, bodyPattern: string, vars: Record<string, string>): string {
   if (SERVICES_LIST_SECTION_TYPES.has(type)) {
@@ -88,6 +111,12 @@ function sectionBody(type: string, bodyPattern: string, vars: Record<string, str
 
 // Clearly-generic placeholders so the trust section of a template preview
 // renders populated (what a finished site looks like) instead of empty.
+const EXAMPLE_SERVICES: PublicService[] = [
+  { id: 'preview-svc-1', name: 'Signature service', description: 'Our most popular offering, tailored to you.', priceCents: 8000, durationMinutes: 60 },
+  { id: 'preview-svc-2', name: 'Quick session', description: 'A shorter option when time is tight.', priceCents: 4500, durationMinutes: 30 },
+  { id: 'preview-svc-3', name: 'Premium package', description: 'The full experience, start to finish.', priceCents: 15000, durationMinutes: 90 },
+];
+
 const EXAMPLE_TESTIMONIALS: PublicTestimonial[] = [
   { id: 'preview-1', authorName: 'Alex Morgan', authorRole: 'Customer', quote: 'Working with them was seamless from start to finish.', rating: 5, createdAt: '2024-01-01T00:00:00.000Z' },
   { id: 'preview-2', authorName: 'Jamie Lee', authorRole: 'Client', quote: 'Exactly what we needed, professional and reliable.', rating: 5, createdAt: '2024-01-01T00:00:00.000Z' },
@@ -142,12 +171,18 @@ export function buildTemplatePreviewSite(detail: TemplateDetail): PublicSite {
     slug: 'preview',
     maxPartySize: null,
     reservationIntervalMinutes: 30,
-    openingTime: null,
-    closingTime: null,
+    openingTime: '09:00',
+    closingTime: '18:00',
+    workingDays: [1, 2, 3, 4, 5],
+    appointmentDurationMinutes: 30,
+    appointmentBufferMinutes: 0,
+    appointmentCapacity: 1,
+    serviceArea: 'Your local area',
     customDomain: null,
     publishedAt: null,
     pages,
     testimonials: EXAMPLE_TESTIMONIALS,
     menuCategories: [],
+    services: EXAMPLE_SERVICES,
   };
 }

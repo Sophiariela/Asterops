@@ -7,6 +7,19 @@ import { sendSms, smsConfigured } from '../../lib/sms.js';
 import { sendWhatsAppMessage, whatsappConfigured } from '../../lib/whatsapp.js';
 import { createCalendarEvent, updateCalendarEvent, deleteCalendarEvent } from '../../lib/googleCalendar.js';
 import { isTableFree } from './tables.service.js';
+import { assertSlotAvailable } from './availability.service.js';
+import { zonedTimeToUtc } from '../../lib/zonedTime.js';
+
+// Appointment bookings (non-RESTAURANT) send slotDate/slotTime (what the
+// availability endpoint itself returned) so the instant is reconstructed
+// in the SITE's own timezone; RESTAURANT keeps sending a pre-combined
+// reservationAt built in the visitor's own browser timezone, unchanged.
+function resolveReservationAt(site: Pick<Site, 'timezone'>, data: { reservationAt?: string; slotDate?: string; slotTime?: string }): Date {
+  if (data.slotDate && data.slotTime) {
+    return zonedTimeToUtc(data.slotDate, data.slotTime, site.timezone ?? 'UTC');
+  }
+  return new Date(data.reservationAt ?? '');
+}
 
 async function assertSiteOwned(ownerId: string, siteId: string) {
   const site = await prisma.site.findFirst({ where: { id: siteId, ownerId } });
@@ -111,8 +124,33 @@ export async function listReservations(ownerId: string, siteId: string, status?:
   return prisma.reservation.findMany({
     where: { siteId, ...(status ? { status } : {}) },
     orderBy: { reservationAt: 'asc' },
-    include: { table: { select: { id: true, name: true } } },
+    include: { table: { select: { id: true, name: true } }, service: { select: { id: true, name: true } } },
   });
+}
+
+// A non-RESTAURANT booking (consultant/professional services/salon/
+// education/fitness) goes through the real appointment-availability
+// engine instead of the table-capacity rules above: working days,
+// business hours, blocked dates and a capacity-based double-booking
+// check, re-validated here regardless of what the client's own slot
+// picker showed. Returns the duration to store on the Reservation (the
+// Service's own, if one was booked, else the site default) and the
+// resolved serviceId.
+async function resolveAppointmentBooking(
+  site: Site,
+  serviceId: string | undefined,
+  reservationAt: Date,
+): Promise<{ durationMinutes: number; serviceId: string | null }> {
+  let durationMinutes = site.appointmentDurationMinutes;
+  let resolvedServiceId: string | null = null;
+  if (serviceId) {
+    const service = await prisma.service.findFirst({ where: { id: serviceId, siteId: site.id, active: true } });
+    if (!service) throw new CommerceError(400, 'Service not found.');
+    resolvedServiceId = service.id;
+    if (service.durationMinutes) durationMinutes = service.durationMinutes;
+  }
+  await assertSlotAvailable(site, reservationAt, durationMinutes);
+  return { durationMinutes, serviceId: resolvedServiceId };
 }
 
 // Mirrors leads.service's submitPublicLead: unauthenticated because it's
@@ -123,15 +161,29 @@ export async function submitPublicReservation(data: {
   customerEmail: string;
   customerPhone?: string;
   partySize: number;
-  reservationAt: string;
+  reservationAt?: string;
+  slotDate?: string;
+  slotTime?: string;
   notes?: string;
+  serviceId?: string;
 }) {
   const site = await prisma.site.findUnique({ where: { id: data.siteId }, include: { owner: { select: { email: true } } } });
   if (!site) throw new CommerceError(404, 'Site not found.');
-  const reservationAt = new Date(data.reservationAt);
+  const reservationAt = resolveReservationAt(site, data);
   if (Number.isNaN(reservationAt.getTime())) throw new CommerceError(400, 'Invalid reservation date/time.');
   if (reservationAt.getTime() < Date.now()) throw new CommerceError(400, 'Reservation time must be in the future.');
-  assertWithinRestaurantRules(site, data.partySize, reservationAt);
+
+  let durationMinutes = 90;
+  let serviceId: string | null = null;
+  let partySize = data.partySize;
+  if (site.playbook === 'RESTAURANT') {
+    assertWithinRestaurantRules(site, data.partySize, reservationAt);
+  } else {
+    const resolved = await resolveAppointmentBooking(site, data.serviceId, reservationAt);
+    durationMinutes = resolved.durationMinutes;
+    serviceId = resolved.serviceId;
+    partySize = 1; // 1:1 or per-service appointment, not a table of covers.
+  }
 
   const reservation = await prisma.reservation.create({
     data: {
@@ -139,8 +191,10 @@ export async function submitPublicReservation(data: {
       customerName: data.customerName,
       customerEmail: data.customerEmail,
       customerPhone: data.customerPhone,
-      partySize: data.partySize,
+      partySize,
       reservationAt,
+      durationMinutes,
+      serviceId,
       notes: data.notes,
     },
   });
@@ -156,13 +210,29 @@ export async function submitPublicReservation(data: {
 export async function createReservation(
   ownerId: string,
   siteId: string,
-  data: { customerName: string; customerEmail: string; customerPhone?: string; partySize: number; reservationAt: string; notes?: string },
+  data: { customerName: string; customerEmail: string; customerPhone?: string; partySize: number; reservationAt?: string; slotDate?: string; slotTime?: string; notes?: string; serviceId?: string },
 ) {
   await assertSiteOwned(ownerId, siteId);
   const site = await prisma.site.findUniqueOrThrow({ where: { id: siteId }, include: { owner: { select: { email: true } } } });
-  const reservationAt = new Date(data.reservationAt);
+  const reservationAt = resolveReservationAt(site, data);
   if (Number.isNaN(reservationAt.getTime())) throw new CommerceError(400, 'Invalid reservation date/time.');
-  const reservation = await prisma.reservation.create({ data: { siteId, ...data, reservationAt } });
+
+  let durationMinutes = 90;
+  let serviceId: string | null = null;
+  let partySize = data.partySize;
+  if (site.playbook !== 'RESTAURANT') {
+    const resolved = await resolveAppointmentBooking(site, data.serviceId, reservationAt);
+    durationMinutes = resolved.durationMinutes;
+    serviceId = resolved.serviceId;
+    partySize = 1;
+  }
+
+  const reservation = await prisma.reservation.create({
+    data: {
+      siteId, customerName: data.customerName, customerEmail: data.customerEmail, customerPhone: data.customerPhone,
+      partySize, reservationAt, durationMinutes, serviceId, notes: data.notes,
+    },
+  });
 
   await fireReservationCreatedSideEffects(site, { ...reservation, customerPhone: reservation.customerPhone ?? null, notes: reservation.notes ?? null });
   return reservation;

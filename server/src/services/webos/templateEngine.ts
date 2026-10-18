@@ -30,7 +30,10 @@ export type PageTemplate = {
 // so they're always regenerated live from services rather than filled
 // from a stale stored string. trust-placeholder is likewise forced to
 // the same canonical message the Trust Engine cross-references.
-const SERVICES_LIST_SECTION_TYPES = new Set(['benefits', 'program-overview', 'featured-products', 'menu-highlights']);
+const SERVICES_LIST_SECTION_TYPES = new Set([
+  'benefits', 'program-overview', 'featured-products', 'menu-highlights',
+  'services-catalog', 'rooms-overview', 'packages-overview', 'courses-overview', 'practice-areas',
+]);
 
 function buildVars(input: GeneratorInput, page: TemplatePage): Record<string, string> {
   return {

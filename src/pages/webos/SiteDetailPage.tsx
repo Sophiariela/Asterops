@@ -12,6 +12,9 @@ import ReservationsDashboard from '../../components/webos/ReservationsDashboard'
 import MenuManager from '../../components/webos/MenuManager';
 import BusinessSettingsPanel from '../../components/webos/BusinessSettingsPanel';
 import RestaurantSettingsPanel from '../../components/webos/RestaurantSettingsPanel';
+import AvailabilitySettingsPanel from '../../components/webos/AvailabilitySettingsPanel';
+import ServiceAreaPanel from '../../components/webos/ServiceAreaPanel';
+import ServicesManager from '../../components/webos/ServicesManager';
 import LeadsDashboard from '../../components/webos/LeadsDashboard';
 import ReviewsPanel from '../../components/webos/ReviewsPanel';
 import OwnerDashboardCards from '../../components/webos/OwnerDashboardCards';
@@ -23,6 +26,7 @@ import { CURRENCIES } from '../../lib/webos/currency';
 import { getPublicSiteUrl, resolvePublicSiteUrl, checkPublishingAvailable, type DomainStatus } from '../../lib/webos/publicUrl';
 import { formatRelativeTime } from '../../lib/webos/time';
 import { titleCase } from '../../lib/webos/locale';
+import { APPOINTMENT_PLAYBOOKS } from '../../lib/webos/types';
 import type {
   Site, Page, Testimonial, TrustElement, TrustElementType, Playbook, WebsiteHealth, ConversionAudit, TrustGap,
   RecommendedAction, Lead, LeadStatus, ConversionPathsResult, PageInventoryItem,
@@ -43,7 +47,7 @@ const LEAD_STATUS_STYLE: Record<LeadStatus, string> = {
   CLIENT: 'bg-slate-200 text-slate-500',
 };
 
-type Tab = 'overview' | 'pages' | 'menu' | 'reservations' | 'trust' | 'forms' | 'analytics' | 'settings';
+type Tab = 'overview' | 'pages' | 'menu' | 'services' | 'reservations' | 'trust' | 'forms' | 'analytics' | 'settings';
 
 const TRUST_ELEMENT_LABEL: Record<TrustElementType, string> = {
   CASE_STUDY: 'Case study',
@@ -367,12 +371,20 @@ export default function SiteDetailPage() {
     return <SiteDetailSkeleton />;
   }
 
-  const playbookLabel = playbooks.find((p) => p.key === site.playbook)?.label ?? site.playbook;
+  // Prefer the site's own actual source template name — several distinct
+  // templates can share a playbook key (e.g. five different RESTAURANT
+  // templates), so a key-based lookup can no longer reliably name which
+  // one this site came from.
+  const playbookLabel = site.template?.name ?? playbooks.find((p) => p.key === site.playbook)?.label ?? site.playbook;
   const isRestaurant = site.playbook === 'RESTAURANT';
-  // Table reservations and 1:1 consultation booking share the same
-  // scheduling mechanism (see ReservationsDashboard/PublicSiteRenderer).
-  const isBookable = isRestaurant || site.playbook === 'CONSULTANT';
+  // Table reservations and slot-based appointment booking (consultant,
+  // professional services, salon, education, fitness) share the same
+  // Reservation model and dashboard (see ReservationsDashboard/
+  // PublicSiteRenderer) — just with/without tables and party size.
+  const isAppointmentPlaybook = APPOINTMENT_PLAYBOOKS.includes(site.playbook);
+  const isBookable = isRestaurant || isAppointmentPlaybook;
   const bookingsLabel = isRestaurant ? 'Reservations' : 'Bookings';
+  const hasServiceCatalog = isAppointmentPlaybook;
   const maxFunnelCount = conversionPaths ? Math.max(1, ...conversionPaths.funnel.map((f) => f.count)) : 1;
   // Instant best-guess from known data, upgraded to the verified/fallback
   // result the moment resolvePublicSiteUrl() finishes checking.
@@ -478,6 +490,7 @@ export default function SiteDetailPage() {
           { key: 'overview' as Tab, label: 'Overview' },
           { key: 'pages' as Tab, label: 'Pages' },
           ...(isRestaurant ? ([{ key: 'menu', label: 'Menu' }] as { key: Tab; label: string }[]) : []),
+          ...(hasServiceCatalog ? ([{ key: 'services', label: 'Services' }] as { key: Tab; label: string }[]) : []),
           ...(isBookable ? ([{ key: 'reservations', label: bookingsLabel }] as { key: Tab; label: string }[]) : []),
           { key: 'trust' as Tab, label: 'Trust' },
           { key: 'forms' as Tab, label: 'Forms' },
@@ -562,6 +575,12 @@ export default function SiteDetailPage() {
       {tab === 'menu' && (
         <div className="mt-6">
           <MenuManager siteId={site.id} currency={site.currency} />
+        </div>
+      )}
+
+      {tab === 'services' && (
+        <div className="mt-6">
+          <ServicesManager siteId={site.id} currency={site.currency} onChanged={loadCore} />
         </div>
       )}
 
@@ -896,6 +915,8 @@ export default function SiteDetailPage() {
           <BusinessSettingsPanel site={site} onRefresh={loadCore} />
 
           {isRestaurant && <RestaurantSettingsPanel site={site} onRefresh={loadCore} />}
+          {isAppointmentPlaybook && <AvailabilitySettingsPanel site={site} onRefresh={loadCore} />}
+          {site.playbook === 'LOCAL_SERVICES' && <ServiceAreaPanel site={site} onRefresh={loadCore} />}
 
           <div className="bg-white rounded-[28px] card-shadow border border-ASTER-100 p-6 space-y-4">
             <p className="text-xs font-bold text-slate-400 uppercase tracking-wide">Regional settings</p>

@@ -48,6 +48,13 @@ export async function getSite(ownerId: string, id: string) {
       trustElements: { orderBy: { createdAt: 'desc' } },
       reviews: { orderBy: { createdAt: 'desc' } },
       menuCategories: { orderBy: { order: 'asc' }, include: { items: { orderBy: { order: 'asc' } } } },
+      services: { orderBy: { order: 'asc' } },
+      blockedDates: { orderBy: { date: 'asc' } },
+      // The site's own actual source template's name — several distinct
+      // templates can share a playbook key (e.g. five different
+      // RESTAURANT templates), so a key-only lookup can no longer tell
+      // the dashboard which one this site was really generated from.
+      template: { select: { name: true } },
     },
   });
   if (!site) throw new CommerceError(404, 'Site not found.');
@@ -77,6 +84,16 @@ export async function getPublicSiteBySlug(slug: string) {
       reservationIntervalMinutes: true,
       openingTime: true,
       closingTime: true,
+      workingDays: true,
+      appointmentDurationMinutes: true,
+      appointmentBufferMinutes: true,
+      appointmentCapacity: true,
+      serviceArea: true,
+      services: {
+        where: { active: true },
+        orderBy: { order: 'asc' },
+        select: { id: true, name: true, description: true, priceCents: true, durationMinutes: true },
+      },
       pages: {
         orderBy: { order: 'asc' },
         select: {
@@ -170,7 +187,35 @@ export async function generateSite(
     return getSite(ownerId, site.id);
   }
 
+  // Appointment-booking verticals (Salon/Education/Professional
+  // Services/Consultant/Fitness) get the same treatment with the Service
+  // catalog instead of a Menu — real offering names from the wizard, no
+  // fabricated price or duration until the owner sets them.
+  if (APPOINTMENT_PLAYBOOKS.has(template.key) && input.services.length) {
+    await prisma.service.createMany({
+      data: input.services.map((name, i) => ({ siteId: site.id, name, order: i })),
+    });
+    return getSite(ownerId, site.id);
+  }
+
   return omitSecrets(site);
+}
+
+const APPOINTMENT_PLAYBOOKS = new Set<SitePlaybook>(['CONSULTANT', 'PROFESSIONAL_SERVICES', 'SALON', 'EDUCATION', 'FITNESS']);
+
+// Unauthenticated: backs the Ecommerce playbook's public product grid.
+// Reuses CommerceOS's own Product catalog (owner-scoped, see schema.prisma)
+// rather than duplicating it onto Site — a tenant's catalog is the same
+// across every ecommerce site they publish, which is the existing,
+// intentional CommerceOS data model, not something this introduces.
+export async function getPublicSiteProducts(siteId: string) {
+  const site = await prisma.site.findUnique({ where: { id: siteId }, select: { ownerId: true } });
+  if (!site) throw new CommerceError(404, 'Site not found.');
+  return prisma.product.findMany({
+    where: { ownerId: site.ownerId, status: 'ACTIVE' },
+    orderBy: { createdAt: 'desc' },
+    select: { id: true, name: true, slug: true, description: true, price: true, compareAtPrice: true, imageUrl: true, stockQuantity: true },
+  });
 }
 
 export async function deleteSite(ownerId: string, id: string) {
@@ -208,6 +253,8 @@ export async function updateSite(
     businessName: string; industry: string; targetAudience: string; currency: SiteCurrency; country: string; timezone: string;
     contactEmail: string; reservationEmail: string; reviewEmail: string; phone: string; whatsappNumber: string; primaryColor: string;
     maxPartySize: number | null; reservationIntervalMinutes: number; openingTime: string; closingTime: string;
+    workingDays: number[]; appointmentDurationMinutes: number; appointmentBufferMinutes: number; appointmentCapacity: number;
+    serviceArea: string;
   }>,
 ) {
   const existing = await prisma.site.findFirst({ where: { id, ownerId } });
@@ -216,7 +263,7 @@ export async function updateSite(
   // A Business Settings field submitted as '' means "clear this" (fall
   // back to the owner's account email / no notification), not "set it to
   // an empty string" — normalize before writing.
-  const CLEARABLE_FIELDS = ['contactEmail', 'reservationEmail', 'reviewEmail', 'phone', 'whatsappNumber', 'primaryColor', 'openingTime', 'closingTime'] as const;
+  const CLEARABLE_FIELDS = ['contactEmail', 'reservationEmail', 'reviewEmail', 'phone', 'whatsappNumber', 'primaryColor', 'openingTime', 'closingTime', 'serviceArea'] as const;
   const normalized = { ...data };
   for (const field of CLEARABLE_FIELDS) {
     if (normalized[field] === '') (normalized as Record<string, unknown>)[field] = null;

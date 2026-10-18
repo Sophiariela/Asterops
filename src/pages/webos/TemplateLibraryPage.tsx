@@ -1,10 +1,13 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Sparkles, ArrowRight, Layers, Target, AlertTriangle } from 'lucide-react';
+import {
+  Search, Sparkles, ArrowRight, Layers, Target, AlertTriangle, CalendarCheck, ShoppingBag, Megaphone, ClipboardList,
+} from 'lucide-react';
 import { api, ApiError } from '../../lib/api';
 import { titleCase } from '../../lib/webos/locale';
 import { getTemplateThumbnail } from '../../lib/webos/templatePreview';
 import { TemplateCardSkeleton } from '../../components/webos/Skeleton';
+import { ALL_CATEGORIES, CATEGORY_BY_PLAYBOOK, templateCapabilities, type TemplateCategory } from '../../lib/webos/templateCategories';
 import type { TemplateSummary, TemplateComplexity } from '../../lib/webos/types';
 
 function scoreColor(score: number) {
@@ -19,6 +22,43 @@ const COMPLEXITY_STYLE: Record<TemplateComplexity, string> = {
   ADVANCED: 'bg-violet-50 text-violet-700',
 };
 
+type Capability = 'ALL' | 'booking' | 'ecommerce' | 'quoteOrInquiry' | 'leadGeneration';
+const CAPABILITY_OPTIONS: { value: Capability; label: string }[] = [
+  { value: 'ALL', label: 'Any functionality' },
+  { value: 'booking', label: 'Booking support' },
+  { value: 'ecommerce', label: 'Ecommerce support' },
+  { value: 'quoteOrInquiry', label: 'Quote & inquiry forms' },
+  { value: 'leadGeneration', label: 'Lead generation' },
+];
+
+function CapabilityBadges({ t }: { t: TemplateSummary }) {
+  const caps = templateCapabilities(t);
+  return (
+    <div className="flex items-center gap-1.5 flex-wrap">
+      {caps.booking && (
+        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
+          <CalendarCheck size={10} /> Booking
+        </span>
+      )}
+      {caps.ecommerce && (
+        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-violet-700 bg-violet-50 px-2 py-0.5 rounded-full">
+          <ShoppingBag size={10} /> Ecommerce
+        </span>
+      )}
+      {caps.quoteOrInquiry && (
+        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full">
+          <ClipboardList size={10} /> Quote & inquiry
+        </span>
+      )}
+      {caps.leadGeneration && (
+        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full">
+          <Megaphone size={10} /> Lead generation
+        </span>
+      )}
+    </div>
+  );
+}
+
 export default function TemplateLibraryPage() {
   const navigate = useNavigate();
   const [templates, setTemplates] = useState<TemplateSummary[] | null>(null);
@@ -28,6 +68,8 @@ export default function TemplateLibraryPage() {
   const [goal, setGoal] = useState('');
   const [complexity, setComplexity] = useState<TemplateComplexity | ''>('');
   const [ecommerceOnly, setEcommerceOnly] = useState(false);
+  const [category, setCategory] = useState<TemplateCategory | 'ALL'>('ALL');
+  const [capability, setCapability] = useState<Capability>('ALL');
 
   const [showLuna, setShowLuna] = useState(false);
   const [lunaForm, setLunaForm] = useState({ industry: '', targetAudience: '', description: '' });
@@ -60,6 +102,23 @@ export default function TemplateLibraryPage() {
 
   const industries = useMemo(() => Array.from(new Set((templates ?? []).map((t) => t.industry))).sort(), [templates]);
   const goals = useMemo(() => Array.from(new Set((templates ?? []).map((t) => t.primaryGoal))).sort(), [templates]);
+
+  // Category and functionality-capability filters are purely client-side
+  // on top of the already-fetched, server-filtered list — both are
+  // derived straight from each template's own real playbook/isEcommerce,
+  // never a separate "tag" someone could set inconsistently.
+  const visibleTemplates = useMemo(() => {
+    let list = templates ?? [];
+    if (category !== 'ALL') list = list.filter((t) => CATEGORY_BY_PLAYBOOK[t.key] === category);
+    if (capability !== 'ALL') list = list.filter((t) => templateCapabilities(t)[capability]);
+    return list;
+  }, [templates, category, capability]);
+
+  const categoryCounts = useMemo(() => {
+    const counts = new Map<TemplateCategory, number>();
+    for (const t of templates ?? []) counts.set(CATEGORY_BY_PLAYBOOK[t.key], (counts.get(CATEGORY_BY_PLAYBOOK[t.key]) ?? 0) + 1);
+    return counts;
+  }, [templates]);
 
   const openPreview = (t: TemplateSummary) => {
     navigate(`/webos/templates/${t.id}/preview`);
@@ -104,7 +163,25 @@ export default function TemplateLibraryPage() {
         </button>
       </div>
 
-      <div className="mt-6 flex flex-wrap items-center gap-3">
+      <div className="mt-6 flex items-center gap-2 overflow-x-auto pb-1">
+        <button
+          onClick={() => setCategory('ALL')}
+          className={`shrink-0 text-xs font-bold px-4 py-2 rounded-full whitespace-nowrap transition-colors ${category === 'ALL' ? 'bg-ink-950 text-white' : 'bg-slate-100 text-slate-500 hover:text-ink-900'}`}
+        >
+          All categories ({(templates ?? []).length})
+        </button>
+        {ALL_CATEGORIES.filter((c) => (categoryCounts.get(c) ?? 0) > 0).map((c) => (
+          <button
+            key={c}
+            onClick={() => setCategory(c)}
+            className={`shrink-0 text-xs font-bold px-4 py-2 rounded-full whitespace-nowrap transition-colors ${category === c ? 'bg-ink-950 text-white' : 'bg-slate-100 text-slate-500 hover:text-ink-900'}`}
+          >
+            {c} ({categoryCounts.get(c)})
+          </button>
+        ))}
+      </div>
+
+      <div className="mt-4 flex flex-wrap items-center gap-3">
         <div className="relative flex-1 min-w-[220px]">
           <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" />
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search templates" className="w-full border-2 border-ASTER-100 focus:border-ASTER-600 rounded-full pl-11 pr-4 py-2.5 text-sm outline-none transition-colors" />
@@ -122,6 +199,9 @@ export default function TemplateLibraryPage() {
           <option value="SIMPLE">Simple</option>
           <option value="STANDARD">Standard</option>
           <option value="ADVANCED">Advanced</option>
+        </select>
+        <select value={capability} onChange={(e) => setCapability(e.target.value as Capability)} className="border-2 border-ASTER-100 rounded-full px-4 py-2.5 text-sm outline-none">
+          {CAPABILITY_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
         </select>
         <label className="flex items-center gap-2 text-sm font-semibold text-slate-600 px-3">
           <input type="checkbox" checked={ecommerceOnly} onChange={(e) => setEcommerceOnly(e.target.checked)} className="accent-ASTER-600" />
@@ -141,7 +221,7 @@ export default function TemplateLibraryPage() {
 
       <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
         {!loadError && templates === null && Array.from({ length: 6 }).map((_, i) => <TemplateCardSkeleton key={i} />)}
-        {!loadError && templates?.map((t) => {
+        {!loadError && visibleTemplates.map((t) => {
           return (
             <button key={t.id} onClick={() => openPreview(t)} className="text-left bg-white rounded-[28px] card-shadow border border-ASTER-100 overflow-hidden hover:-translate-y-0.5 transition-transform flex flex-col">
               <div className="relative aspect-[16/10]">
@@ -151,6 +231,7 @@ export default function TemplateLibraryPage() {
               <div className="p-6 flex flex-col flex-1">
                 <p className="font-display font-bold text-lg text-ink-900">{t.name}</p>
                 <p className="text-slate-500 text-xs mt-1">{t.industry}</p>
+                <div className="mt-2"><CapabilityBadges t={t} /></div>
                 <p className="text-sm text-slate-600 mt-3 flex-1">{t.description}</p>
                 <div className="mt-4 bg-slate-50 rounded-2xl p-3 text-[11px] text-slate-500 italic">
                   {t.recommendedUseCase}
@@ -167,7 +248,7 @@ export default function TemplateLibraryPage() {
             </button>
           );
         })}
-        {templates && templates.length === 0 && (
+        {templates && visibleTemplates.length === 0 && (
           <p className="col-span-full text-center text-slate-400 py-10">No templates match these filters.</p>
         )}
       </div>

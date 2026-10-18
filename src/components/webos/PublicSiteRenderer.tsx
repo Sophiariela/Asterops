@@ -1,10 +1,33 @@
 import { useState, type CSSProperties, type FormEvent, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { Star, UtensilsCrossed, CalendarCheck, CheckCircle2 } from 'lucide-react';
+import { Star, UtensilsCrossed, CalendarCheck, CheckCircle2, Clock } from 'lucide-react';
 import { api, ApiError, resolveUploadUrl } from '../../lib/api';
 import ReservationBookingForm from './ReservationBookingForm';
+import AppointmentBookingForm from './AppointmentBookingForm';
+import HotelInquiryForm from './HotelInquiryForm';
+import CateringInquiryForm from './CateringInquiryForm';
+import QuoteRequestForm from './QuoteRequestForm';
+import ProductShowcase from './ProductShowcase';
 import { formatMoney } from '../../lib/webos/currency';
-import type { PublicSite, PublicPage } from '../../lib/webos/types';
+import { APPOINTMENT_PLAYBOOKS } from '../../lib/webos/types';
+import { BOOKING_SLUG } from '../../lib/webos/bookingSlug';
+import type { PublicSite, PublicPage, PublicProduct } from '../../lib/webos/types';
+
+// Section types backed by the real Service catalog (see Service model) —
+// rendered as a proper priced/duration grid instead of a plain bullet
+// list whenever the business has actually configured one.
+const SERVICE_CATALOG_SECTION_TYPES = new Set(['services-catalog', 'program-overview', 'courses-overview']);
+
+// Template Library preview only — stands in for the real CommerceOS
+// catalog ProductShowcase otherwise fetches, since a "preview" site id
+// has no real tenant behind it.
+function PREVIEW_PRODUCTS(imageUrl: string | null): PublicProduct[] {
+  return [
+    { id: 'preview-p1', name: 'Best seller', slug: 'best-seller', description: 'Our most popular item.', price: 4800, compareAtPrice: null, imageUrl, stockQuantity: 12 },
+    { id: 'preview-p2', name: 'New arrival', slug: 'new-arrival', description: 'Just added to the shop.', price: 3200, compareAtPrice: 4000, imageUrl, stockQuantity: 8 },
+    { id: 'preview-p3', name: 'Customer favorite', slug: 'customer-favorite', description: 'Loved by repeat customers.', price: 6500, compareAtPrice: null, imageUrl, stockQuantity: 5 },
+  ];
+}
 
 function LeadCaptureForm({ siteId, pageId }: { siteId: string; pageId: string }) {
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
@@ -181,10 +204,15 @@ export default function PublicSiteRenderer({
 }) {
   const isRestaurant = site.playbook === 'RESTAURANT';
   const isMenuPage = isRestaurant && page.slug === 'menu';
-  // Table reservations and 1:1 consultation bookings share the same
-  // scheduling mechanism — the only difference is table/party-size, which
-  // ReservationBookingForm itself hides for a non-restaurant site.
-  const isReservationsPage = page.slug === 'reservations' || page.slug === 'book-a-call';
+  const isAppointmentPlaybook = APPOINTMENT_PLAYBOOKS.includes(site.playbook);
+  const isHotel = site.playbook === 'HOTEL';
+  const isCatering = site.playbook === 'CATERING';
+  const isLocalServices = site.playbook === 'LOCAL_SERVICES';
+  const isEcommerce = site.playbook === 'ECOMMERCE';
+  // The one page that carries this playbook's real business-functionality
+  // form (table reservation, slot booking, accommodation/event inquiry,
+  // or quote request) — see BOOKING_SLUG above.
+  const isReservationsPage = page.slug === BOOKING_SLUG[site.playbook];
   const isHomePage = page.slug === 'home';
   const featuredItems = isRestaurant ? site.menuCategories.flatMap((c) => c.items).filter((i) => i.featured) : [];
   const ctaTargetSlug = page.ctaHref?.replace(/^\//, '');
@@ -236,6 +264,11 @@ export default function PublicSiteRenderer({
         <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-10 gap-3">
           <h1 className="font-display font-extrabold text-2xl sm:text-4xl text-white max-w-2xl">{page.heroHeadline}</h1>
           <p className="text-white/90 text-sm sm:text-base max-w-xl">{page.heroSubheadline}</p>
+          {isLocalServices && site.serviceArea && (
+            <span className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-white/15 backdrop-blur rounded-full px-3 py-1 w-fit">
+              Proudly serving {site.serviceArea}
+            </span>
+          )}
           <div className="mt-1">
             {ctaTargetPage ? (
               <PageLink to={pageHref(ctaTargetPage.slug)} slug={ctaTargetPage.slug} onNavigate={onNavigate} className="inline-block bg-ASTER-600 hover:bg-ASTER-700 rounded-full text-white font-bold text-sm px-5 py-2.5 transition-colors">
@@ -315,9 +348,9 @@ export default function PublicSiteRenderer({
 
       {/* Sections */}
       <div className="divide-y divide-ASTER-100">
-        {!isMenuPage && page.sections.map((section, i) =>
-          section.type === 'trust-placeholder' ? (
-            site.testimonials.length > 0 && (
+        {!isMenuPage && page.sections.map((section, i) => {
+          if (section.type === 'trust-placeholder') {
+            return site.testimonials.length > 0 && (
               <div key={i} className="p-6 sm:p-10">
                 <h3 className="font-display font-bold text-xl text-ink-900 mb-5">{section.heading}</h3>
                 <div className="grid sm:grid-cols-3 gap-4">
@@ -332,8 +365,48 @@ export default function PublicSiteRenderer({
                   ))}
                 </div>
               </div>
-            )
-          ) : (
+            );
+          }
+
+          // Real Service catalog (price + duration), not a plain bullet
+          // list, whenever the business has actually configured one.
+          if (SERVICE_CATALOG_SECTION_TYPES.has(section.type) && site.services.length > 0) {
+            return (
+              <div key={i} className="p-6 sm:p-10">
+                <h3 className="font-display font-bold text-xl text-ink-900 mb-5">{section.heading}</h3>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  {site.services.map((s) => (
+                    <div key={s.id} className="bg-slate-50 rounded-2xl p-5">
+                      <div className="flex items-start justify-between gap-3">
+                        <p className="text-sm font-bold text-ink-900">{s.name}</p>
+                        {s.priceCents !== null && <span className="text-sm font-bold text-ASTER-600 tabular-nums whitespace-nowrap">{formatMoney(s.priceCents, site.currency)}</span>}
+                      </div>
+                      {s.description && <p className="text-xs text-slate-500 mt-1.5">{s.description}</p>}
+                      {s.durationMinutes && <p className="text-[11px] text-slate-400 mt-2 flex items-center gap-1"><Clock size={11} /> {s.durationMinutes} min</p>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          }
+
+          // Ecommerce's real product catalog (CommerceOS), not a bullet
+          // list of entered offerings.
+          if (section.type === 'featured-products' && isEcommerce) {
+            return (
+              <div key={i} className="p-6 sm:p-10">
+                <h3 className="font-display font-bold text-xl text-ink-900 mb-5">{section.heading}</h3>
+                <ProductShowcase
+                  siteId={site.id}
+                  currency={site.currency}
+                  previewMode={previewMode}
+                  previewProducts={previewMode ? PREVIEW_PRODUCTS(section.imageUrl ?? null) : undefined}
+                />
+              </div>
+            );
+          }
+
+          return (
             <div key={i} className={`p-6 sm:p-10 grid sm:grid-cols-2 gap-6 items-center ${i % 2 === 1 ? 'sm:[&>*:first-child]:order-2' : ''}`}>
               {section.imageUrl ? (
                 <img src={resolveUploadUrl(section.imageUrl) ?? undefined} alt="" className="aspect-video w-full object-cover rounded-2xl" />
@@ -345,24 +418,35 @@ export default function PublicSiteRenderer({
                 <p className="text-sm text-slate-600 whitespace-pre-line">{section.body}</p>
               </div>
             </div>
-          ),
-        )}
+          );
+        })}
       </div>
 
-      {/* Reservation booking */}
+      {/* The one real business-functionality form for this playbook. */}
       {isReservationsPage && (
         <div id="contact" className="p-6 sm:p-10 bg-slate-50 border-t border-ASTER-100">
-          <p className="font-display font-bold text-lg text-ink-900 mb-4 flex items-center gap-2"><CalendarCheck size={18} className="text-ASTER-600" /> {isRestaurant ? 'Reserve a table' : 'Book a time'}</p>
-          {previewMode ? <PreviewContactForm /> : (
+          <p className="font-display font-bold text-lg text-ink-900 mb-4 flex items-center gap-2">
+            <CalendarCheck size={18} className="text-ASTER-600" />
+            {isRestaurant ? 'Reserve a table' : isHotel ? 'Check availability' : isCatering ? 'Request a quote' : isLocalServices ? 'Get a free quote' : 'Book a time'}
+          </p>
+          {previewMode ? <PreviewContactForm /> : isRestaurant ? (
             <ReservationBookingForm
               siteId={site.id}
-              showPartySize={isRestaurant}
+              showPartySize
               maxPartySize={site.maxPartySize}
               reservationIntervalMinutes={site.reservationIntervalMinutes}
               openingTime={site.openingTime}
               closingTime={site.closingTime}
             />
-          )}
+          ) : isAppointmentPlaybook ? (
+            <AppointmentBookingForm siteId={site.id} services={site.services} currency={site.currency} />
+          ) : isHotel ? (
+            <HotelInquiryForm siteId={site.id} />
+          ) : isCatering ? (
+            <CateringInquiryForm siteId={site.id} />
+          ) : isLocalServices ? (
+            <QuoteRequestForm siteId={site.id} serviceArea={site.serviceArea} />
+          ) : null}
         </div>
       )}
 

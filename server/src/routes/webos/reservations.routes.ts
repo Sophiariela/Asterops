@@ -1,9 +1,10 @@
 import { Router, type Request } from 'express';
 import { authenticate, requireRole } from '../../middleware/auth.js';
 import {
-  createReservationSchema, publicReservationSchema, updateReservationStatusSchema, assignTableSchema,
+  createReservationSchema, publicReservationSchema, updateReservationStatusSchema, assignTableSchema, availabilityQuerySchema,
 } from '../../validation/webos.js';
 import * as reservationsService from '../../services/webos/reservations.service.js';
+import { getPublicAvailableSlots } from '../../services/webos/availability.service.js';
 import type { ReservationStatus } from '@prisma/client';
 
 type SiteParams = { siteId: string };
@@ -55,4 +56,16 @@ publicReservationsRouter.post('/', async (req, res) => {
   }
   const reservation = await reservationsService.submitPublicReservation(parsed.data);
   res.status(201).json({ reservation: { id: reservation.id, status: reservation.status } });
+});
+
+// Real, pickable time slots for a given date — never a blind date/time
+// input. Query param siteId since this is a single flat public route.
+publicReservationsRouter.get('/availability', async (req, res) => {
+  const parsed = availabilityQuerySchema.safeParse(req.query);
+  const siteId = typeof req.query.siteId === 'string' ? req.query.siteId : '';
+  if (!parsed.success || !siteId) {
+    return res.status(400).json({ error: parsed.success ? 'siteId is required.' : parsed.error.issues[0]?.message ?? 'Invalid input.' });
+  }
+  const availability = await getPublicAvailableSlots(siteId, parsed.data.date, parsed.data.serviceId);
+  res.json(availability);
 });

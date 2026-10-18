@@ -3,7 +3,13 @@ import { Monitor, Tablet, Smartphone, Plus, Star, UtensilsCrossed, CalendarCheck
 import { api } from '../../lib/api';
 import { EditableText, EditableImage } from './editable';
 import ReservationBookingForm from './ReservationBookingForm';
+import AppointmentBookingForm from './AppointmentBookingForm';
+import HotelInquiryForm from './HotelInquiryForm';
+import CateringInquiryForm from './CateringInquiryForm';
+import QuoteRequestForm from './QuoteRequestForm';
+import { BOOKING_SLUG } from '../../lib/webos/bookingSlug';
 import { formatMoney } from '../../lib/webos/currency';
+import { APPOINTMENT_PLAYBOOKS } from '../../lib/webos/types';
 import type { Site, Page, MenuItem, Currency } from '../../lib/webos/types';
 
 // Mirrors PublicSiteRenderer's darken() — keeps the editor's live preview
@@ -135,7 +141,14 @@ export default function WebsiteEditor({
 
   const isRestaurant = site.playbook === 'RESTAURANT';
   const isMenuPage = isRestaurant && page.slug === 'menu';
-  const isReservationsPage = isRestaurant && page.slug === 'reservations';
+  const isAppointmentPlaybook = APPOINTMENT_PLAYBOOKS.includes(site.playbook);
+  const isHotel = site.playbook === 'HOTEL';
+  const isCatering = site.playbook === 'CATERING';
+  const isLocalServices = site.playbook === 'LOCAL_SERVICES';
+  // The one page carrying this playbook's real business-functionality
+  // form — mirrors PublicSiteRenderer's BOOKING_SLUG exactly, so the
+  // editor's "live" preview never disagrees with the published site.
+  const isReservationsPage = page.slug === BOOKING_SLUG[site.playbook];
   const isHomePage = page.slug === 'home';
   const featuredItems = isRestaurant ? site.menuCategories.flatMap((c) => c.items).filter((i) => i.featured) : [];
   const ctaTargetSlug = page.ctaHref?.replace(/^\//, '');
@@ -385,25 +398,40 @@ export default function WebsiteEditor({
           )}
         </div>
 
-        {/* Reservation booking — a real, functional form (not a preview) on the Reservations page */}
+        {/* The one real business-functionality form for this playbook — a
+            real, functional form (not a preview), matching exactly what
+            PublicSiteRenderer puts on the live site. */}
         {isReservationsPage && (
           <div className="p-6 sm:p-10 bg-slate-50 border-t border-ASTER-100">
             <div className="flex items-center justify-between gap-4 mb-1">
-              <p className="font-display font-bold text-lg text-ink-900 flex items-center gap-2"><CalendarCheck size={18} className="text-ASTER-600" /> Reserve a table</p>
-              {onManageReservations && (
+              <p className="font-display font-bold text-lg text-ink-900 flex items-center gap-2">
+                <CalendarCheck size={18} className="text-ASTER-600" />
+                {isRestaurant ? 'Reserve a table' : isHotel ? 'Check availability' : isCatering ? 'Request a quote' : isLocalServices ? 'Get a free quote' : 'Book a time'}
+              </p>
+              {onManageReservations && (isRestaurant || isAppointmentPlaybook) && (
                 <button onClick={onManageReservations} className="flex items-center gap-1 text-xs font-bold text-ASTER-600 hover:text-ASTER-700">
-                  Manage reservations <ArrowUpRight size={13} />
+                  Manage {isRestaurant ? 'reservations' : 'bookings'} <ArrowUpRight size={13} />
                 </button>
               )}
             </div>
-            <p className="text-xs text-slate-400 mb-4">Fully functional. Submissions appear in your Reservations dashboard right away.</p>
-            <ReservationBookingForm
-              siteId={site.id}
-              maxPartySize={site.maxPartySize}
-              reservationIntervalMinutes={site.reservationIntervalMinutes}
-              openingTime={site.openingTime}
-              closingTime={site.closingTime}
-            />
+            <p className="text-xs text-slate-400 mb-4">Fully functional. Submissions appear in your dashboard right away.</p>
+            {isRestaurant ? (
+              <ReservationBookingForm
+                siteId={site.id}
+                maxPartySize={site.maxPartySize}
+                reservationIntervalMinutes={site.reservationIntervalMinutes}
+                openingTime={site.openingTime}
+                closingTime={site.closingTime}
+              />
+            ) : isAppointmentPlaybook ? (
+              <AppointmentBookingForm siteId={site.id} services={site.services} currency={site.currency} />
+            ) : isHotel ? (
+              <HotelInquiryForm siteId={site.id} />
+            ) : isCatering ? (
+              <CateringInquiryForm siteId={site.id} />
+            ) : isLocalServices ? (
+              <QuoteRequestForm siteId={site.id} serviceArea={site.serviceArea} />
+            ) : null}
           </div>
         )}
 

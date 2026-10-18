@@ -149,6 +149,7 @@ export default function ReservationsDashboard({ siteId, timezone, country, isRes
       <div className="min-w-0 flex-1">
         <p className="text-sm font-semibold text-ink-900 truncate">{r.customerName}</p>
         {!compact && isRestaurant && <p className="text-xs text-slate-400">{r.partySize} guests{r.table ? ` · ${r.table.name}` : ''}</p>}
+        {!compact && !isRestaurant && r.service && <p className="text-xs text-slate-400">{r.service.name}</p>}
       </div>
       <select
         value={r.status}
@@ -208,6 +209,7 @@ export default function ReservationsDashboard({ siteId, timezone, country, isRes
               <tr>
                 <th className="px-6 py-3 font-semibold">Customer</th>
                 {isRestaurant && <th className="px-6 py-3 font-semibold">Party</th>}
+                {!isRestaurant && <th className="px-6 py-3 font-semibold">Service</th>}
                 <th className="px-6 py-3 font-semibold">Date &amp; time</th>
                 <th className="px-6 py-3 font-semibold">Notes</th>
                 {isRestaurant && <th className="px-6 py-3 font-semibold">Table</th>}
@@ -224,6 +226,7 @@ export default function ReservationsDashboard({ siteId, timezone, country, isRes
                     <p className="text-slate-400 text-xs">{r.customerEmail}{r.customerPhone ? ` · ${r.customerPhone}` : ''}</p>
                   </td>
                   {isRestaurant && <td className="px-6 py-4 text-slate-600 flex items-center gap-1.5"><Users size={13} /> {r.partySize}</td>}
+                  {!isRestaurant && <td className="px-6 py-4 text-slate-600">{r.service?.name ?? '—'}</td>}
                   <td className="px-6 py-4 text-slate-600 text-xs">{formatDateTime(r.reservationAt, country, timezone)}</td>
                   <td className="px-6 py-4 text-slate-500 text-xs max-w-[180px] truncate">{r.notes ?? '—'}</td>
                   {isRestaurant && (
@@ -264,7 +267,7 @@ export default function ReservationsDashboard({ siteId, timezone, country, isRes
                 );
               })}
               {filtered.length === 0 && (
-                <tr><td colSpan={isRestaurant ? 6 : 4} className="px-6 py-10 text-center text-slate-400">No reservations here yet. This needs a live, publicly-hosted reservation form to start filling in.</td></tr>
+                <tr><td colSpan={isRestaurant ? 6 : 5} className="px-6 py-10 text-center text-slate-400">No reservations here yet. This needs a live, publicly-hosted reservation form to start filling in.</td></tr>
               )}
             </tbody>
           </table>

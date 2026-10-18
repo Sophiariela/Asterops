@@ -1,6 +1,9 @@
 export type PlaybookKey =
   | 'LOCAL_BUSINESS' | 'SAAS' | 'ECOMMERCE' | 'CONSULTANT' | 'AGENCY' | 'RESTAURANT' | 'FITNESS' | 'CREATOR'
-  | 'PERSONAL_BRAND' | 'PROFESSIONAL_SERVICES';
+  | 'PERSONAL_BRAND' | 'PROFESSIONAL_SERVICES' | 'HOTEL' | 'CATERING' | 'SALON' | 'EDUCATION' | 'LOCAL_SERVICES';
+// Playbooks that book a real time slot via the appointment-availability
+// engine (not RESTAURANT's tables, not a plain Lead/inquiry form).
+export const APPOINTMENT_PLAYBOOKS: PlaybookKey[] = ['CONSULTANT', 'PROFESSIONAL_SERVICES', 'SALON', 'EDUCATION', 'FITNESS'];
 export type SiteStatus = 'DRAFT' | 'PUBLISHED';
 export type LeadStatus = 'LEAD' | 'CONSULTATION' | 'PROPOSAL' | 'CLIENT';
 export type TrustElementType = 'CASE_STUDY' | 'CLIENT_LOGO' | 'CERTIFICATION';
@@ -72,6 +75,39 @@ export type MenuCategory = {
   items: MenuItem[];
 };
 
+export type Service = {
+  id: string;
+  siteId: string;
+  name: string;
+  description: string | null;
+  priceCents: number | null;
+  durationMinutes: number | null;
+  active: boolean;
+  order: number;
+};
+
+export type PublicService = Pick<Service, 'id' | 'name' | 'description' | 'priceCents' | 'durationMinutes'>;
+
+export type BlockedDate = {
+  id: string;
+  siteId: string;
+  date: string;
+  reason: string | null;
+};
+
+export type PublicProduct = {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  price: number;
+  compareAtPrice: number | null;
+  imageUrl: string | null;
+  stockQuantity: number;
+};
+
+export type AvailabilityResponse = { slots: string[]; durationMinutes: number };
+
 export type Review = {
   id: string;
   siteId: string;
@@ -109,6 +145,13 @@ export type Site = {
   reservationIntervalMinutes: number;
   openingTime: string | null;
   closingTime: string | null;
+  // Appointment availability — meaningful for APPOINTMENT_PLAYBOOKS sites.
+  workingDays: number[];
+  appointmentDurationMinutes: number;
+  appointmentBufferMinutes: number;
+  appointmentCapacity: number;
+  // Local Services vertical.
+  serviceArea: string | null;
   playbook: PlaybookKey;
   status: SiteStatus;
   slug: string | null;
@@ -119,6 +162,12 @@ export type Site = {
   trustElements: TrustElement[];
   reviews: Review[];
   menuCategories: MenuCategory[];
+  services: Service[];
+  blockedDates: BlockedDate[];
+  // The site's own source Template — several distinct templates can
+  // share a playbook key, so this (not a key-based lookup) is the real
+  // name of what this site was generated from.
+  template?: { name: string } | null;
   createdAt: string;
   updatedAt: string;
   _count?: { pages: number; testimonials: number; leads: number };
@@ -152,9 +201,15 @@ export type PublicSite = {
   reservationIntervalMinutes: number;
   openingTime: string | null;
   closingTime: string | null;
+  workingDays: number[];
+  appointmentDurationMinutes: number;
+  appointmentBufferMinutes: number;
+  appointmentCapacity: number;
+  serviceArea: string | null;
   pages: PublicPage[];
   testimonials: PublicTestimonial[];
   menuCategories: PublicMenuCategory[];
+  services: PublicService[];
 };
 
 export type Table = {
@@ -185,6 +240,8 @@ export type Reservation = {
   siteId: string;
   tableId: string | null;
   table?: { id: string; name: string } | null;
+  serviceId: string | null;
+  service?: { id: string; name: string } | null;
   customerName: string;
   customerEmail: string;
   customerPhone: string | null;
