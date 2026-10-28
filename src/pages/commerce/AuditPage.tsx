@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { PlayCircle, CheckCircle2, AlertCircle, MinusCircle } from 'lucide-react';
+import { PlayCircle, CheckCircle2, AlertCircle, MinusCircle, Package, Boxes, Users } from 'lucide-react';
 import { api } from '../../lib/api';
 import type { AuditResult } from '../../lib/commerce/types';
 
@@ -8,6 +8,24 @@ function scoreColor(score: number) {
   if (score >= 60) return 'text-amber-500';
   return 'text-rose-600';
 }
+
+const PREVIEW_CATEGORIES = [
+  {
+    icon: Package,
+    title: 'Catálogo',
+    detail: 'Produtos sem descrição ou imagem, e quantos estão sem categoria.',
+  },
+  {
+    icon: Boxes,
+    title: 'Estoque',
+    detail: 'Quais produtos ativos estão no ponto de reposição ou abaixo dele.',
+  },
+  {
+    icon: Users,
+    title: 'Dados de cliente',
+    detail: 'Taxa de clientes que voltam a comprar, e se o abandono de carrinho já é rastreado.',
+  },
+];
 
 export default function AuditPage() {
   const [audit, setAudit] = useState<AuditResult | null>(null);
@@ -79,8 +97,28 @@ export default function AuditPage() {
         </div>
       )}
 
-      {!audit && !running && (
-        <p className="text-slate-400 text-sm mt-10">Clique em "Executar Auditoria" para gerar sua nota.</p>
+      {!audit && (
+        <div className="mt-8">
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-4">O que será analisado</p>
+          <div className="grid sm:grid-cols-3 gap-4">
+            {PREVIEW_CATEGORIES.map((cat) => (
+              <div key={cat.title} className="bg-white rounded-2xl card-shadow-sm border border-ASTER-100 p-5">
+                <div className="flex items-start gap-3">
+                  <span className="w-9 h-9 rounded-xl bg-ASTER-50 text-ASTER-600 flex items-center justify-center shrink-0">
+                    <cat.icon size={17} />
+                  </span>
+                  <div>
+                    <p className="font-semibold text-ink-900 text-sm">{cat.title}</p>
+                    <p className="text-slate-500 text-xs mt-1">{cat.detail}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          {!running && (
+            <p className="text-slate-400 text-sm mt-6">Clique em "Executar Auditoria" para gerar sua nota.</p>
+          )}
+        </div>
       )}
     </div>
   );
