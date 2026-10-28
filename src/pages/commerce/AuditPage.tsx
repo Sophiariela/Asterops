@@ -27,22 +27,22 @@ export default function AuditPage() {
     <div>
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-ink-900">ASTER Commerce Audit</h1>
-          <p className="text-slate-500 mt-2 text-sm max-w-xl">A rules-based scan of your catalog, inventory and customer data — with the specific things to fix, not just a grade.</p>
+          <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-ink-900">Auditoria ASTER Commerce</h1>
+          <p className="text-slate-500 mt-2 text-sm max-w-xl">Uma análise baseada em regras do seu catálogo, estoque e dados de clientes — com o que precisa ser corrigido, não só uma nota.</p>
         </div>
         <button
           onClick={run}
           disabled={running}
           className="flex items-center gap-2 bg-ASTER-600 hover:bg-ASTER-700 disabled:opacity-60 text-white font-bold px-5 py-3 rounded-full transition-all whitespace-nowrap"
         >
-          <PlayCircle size={18} /> {running ? 'Running…' : 'Run Commerce Audit'}
+          <PlayCircle size={18} /> {running ? 'Executando…' : 'Executar Auditoria'}
         </button>
       </div>
 
       {audit && (
         <div className="mt-8">
           <div className="bg-ink-950 text-white rounded-[28px] card-shadow p-8 text-center">
-            <p className="text-white/60 text-sm font-bold uppercase tracking-wide">Commerce Score</p>
+            <p className="text-white/60 text-sm font-bold uppercase tracking-wide">Nota Commerce</p>
             <p className={`font-display font-extrabold text-6xl mt-2 ${scoreColor(audit.score)}`}>{audit.score}<span className="text-2xl text-white/40">/100</span></p>
           </div>
 
@@ -68,7 +68,7 @@ export default function AuditPage() {
 
           {audit.recommendations.length > 0 && (
             <div className="mt-6 bg-white rounded-[28px] card-shadow border border-ASTER-100 p-6">
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-4">Recommendations</p>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-4">Recomendações</p>
               <ol className="space-y-2.5 list-decimal list-inside">
                 {audit.recommendations.map((r, i) => (
                   <li key={i} className="text-sm text-ink-900">{r}</li>
@@ -80,7 +80,7 @@ export default function AuditPage() {
       )}
 
       {!audit && !running && (
-        <p className="text-slate-400 text-sm mt-10">Click "Run Commerce Audit" to generate your score.</p>
+        <p className="text-slate-400 text-sm mt-10">Clique em "Executar Auditoria" para gerar sua nota.</p>
       )}
     </div>
   );

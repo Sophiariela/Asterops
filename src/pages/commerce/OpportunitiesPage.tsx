@@ -12,20 +12,20 @@ export default function OpportunitiesPage() {
   }, []);
 
   if (!data) {
-    return <p className="text-slate-400">Scanning for opportunities…</p>;
+    return <p className="text-slate-400">Buscando oportunidades…</p>;
   }
 
   return (
     <div>
-      <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-ink-900">Opportunity Center</h1>
-      <p className="text-slate-500 mt-2 text-sm">Estimated revenue you could recover with a specific action — not a metric, a to-do list.</p>
+      <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-ink-900">Central de Oportunidades</h1>
+      <p className="text-slate-500 mt-2 text-sm">Receita estimada que você poderia recuperar com uma ação específica — não é uma métrica, é uma lista de tarefas.</p>
 
       <div className="mt-6 bg-ink-950 text-white rounded-[28px] card-shadow p-7 flex items-center gap-4">
         <span className="w-14 h-14 rounded-2xl bg-ASTER-600 flex items-center justify-center shrink-0">
           <TrendingUp size={26} />
         </span>
         <div>
-          <p className="text-white/60 text-sm">Total opportunity</p>
+          <p className="text-white/60 text-sm">Oportunidade total</p>
           <p className="font-display font-extrabold text-3xl tabular-nums">{formatBRL(data.total)}</p>
         </div>
       </div>

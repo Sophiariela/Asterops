@@ -64,40 +64,40 @@ export async function getProductHealthScores(ownerId: string): Promise<ProductHe
     const factors: Factor[] = [
       {
         key: 'velocity',
-        label: 'Sales velocity',
+        label: 'Velocidade de vendas',
         available: true,
         score: velocityScore,
-        detail: `${velocity.recent} units sold in the last 30 days${declining ? ' — down from the 30 days before' : ''}`,
+        detail: `${velocity.recent} unidade(s) vendida(s) nos últimos 30 dias${declining ? ' — queda em relação aos 30 dias anteriores' : ''}`,
       },
       {
         key: 'inventory',
-        label: 'Inventory level',
+        label: 'Nível de estoque',
         available: true,
         score: inventoryScore,
-        detail: `${p.stockQuantity} on hand, reorder point ${p.reorderPoint}`,
+        detail: `${p.stockQuantity} em estoque, ponto de reposição ${p.reorderPoint}`,
       },
       {
         key: 'margin',
-        label: 'Profit margin',
+        label: 'Margem de lucro',
         available: marginAvailable,
         score: marginScore,
-        detail: marginAvailable ? `${Math.round((marginPct as number) * 100)}% margin` : 'Set a cost price to track margin',
+        detail: marginAvailable ? `${Math.round((marginPct as number) * 100)}% de margem` : 'Defina um preço de custo para acompanhar a margem',
       },
-      { key: 'conversion', label: 'Conversion rate', available: false, score: null, detail: 'Needs storefront page-view tracking (not yet instrumented)' },
-      { key: 'satisfaction', label: 'Customer satisfaction', available: false, score: null, detail: 'Needs review/rating data (not yet collected)' },
+      { key: 'conversion', label: 'Taxa de conversão', available: false, score: null, detail: 'Precisa de rastreamento de visualizações na loja (ainda não instrumentado)' },
+      { key: 'satisfaction', label: 'Satisfação do cliente', available: false, score: null, detail: 'Precisa de dados de avaliação/nota (ainda não coletados)' },
     ];
 
     const availableScores = factors.filter((f) => f.available && f.score !== null).map((f) => f.score as number);
     const score = availableScores.length ? Math.round(availableScores.reduce((a, b) => a + b, 0) / availableScores.length) : 0;
 
     const badges: ProductHealth['badges'] = [];
-    if (velocityScore >= 70) badges.push({ tone: 'good', label: 'Strong sales' });
-    if (declining) badges.push({ tone: 'warn', label: 'Sales declining' });
-    if (inventoryScore >= 100) badges.push({ tone: 'good', label: 'Healthy inventory' });
-    if (inventoryScore <= 40) badges.push({ tone: 'warn', label: p.stockQuantity <= 0 ? 'Out of stock' : 'Low stock' });
-    if (marginScore !== null && marginScore >= 70) badges.push({ tone: 'good', label: 'High margin' });
-    if (marginScore !== null && marginScore < 30) badges.push({ tone: 'warn', label: 'Thin margin' });
-    if (velocityScore <= 15 && velocity.recent === 0) badges.push({ tone: 'warn', label: 'No recent sales' });
+    if (velocityScore >= 70) badges.push({ tone: 'good', label: 'Vendas fortes' });
+    if (declining) badges.push({ tone: 'warn', label: 'Vendas em queda' });
+    if (inventoryScore >= 100) badges.push({ tone: 'good', label: 'Estoque saudável' });
+    if (inventoryScore <= 40) badges.push({ tone: 'warn', label: p.stockQuantity <= 0 ? 'Sem estoque' : 'Estoque baixo' });
+    if (marginScore !== null && marginScore >= 70) badges.push({ tone: 'good', label: 'Margem alta' });
+    if (marginScore !== null && marginScore < 30) badges.push({ tone: 'warn', label: 'Margem baixa' });
+    if (velocityScore <= 15 && velocity.recent === 0) badges.push({ tone: 'warn', label: 'Sem vendas recentes' });
 
     return { productId: p.id, name: p.name, score, factors, badges };
   });

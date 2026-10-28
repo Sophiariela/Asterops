@@ -14,7 +14,7 @@ categoriesRouter.get('/', async (req, res) => {
 categoriesRouter.post('/', async (req, res) => {
   const parsed = createCategorySchema.safeParse(req.body);
   if (!parsed.success) {
-    return res.status(400).json({ error: parsed.error.issues[0]?.message ?? 'Invalid input.' });
+    return res.status(400).json({ error: parsed.error.issues[0]?.message ?? 'Entrada inválida.' });
   }
   const category = await categoriesService.createCategory(req.user!.userId, parsed.data);
   res.status(201).json({ category });
@@ -23,7 +23,7 @@ categoriesRouter.post('/', async (req, res) => {
 categoriesRouter.patch('/:id', async (req, res) => {
   const parsed = updateCategorySchema.safeParse(req.body);
   if (!parsed.success) {
-    return res.status(400).json({ error: parsed.error.issues[0]?.message ?? 'Invalid input.' });
+    return res.status(400).json({ error: parsed.error.issues[0]?.message ?? 'Entrada inválida.' });
   }
   const category = await categoriesService.updateCategory(req.user!.userId, req.params.id, parsed.data);
   res.json({ category });

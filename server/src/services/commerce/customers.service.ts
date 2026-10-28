@@ -24,7 +24,7 @@ export async function getCustomer(ownerId: string, id: string) {
     where: { id, ownerId },
     include: { orders: { orderBy: { createdAt: 'desc' }, include: { items: true } } },
   });
-  if (!customer) throw new CommerceError(404, 'Customer not found.');
+  if (!customer) throw new CommerceError(404, 'Cliente não encontrado.');
   return customer;
 }
 
@@ -41,16 +41,16 @@ export async function updateCustomer(
   data: Partial<{ name: string; email: string | null; phone: string | null; notes: string | null }>,
 ) {
   const existing = await prisma.commerceCustomer.findFirst({ where: { id, ownerId } });
-  if (!existing) throw new CommerceError(404, 'Customer not found.');
+  if (!existing) throw new CommerceError(404, 'Cliente não encontrado.');
   return prisma.commerceCustomer.update({ where: { id }, data });
 }
 
 export async function deleteCustomer(ownerId: string, id: string) {
   const existing = await prisma.commerceCustomer.findFirst({ where: { id, ownerId } });
-  if (!existing) throw new CommerceError(404, 'Customer not found.');
+  if (!existing) throw new CommerceError(404, 'Cliente não encontrado.');
 
   const hasOrders = await prisma.commerceOrder.findFirst({ where: { customerId: id } });
-  if (hasOrders) throw new CommerceError(409, 'This customer has order history and cannot be deleted.');
+  if (hasOrders) throw new CommerceError(409, 'Este cliente tem histórico de pedidos e não pode ser excluído.');
 
   await prisma.commerceCustomer.delete({ where: { id } });
 }

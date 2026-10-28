@@ -20,7 +20,7 @@ export default function Modal({
           <h2 className="font-display font-extrabold text-xl text-ink-900">{title}</h2>
           <button
             onClick={onClose}
-            aria-label="Close"
+            aria-label="Fechar"
             className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-ink-900 transition-colors"
           >
             <X size={18} />

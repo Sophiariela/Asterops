@@ -65,26 +65,26 @@ export async function getOpportunities(ownerId: string): Promise<{ opportunities
   const opportunities: Opportunity[] = [
     {
       key: 'restock',
-      label: 'Restock out-of-stock products',
+      label: 'Reabastecer produtos sem estoque',
       available: restockItems.length > 0,
       estimate: restockItems.reduce((s, i) => s + i.estimate, 0),
-      basis: `Estimated from each product's average daily sales over the last 60 days × ${RESTOCK_WINDOW_DAYS} days out of stock.`,
+      basis: `Estimado a partir da venda média diária de cada produto nos últimos 60 dias × ${RESTOCK_WINDOW_DAYS} dias sem estoque.`,
       items: restockItems.slice(0, 5),
     },
     {
       key: 'reactivation',
-      label: 'Re-engage inactive customers',
+      label: 'Reengajar clientes inativos',
       available: dormant.length > 0,
       estimate: dormant.reduce((s, i) => s + i.estimate, 0),
-      basis: `${dormant.length} customer(s) inactive 60+ days, valued at their average order × an assumed ${Math.round(REACTIVATION_WIN_BACK_RATE * 100)}% win-back rate — an assumption, not a measured conversion rate.`,
+      basis: `${dormant.length} cliente(s) inativo(s) há mais de 60 dias, avaliados pelo pedido médio × uma taxa de reconquista assumida de ${Math.round(REACTIVATION_WIN_BACK_RATE * 100)}% — uma suposição, não uma taxa de conversão medida.`,
       items: dormant.slice(0, 5),
     },
     {
       key: 'cart-recovery',
-      label: 'Recover abandoned carts',
+      label: 'Recuperar carrinhos abandonados',
       available: false,
       estimate: 0,
-      basis: 'Requires cart/session tracking, which CommerceOS does not instrument yet.',
+      basis: 'Requer rastreamento de carrinho/sessão, que o CommerceOS ainda não instrumenta.',
     },
   ];
 

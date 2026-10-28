@@ -4,6 +4,7 @@ import { Plus, Search, Pencil, Trash2 } from 'lucide-react';
 import { api, ApiError } from '../../lib/api';
 import { formatBRL } from '../../lib/currency';
 import type { Category, Product, ProductHealth, ProductStatus } from '../../lib/commerce/types';
+import { PRODUCT_STATUS_LABEL } from '../../lib/commerce/labels';
 import Modal from '../../components/commerce/Modal';
 
 type FormState = {
@@ -129,31 +130,31 @@ export default function ProductsPage() {
       setShowForm(false);
       load();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Could not save this product.');
+      setError(err instanceof ApiError ? err.message : 'Não foi possível salvar este produto.');
     } finally {
       setSaving(false);
     }
   };
 
   const onDelete = async (product: Product) => {
-    if (!confirm(`Delete "${product.name}"? This can't be undone.`)) return;
+    if (!confirm(`Excluir "${product.name}"? Isso não pode ser desfeito.`)) return;
     try {
       await api.del(`/commerce/products/${product.id}`);
       load();
     } catch (err) {
-      alert(err instanceof ApiError ? err.message : 'Could not delete this product.');
+      alert(err instanceof ApiError ? err.message : 'Não foi possível excluir este produto.');
     }
   };
 
   return (
     <div>
       <div className="flex items-center justify-between gap-4 flex-wrap">
-        <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-ink-900">Products</h1>
+        <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-ink-900">Produtos</h1>
         <button
           onClick={openCreate}
           className="flex items-center gap-2 bg-ASTER-600 hover:bg-ASTER-700 text-white font-bold px-5 py-2.5 rounded-full transition-all"
         >
-          <Plus size={16} /> New product
+          <Plus size={16} /> Novo produto
         </button>
       </div>
 
@@ -162,7 +163,7 @@ export default function ProductsPage() {
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search by name or SKU"
+          placeholder="Buscar por nome ou SKU"
           className="w-full border-2 border-ASTER-100 focus:border-ASTER-600 rounded-full pl-11 pr-4 py-2.5 text-sm outline-none transition-colors"
         />
       </div>
@@ -171,12 +172,12 @@ export default function ProductsPage() {
         <table className="w-full text-sm">
           <thead className="bg-slate-50 text-slate-400 text-left">
             <tr>
-              <th className="px-6 py-3 font-semibold">Product</th>
-              <th className="px-6 py-3 font-semibold">Category</th>
-              <th className="px-6 py-3 font-semibold">Price</th>
-              <th className="px-6 py-3 font-semibold">Stock</th>
+              <th className="px-6 py-3 font-semibold">Produto</th>
+              <th className="px-6 py-3 font-semibold">Categoria</th>
+              <th className="px-6 py-3 font-semibold">Preço</th>
+              <th className="px-6 py-3 font-semibold">Estoque</th>
               <th className="px-6 py-3 font-semibold">Status</th>
-              <th className="px-6 py-3 font-semibold">Health</th>
+              <th className="px-6 py-3 font-semibold">Saúde</th>
               <th className="px-6 py-3 font-semibold"></th>
             </tr>
           </thead>
@@ -195,7 +196,7 @@ export default function ProductsPage() {
                   </span>
                 </td>
                 <td className="px-6 py-4">
-                  <span className={`text-xs font-bold px-3 py-1.5 rounded-full ${STATUS_STYLE[p.status]}`}>{p.status}</span>
+                  <span className={`text-xs font-bold px-3 py-1.5 rounded-full ${STATUS_STYLE[p.status]}`}>{PRODUCT_STATUS_LABEL[p.status]}</span>
                 </td>
                 <td className="px-6 py-4">
                   {health[p.id] ? (
@@ -211,10 +212,10 @@ export default function ProductsPage() {
                 </td>
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-1 justify-end">
-                    <button onClick={() => openEdit(p)} className="p-2 rounded-full text-slate-400 hover:text-ASTER-600 hover:bg-ASTER-50 transition-colors" aria-label={`Edit ${p.name}`}>
+                    <button onClick={() => openEdit(p)} className="p-2 rounded-full text-slate-400 hover:text-ASTER-600 hover:bg-ASTER-50 transition-colors" aria-label={`Editar ${p.name}`}>
                       <Pencil size={15} />
                     </button>
-                    <button onClick={() => onDelete(p)} className="p-2 rounded-full text-slate-400 hover:text-rose-500 hover:bg-rose-50 transition-colors" aria-label={`Delete ${p.name}`}>
+                    <button onClick={() => onDelete(p)} className="p-2 rounded-full text-slate-400 hover:text-rose-500 hover:bg-rose-50 transition-colors" aria-label={`Excluir ${p.name}`}>
                       <Trash2 size={15} />
                     </button>
                   </div>
@@ -224,7 +225,7 @@ export default function ProductsPage() {
             {products && products.length === 0 && (
               <tr>
                 <td colSpan={7} className="px-6 py-10 text-center text-slate-400">
-                  No products yet. <button onClick={openCreate} className="text-ASTER-600 font-bold">Add your first one</button>.
+                  Nenhum produto ainda. <button onClick={openCreate} className="text-ASTER-600 font-bold">Cadastre o primeiro</button>.
                 </td>
               </tr>
             )}
@@ -233,23 +234,23 @@ export default function ProductsPage() {
       </div>
 
       <p className="text-xs text-slate-400 mt-4">
-        Need categories first? Manage them on the <Link to="/commerce/categories" className="text-ASTER-600 font-semibold">Categories</Link> tab.
+        Precisa de categorias antes? Gerencie na aba <Link to="/commerce/categories" className="text-ASTER-600 font-semibold">Categorias</Link>.
       </p>
 
       {showForm && (
-        <Modal title={editing ? 'Edit product' : 'New product'} onClose={() => setShowForm(false)}>
+        <Modal title={editing ? 'Editar produto' : 'Novo produto'} onClose={() => setShowForm(false)}>
           <form onSubmit={onSubmit} className="space-y-4">
             <div className="grid sm:grid-cols-2 gap-4">
-              <Field label="Name" required value={form.name} onChange={(v) => setForm((f) => ({ ...f, name: v }))} />
+              <Field label="Nome" required value={form.name} onChange={(v) => setForm((f) => ({ ...f, name: v }))} />
               <Field label="SKU" required value={form.sku} onChange={(v) => setForm((f) => ({ ...f, sku: v }))} />
             </div>
-            <Field label="Description" textarea value={form.description} onChange={(v) => setForm((f) => ({ ...f, description: v }))} />
+            <Field label="Descrição" textarea value={form.description} onChange={(v) => setForm((f) => ({ ...f, description: v }))} />
             <div className="grid sm:grid-cols-2 gap-4">
-              <Field label="Price (R$)" required type="number" step="0.01" value={form.price} onChange={(v) => setForm((f) => ({ ...f, price: v }))} />
-              <Field label="Compare-at price (R$)" type="number" step="0.01" value={form.compareAtPrice} onChange={(v) => setForm((f) => ({ ...f, compareAtPrice: v }))} />
+              <Field label="Preço (R$)" required type="number" step="0.01" value={form.price} onChange={(v) => setForm((f) => ({ ...f, price: v }))} />
+              <Field label="Preço comparativo (R$)" type="number" step="0.01" value={form.compareAtPrice} onChange={(v) => setForm((f) => ({ ...f, compareAtPrice: v }))} />
             </div>
             <Field
-              label="Cost price (R$) — optional, used to track profit margin"
+              label="Preço de custo (R$) — opcional, usado para acompanhar a margem de lucro"
               type="number"
               step="0.01"
               value={form.costPrice}
@@ -257,13 +258,13 @@ export default function ProductsPage() {
             />
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
-                <label className="text-[13px] font-bold text-ink-900 block mb-1.5">Category</label>
+                <label className="text-[13px] font-bold text-ink-900 block mb-1.5">Categoria</label>
                 <select
                   value={form.categoryId}
                   onChange={(e) => setForm((f) => ({ ...f, categoryId: e.target.value }))}
                   className="w-full border-2 border-ASTER-100 focus:border-ASTER-600 rounded-2xl px-4 py-3 text-[15px] outline-none transition-colors"
                 >
-                  <option value="">Uncategorized</option>
+                  <option value="">Sem categoria</option>
                   {categories.map((c) => (
                     <option key={c.id} value={c.id}>{c.name}</option>
                   ))}
@@ -276,21 +277,21 @@ export default function ProductsPage() {
                   onChange={(e) => setForm((f) => ({ ...f, status: e.target.value as ProductStatus }))}
                   className="w-full border-2 border-ASTER-100 focus:border-ASTER-600 rounded-2xl px-4 py-3 text-[15px] outline-none transition-colors"
                 >
-                  <option value="ACTIVE">Active</option>
-                  <option value="DRAFT">Draft</option>
-                  <option value="ARCHIVED">Archived</option>
+                  <option value="ACTIVE">Ativo</option>
+                  <option value="DRAFT">Rascunho</option>
+                  <option value="ARCHIVED">Arquivado</option>
                 </select>
               </div>
             </div>
             <div className="grid sm:grid-cols-2 gap-4">
               {!editing && (
-                <Field label="Initial stock" type="number" value={form.stockQuantity} onChange={(v) => setForm((f) => ({ ...f, stockQuantity: v }))} />
+                <Field label="Estoque inicial" type="number" value={form.stockQuantity} onChange={(v) => setForm((f) => ({ ...f, stockQuantity: v }))} />
               )}
-              <Field label="Reorder point" type="number" value={form.reorderPoint} onChange={(v) => setForm((f) => ({ ...f, reorderPoint: v }))} />
+              <Field label="Ponto de reposição" type="number" value={form.reorderPoint} onChange={(v) => setForm((f) => ({ ...f, reorderPoint: v }))} />
             </div>
             {editing && (
               <p className="text-xs text-slate-400">
-                Stock isn't edited here — adjust it from the <Link to="/commerce/inventory" className="text-ASTER-600 font-semibold">Inventory</Link> tab so it stays logged.
+                O estoque não é editado aqui — ajuste-o na aba <Link to="/commerce/inventory" className="text-ASTER-600 font-semibold">Estoque</Link> para manter o histórico.
               </p>
             )}
             {error && <p className="text-rose-500 text-sm font-semibold">{error}</p>}
@@ -299,14 +300,14 @@ export default function ProductsPage() {
               disabled={saving}
               className="w-full bg-ASTER-600 hover:bg-ASTER-700 disabled:opacity-60 text-white font-bold py-3.5 rounded-full transition-all"
             >
-              {saving ? 'Saving…' : editing ? 'Save changes' : 'Create product'}
+              {saving ? 'Salvando…' : editing ? 'Salvar alterações' : 'Criar produto'}
             </button>
           </form>
         </Modal>
       )}
 
       {healthDetail && (
-        <Modal title={`Health Score — ${healthDetail.name}`} onClose={() => setHealthDetail(null)}>
+        <Modal title={`Índice de Saúde — ${healthDetail.name}`} onClose={() => setHealthDetail(null)}>
           <div className={`text-center font-display font-extrabold text-4xl mb-5 ${healthColor(healthDetail.score).split(' ')[0]}`}>
             {healthDetail.score}<span className="text-lg text-slate-300">/100</span>
           </div>

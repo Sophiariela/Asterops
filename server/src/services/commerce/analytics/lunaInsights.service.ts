@@ -19,6 +19,7 @@ Write 3 to 5 short insight bullets a busy business owner can act on today. Each 
 - prefers a causal or comparative framing when the data supports it ("X happened after Y", "A correlates with B")
 - ends with a specific recommended action when one is obvious
 - is one sentence, plain language, no jargon, no preamble, no markdown headers
+- is written in Brazilian Portuguese (pt-BR) — the merchant reads the dashboard in Portuguese
 
 Output ONLY the bullets, one per line, each starting with "- ". Nothing else.`;
 
@@ -52,7 +53,7 @@ async function getCoPurchasePairs(ownerId: string, limit = 3) {
 
 export async function getLunaInsights(ownerId: string): Promise<{ insights: string[] }> {
   if (!anthropic) {
-    throw new CommerceError(503, 'Luna AI is not configured on this server yet.');
+    throw new CommerceError(503, 'A Luna AI ainda não está configurada neste servidor.');
   }
 
   const [pulse, health, opportunities, audit, coPurchases] = await Promise.all([
@@ -82,7 +83,7 @@ export async function getLunaInsights(ownerId: string): Promise<{ insights: stri
   };
 
   if (pulse.orders.current === 0 && pulse.orders.previous === 0 && health.length === 0) {
-    return { insights: ["There isn't enough store activity yet for Luna to find a pattern — add products and a few orders first."] };
+    return { insights: ['Ainda não há atividade suficiente na loja para a Luna encontrar um padrão — cadastre produtos e alguns pedidos primeiro.'] };
   }
 
   let response: Anthropic.Message;

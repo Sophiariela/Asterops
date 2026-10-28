@@ -3,14 +3,14 @@ import { LogOut } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 const TABS = [
-  { to: '/commerce/pulse', label: 'Pulse' },
-  { to: '/commerce/products', label: 'Products' },
-  { to: '/commerce/categories', label: 'Categories' },
-  { to: '/commerce/inventory', label: 'Inventory' },
-  { to: '/commerce/orders', label: 'Orders' },
-  { to: '/commerce/customers', label: 'Customers' },
-  { to: '/commerce/opportunities', label: 'Opportunities' },
-  { to: '/commerce/audit', label: 'Audit' },
+  { to: '/commerce/pulse', label: 'Visão Geral' },
+  { to: '/commerce/products', label: 'Produtos' },
+  { to: '/commerce/categories', label: 'Categorias' },
+  { to: '/commerce/inventory', label: 'Estoque' },
+  { to: '/commerce/orders', label: 'Pedidos' },
+  { to: '/commerce/customers', label: 'Clientes' },
+  { to: '/commerce/opportunities', label: 'Oportunidades' },
+  { to: '/commerce/audit', label: 'Auditoria' },
 ];
 
 export default function CommerceLayout() {
@@ -27,7 +27,7 @@ export default function CommerceLayout() {
           <span className="font-display font-bold text-ink-900">CommerceOS</span>
         </div>
         <button onClick={logout} className="flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-rose-500 transition-colors">
-          <LogOut size={16} /> Log out
+          <LogOut size={16} /> Sair
         </button>
       </header>
 

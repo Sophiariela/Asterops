@@ -21,7 +21,7 @@ inventoryRouter.get('/movements', async (req, res) => {
 inventoryRouter.post('/adjust', async (req, res) => {
   const parsed = adjustStockSchema.safeParse(req.body);
   if (!parsed.success) {
-    return res.status(400).json({ error: parsed.error.issues[0]?.message ?? 'Invalid input.' });
+    return res.status(400).json({ error: parsed.error.issues[0]?.message ?? 'Entrada inválida.' });
   }
   const product = await inventoryService.adjustStock(req.user!.userId, parsed.data);
   res.json({ product });

@@ -87,19 +87,19 @@ export async function getBusinessPulse(ownerId: string): Promise<BusinessPulse> 
   const recommendedActions: string[] = [];
   const topLowStock = topProducts.find((tp) => lowStock.some((ls) => ls.id === tp.id));
   if (topLowStock) {
-    recommendedActions.push(`"${topLowStock.name}" is a top seller and running low — restock it before it goes out of stock.`);
+    recommendedActions.push(`"${topLowStock.name}" é um dos mais vendidos e está acabando — reabasteça antes que falte.`);
   } else if (lowStock.length > 0) {
-    recommendedActions.push(`${lowStock.length} product(s) are running low on stock — review reorder points.`);
+    recommendedActions.push(`${lowStock.length} produto(s) com estoque baixo — revise os pontos de reposição.`);
   }
   if (dormant.length > 0) {
-    recommendedActions.push(`${dormant.length} customer(s) haven't ordered in 60+ days — consider a win-back offer.`);
+    recommendedActions.push(`${dormant.length} cliente(s) sem pedidos há mais de 60 dias — considere uma oferta de reconquista.`);
   }
   const revTrend = pctChange(revenueCurrent, revenuePrevious);
   if (revTrend !== null && revTrend <= -15) {
-    recommendedActions.push(`Revenue is down ${Math.abs(revTrend)}% week-over-week — worth investigating before it compounds.`);
+    recommendedActions.push(`A receita caiu ${Math.abs(revTrend)}% na comparação semanal — vale investigar antes que piore.`);
   }
   if (topProducts.length > 0 && recommendedActions.length < 3) {
-    recommendedActions.push(`"${topProducts[0].name}" is outperforming everything else — consider featuring it or bundling with slower movers.`);
+    recommendedActions.push(`"${topProducts[0].name}" está superando todos os outros — considere destacá-lo ou combiná-lo com produtos de menor saída.`);
   }
 
   return {

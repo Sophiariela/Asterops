@@ -17,7 +17,7 @@ export async function createCategory(ownerId: string, data: { name: string; desc
 
 export async function updateCategory(ownerId: string, id: string, data: { name?: string; description?: string }) {
   const existing = await prisma.category.findFirst({ where: { id, ownerId } });
-  if (!existing) throw new CommerceError(404, 'Category not found.');
+  if (!existing) throw new CommerceError(404, 'Categoria não encontrada.');
 
   const slug = data.name && data.name !== existing.name ? await uniqueSlug(ownerId, data.name, id) : undefined;
   return prisma.category.update({ where: { id }, data: { ...data, ...(slug ? { slug } : {}) } });
@@ -25,7 +25,7 @@ export async function updateCategory(ownerId: string, id: string, data: { name?:
 
 export async function deleteCategory(ownerId: string, id: string) {
   const existing = await prisma.category.findFirst({ where: { id, ownerId } });
-  if (!existing) throw new CommerceError(404, 'Category not found.');
+  if (!existing) throw new CommerceError(404, 'Categoria não encontrada.');
 
   // Products aren't deleted with their category — they just become uncategorized.
   await prisma.product.updateMany({ where: { categoryId: id, ownerId }, data: { categoryId: null } });

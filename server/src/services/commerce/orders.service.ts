@@ -22,7 +22,7 @@ export async function getOrder(ownerId: string, id: string) {
     where: { id, ownerId },
     include: { customer: true, items: { include: { product: true } } },
   });
-  if (!order) throw new CommerceError(404, 'Order not found.');
+  if (!order) throw new CommerceError(404, 'Pedido não encontrado.');
   return order;
 }
 
@@ -37,7 +37,7 @@ export async function createOrder(
 ) {
   return prisma.$transaction(async (tx) => {
     const customer = await tx.commerceCustomer.findFirst({ where: { id: data.customerId, ownerId } });
-    if (!customer) throw new CommerceError(400, 'Customer not found.');
+    if (!customer) throw new CommerceError(400, 'Cliente não encontrado.');
 
     const productIds = data.items.map((i) => i.productId);
     const products = await tx.product.findMany({ where: { id: { in: productIds }, ownerId } });
@@ -46,11 +46,11 @@ export async function createOrder(
     let subtotal = 0;
     for (const item of data.items) {
       const product = productMap.get(item.productId);
-      if (!product) throw new CommerceError(400, `Product ${item.productId} not found.`);
+      if (!product) throw new CommerceError(400, `Produto ${item.productId} não encontrado.`);
       if (product.stockQuantity < item.quantity) {
         throw new CommerceError(
           409,
-          `Not enough stock for "${product.name}" (have ${product.stockQuantity}, need ${item.quantity}).`,
+          `Estoque insuficiente para "${product.name}" (há ${product.stockQuantity}, necessário ${item.quantity}).`,
         );
       }
       subtotal += product.price * item.quantity;
@@ -94,7 +94,7 @@ const RESTOCKING_STATUSES: CommerceOrderStatus[] = ['CANCELLED', 'REFUNDED'];
 export async function updateOrderStatus(ownerId: string, id: string, status: CommerceOrderStatus) {
   return prisma.$transaction(async (tx) => {
     const order = await tx.commerceOrder.findFirst({ where: { id, ownerId }, include: { items: true } });
-    if (!order) throw new CommerceError(404, 'Order not found.');
+    if (!order) throw new CommerceError(404, 'Pedido não encontrado.');
 
     const wasRestocked = RESTOCKING_STATUSES.includes(order.status);
     const willRestock = RESTOCKING_STATUSES.includes(status);

@@ -20,7 +20,7 @@ productsRouter.get('/:id', async (req, res) => {
 productsRouter.post('/', async (req, res) => {
   const parsed = createProductSchema.safeParse(req.body);
   if (!parsed.success) {
-    return res.status(400).json({ error: parsed.error.issues[0]?.message ?? 'Invalid input.' });
+    return res.status(400).json({ error: parsed.error.issues[0]?.message ?? 'Entrada inválida.' });
   }
   const product = await productsService.createProduct(req.user!.userId, parsed.data);
   res.status(201).json({ product });
@@ -29,7 +29,7 @@ productsRouter.post('/', async (req, res) => {
 productsRouter.patch('/:id', async (req, res) => {
   const parsed = updateProductSchema.safeParse(req.body);
   if (!parsed.success) {
-    return res.status(400).json({ error: parsed.error.issues[0]?.message ?? 'Invalid input.' });
+    return res.status(400).json({ error: parsed.error.issues[0]?.message ?? 'Entrada inválida.' });
   }
   const product = await productsService.updateProduct(req.user!.userId, req.params.id, parsed.data);
   res.json({ product });

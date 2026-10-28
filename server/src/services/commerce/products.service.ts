@@ -44,7 +44,7 @@ export async function listProducts(
 
 export async function getProduct(ownerId: string, id: string) {
   const product = await prisma.product.findFirst({ where: { id, ownerId }, include: { category: true } });
-  if (!product) throw new CommerceError(404, 'Product not found.');
+  if (!product) throw new CommerceError(404, 'Produto não encontrado.');
   return product;
 }
 
@@ -91,7 +91,7 @@ export async function createProduct(ownerId: string, data: CreateProductInput) {
 
 export async function updateProduct(ownerId: string, id: string, data: UpdateProductInput) {
   const existing = await prisma.product.findFirst({ where: { id, ownerId } });
-  if (!existing) throw new CommerceError(404, 'Product not found.');
+  if (!existing) throw new CommerceError(404, 'Produto não encontrado.');
   if (data.sku && data.sku !== existing.sku) await assertSkuAvailable(ownerId, data.sku);
   if (data.categoryId) await assertCategoryOwned(ownerId, data.categoryId);
 
@@ -105,11 +105,11 @@ export async function updateProduct(ownerId: string, id: string, data: UpdatePro
 
 export async function deleteProduct(ownerId: string, id: string) {
   const existing = await prisma.product.findFirst({ where: { id, ownerId } });
-  if (!existing) throw new CommerceError(404, 'Product not found.');
+  if (!existing) throw new CommerceError(404, 'Produto não encontrado.');
 
   const usedInOrder = await prisma.commerceOrderItem.findFirst({ where: { productId: id } });
   if (usedInOrder) {
-    throw new CommerceError(409, 'This product has order history and cannot be deleted — archive it instead.');
+    throw new CommerceError(409, 'Este produto tem histórico de pedidos e não pode ser excluído — arquive-o em vez disso.');
   }
 
   await prisma.product.delete({ where: { id } });
@@ -117,12 +117,12 @@ export async function deleteProduct(ownerId: string, id: string) {
 
 async function assertSkuAvailable(ownerId: string, sku: string) {
   const existing = await prisma.product.findFirst({ where: { ownerId, sku } });
-  if (existing) throw new CommerceError(409, `SKU "${sku}" is already in use.`);
+  if (existing) throw new CommerceError(409, `O SKU "${sku}" já está em uso.`);
 }
 
 async function assertCategoryOwned(ownerId: string, categoryId: string) {
   const category = await prisma.category.findFirst({ where: { id: categoryId, ownerId } });
-  if (!category) throw new CommerceError(400, 'Category not found.');
+  if (!category) throw new CommerceError(400, 'Categoria não encontrada.');
 }
 
 async function uniqueProductSlug(ownerId: string, name: string, excludeId?: string): Promise<string> {

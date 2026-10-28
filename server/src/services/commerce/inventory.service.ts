@@ -34,11 +34,11 @@ export async function adjustStock(
 ) {
   return prisma.$transaction(async (tx) => {
     const product = await tx.product.findFirst({ where: { id: input.productId, ownerId } });
-    if (!product) throw new CommerceError(404, 'Product not found.');
+    if (!product) throw new CommerceError(404, 'Produto não encontrado.');
 
     const nextQuantity = product.stockQuantity + input.change;
     if (nextQuantity < 0) {
-      throw new CommerceError(400, `That would bring stock below zero (current: ${product.stockQuantity}).`);
+      throw new CommerceError(400, `Isso deixaria o estoque negativo (atual: ${product.stockQuantity}).`);
     }
 
     const [updated] = await Promise.all([

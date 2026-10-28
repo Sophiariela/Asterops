@@ -4,14 +4,7 @@ import { ArrowLeft } from 'lucide-react';
 import { api, ApiError } from '../../lib/api';
 import { formatBRL } from '../../lib/currency';
 import type { CommerceOrder, OrderStatus, Product } from '../../lib/commerce/types';
-
-const STATUS_STYLE: Record<OrderStatus, string> = {
-  PENDING: 'bg-amber-100 text-amber-700',
-  PROCESSING: 'bg-blue-100 text-blue-700',
-  FULFILLED: 'bg-emerald-100 text-emerald-700',
-  CANCELLED: 'bg-slate-200 text-slate-500',
-  REFUNDED: 'bg-rose-100 text-rose-600',
-};
+import { ORDER_CHANNEL_LABEL, ORDER_STATUS_LABEL, ORDER_STATUS_STYLE } from '../../lib/commerce/labels';
 
 const STATUSES: OrderStatus[] = ['PENDING', 'PROCESSING', 'FULFILLED', 'CANCELLED', 'REFUNDED'];
 
@@ -37,28 +30,28 @@ export default function OrderDetailPage() {
       const data = await api.patch<{ order: CommerceOrder }>(`/commerce/orders/${id}/status`, { status });
       setOrder(data.order);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Could not update this order.');
+      setError(err instanceof ApiError ? err.message : 'Não foi possível atualizar este pedido.');
     } finally {
       setUpdating(false);
     }
   };
 
   if (!order) {
-    return <p className="text-slate-400">Loading order…</p>;
+    return <p className="text-slate-400">Carregando pedido…</p>;
   }
 
   return (
     <div>
       <Link to="/commerce/orders" className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-400 hover:text-ASTER-600 transition-colors mb-6">
-        <ArrowLeft size={16} /> Back to orders
+        <ArrowLeft size={16} /> Voltar para pedidos
       </Link>
 
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-ink-900">Order #{order.id.slice(-8)}</h1>
-          <p className="text-slate-500 mt-1.5 text-sm">Placed {new Date(order.createdAt).toLocaleString()} via {order.channel}</p>
+          <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-ink-900">Pedido #{order.id.slice(-8)}</h1>
+          <p className="text-slate-500 mt-1.5 text-sm">Realizado em {new Date(order.createdAt).toLocaleString()} via {ORDER_CHANNEL_LABEL[order.channel]}</p>
         </div>
-        <span className={`text-xs font-bold px-3 py-1.5 rounded-full ${STATUS_STYLE[order.status]}`}>{order.status}</span>
+        <span className={`text-xs font-bold px-3 py-1.5 rounded-full ${ORDER_STATUS_STYLE[order.status]}`}>{ORDER_STATUS_LABEL[order.status]}</span>
       </div>
 
       <div className="mt-8 grid lg:grid-cols-[1fr_320px] gap-6">
@@ -66,9 +59,9 @@ export default function OrderDetailPage() {
           <table className="w-full text-sm">
             <thead className="bg-slate-50 text-slate-400 text-left">
               <tr>
-                <th className="px-6 py-3 font-semibold">Product</th>
-                <th className="px-6 py-3 font-semibold">Qty</th>
-                <th className="px-6 py-3 font-semibold">Unit price</th>
+                <th className="px-6 py-3 font-semibold">Produto</th>
+                <th className="px-6 py-3 font-semibold">Qtd.</th>
+                <th className="px-6 py-3 font-semibold">Preço unitário</th>
                 <th className="px-6 py-3 font-semibold">Total</th>
               </tr>
             </thead>
@@ -99,17 +92,17 @@ export default function OrderDetailPage() {
 
         <div className="space-y-6">
           <div className="bg-white rounded-[28px] card-shadow border border-ASTER-100 p-6">
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-3">Customer</p>
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-3">Cliente</p>
             <p className="font-semibold text-ink-900">{order.customer.name}</p>
             {order.customer.email && <p className="text-slate-500 text-sm mt-0.5">{order.customer.email}</p>}
             {order.customer.phone && <p className="text-slate-500 text-sm mt-0.5">{order.customer.phone}</p>}
             <Link to={`/commerce/customers/${order.customer.id}`} className="inline-block mt-3 text-xs font-bold text-ASTER-600 hover:text-ASTER-700">
-              View customer →
+              Ver cliente →
             </Link>
           </div>
 
           <div className="bg-white rounded-[28px] card-shadow border border-ASTER-100 p-6">
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-3">Update status</p>
+            <p className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-3">Atualizar status</p>
             <div className="flex flex-wrap gap-2">
               {STATUSES.map((s) => (
                 <button
@@ -120,12 +113,12 @@ export default function OrderDetailPage() {
                     s === order.status ? 'border-ASTER-600 bg-ASTER-50 text-ASTER-600' : 'border-ASTER-100 text-slate-500 hover:border-ASTER-400 hover:text-ASTER-600'
                   }`}
                 >
-                  {s}
+                  {ORDER_STATUS_LABEL[s]}
                 </button>
               ))}
             </div>
             {(order.status === 'CANCELLED' || order.status === 'REFUNDED') && (
-              <p className="text-xs text-slate-400 mt-3">Items from this order were restocked automatically.</p>
+              <p className="text-xs text-slate-400 mt-3">Os itens deste pedido foram repostos no estoque automaticamente.</p>
             )}
             {error && <p className="text-rose-500 text-xs font-semibold mt-3">{error}</p>}
           </div>

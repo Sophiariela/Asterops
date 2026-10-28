@@ -20,7 +20,7 @@ customersRouter.get('/:id', async (req, res) => {
 customersRouter.post('/', async (req, res) => {
   const parsed = createCustomerSchema.safeParse(req.body);
   if (!parsed.success) {
-    return res.status(400).json({ error: parsed.error.issues[0]?.message ?? 'Invalid input.' });
+    return res.status(400).json({ error: parsed.error.issues[0]?.message ?? 'Entrada inválida.' });
   }
   const customer = await customersService.createCustomer(req.user!.userId, parsed.data);
   res.status(201).json({ customer });
@@ -29,7 +29,7 @@ customersRouter.post('/', async (req, res) => {
 customersRouter.patch('/:id', async (req, res) => {
   const parsed = updateCustomerSchema.safeParse(req.body);
   if (!parsed.success) {
-    return res.status(400).json({ error: parsed.error.issues[0]?.message ?? 'Invalid input.' });
+    return res.status(400).json({ error: parsed.error.issues[0]?.message ?? 'Entrada inválida.' });
   }
   const customer = await customersService.updateCustomer(req.user!.userId, req.params.id, parsed.data);
   res.json({ customer });

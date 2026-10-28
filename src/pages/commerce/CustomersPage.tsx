@@ -61,31 +61,31 @@ export default function CustomersPage() {
       setShowForm(false);
       load();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Could not save this customer.');
+      setError(err instanceof ApiError ? err.message : 'Não foi possível salvar este cliente.');
     } finally {
       setSaving(false);
     }
   };
 
   const onDelete = async (customer: CommerceCustomer) => {
-    if (!confirm(`Delete "${customer.name}"?`)) return;
+    if (!confirm(`Excluir "${customer.name}"?`)) return;
     try {
       await api.del(`/commerce/customers/${customer.id}`);
       load();
     } catch (err) {
-      alert(err instanceof ApiError ? err.message : 'Could not delete this customer.');
+      alert(err instanceof ApiError ? err.message : 'Não foi possível excluir este cliente.');
     }
   };
 
   return (
     <div>
       <div className="flex items-center justify-between gap-4 flex-wrap">
-        <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-ink-900">Customers</h1>
+        <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-ink-900">Clientes</h1>
         <button
           onClick={openCreate}
           className="flex items-center gap-2 bg-ASTER-600 hover:bg-ASTER-700 text-white font-bold px-5 py-2.5 rounded-full transition-all"
         >
-          <Plus size={16} /> New customer
+          <Plus size={16} /> Novo cliente
         </button>
       </div>
 
@@ -94,7 +94,7 @@ export default function CustomersPage() {
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search by name or email"
+          placeholder="Buscar por nome ou email"
           className="w-full border-2 border-ASTER-100 focus:border-ASTER-600 rounded-full pl-11 pr-4 py-2.5 text-sm outline-none transition-colors"
         />
       </div>
@@ -103,9 +103,9 @@ export default function CustomersPage() {
         <table className="w-full text-sm">
           <thead className="bg-slate-50 text-slate-400 text-left">
             <tr>
-              <th className="px-6 py-3 font-semibold">Customer</th>
-              <th className="px-6 py-3 font-semibold">Contact</th>
-              <th className="px-6 py-3 font-semibold">Orders</th>
+              <th className="px-6 py-3 font-semibold">Cliente</th>
+              <th className="px-6 py-3 font-semibold">Contato</th>
+              <th className="px-6 py-3 font-semibold">Pedidos</th>
               <th className="px-6 py-3 font-semibold"></th>
             </tr>
           </thead>
@@ -119,10 +119,10 @@ export default function CustomersPage() {
                 <td className="px-6 py-4 text-slate-600">{c._count?.orders ?? 0}</td>
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-1 justify-end">
-                    <button onClick={() => openEdit(c)} className="p-2 rounded-full text-slate-400 hover:text-ASTER-600 hover:bg-ASTER-50 transition-colors" aria-label={`Edit ${c.name}`}>
+                    <button onClick={() => openEdit(c)} className="p-2 rounded-full text-slate-400 hover:text-ASTER-600 hover:bg-ASTER-50 transition-colors" aria-label={`Editar ${c.name}`}>
                       <Pencil size={15} />
                     </button>
-                    <button onClick={() => onDelete(c)} className="p-2 rounded-full text-slate-400 hover:text-rose-500 hover:bg-rose-50 transition-colors" aria-label={`Delete ${c.name}`}>
+                    <button onClick={() => onDelete(c)} className="p-2 rounded-full text-slate-400 hover:text-rose-500 hover:bg-rose-50 transition-colors" aria-label={`Excluir ${c.name}`}>
                       <Trash2 size={15} />
                     </button>
                   </div>
@@ -131,7 +131,7 @@ export default function CustomersPage() {
             ))}
             {customers && customers.length === 0 && (
               <tr>
-                <td colSpan={4} className="px-6 py-10 text-center text-slate-400">No customers yet.</td>
+                <td colSpan={4} className="px-6 py-10 text-center text-slate-400">Nenhum cliente ainda.</td>
               </tr>
             )}
           </tbody>
@@ -139,10 +139,10 @@ export default function CustomersPage() {
       </div>
 
       {showForm && (
-        <Modal title={editing ? 'Edit customer' : 'New customer'} onClose={() => setShowForm(false)}>
+        <Modal title={editing ? 'Editar cliente' : 'Novo cliente'} onClose={() => setShowForm(false)}>
           <form onSubmit={onSubmit} className="space-y-4">
             <div>
-              <label className="text-[13px] font-bold text-ink-900 block mb-1.5">Name *</label>
+              <label className="text-[13px] font-bold text-ink-900 block mb-1.5">Nome *</label>
               <input
                 required
                 value={form.name}
@@ -161,7 +161,7 @@ export default function CustomersPage() {
                 />
               </div>
               <div>
-                <label className="text-[13px] font-bold text-ink-900 block mb-1.5">Phone</label>
+                <label className="text-[13px] font-bold text-ink-900 block mb-1.5">Telefone</label>
                 <input
                   value={form.phone}
                   onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
@@ -170,7 +170,7 @@ export default function CustomersPage() {
               </div>
             </div>
             <div>
-              <label className="text-[13px] font-bold text-ink-900 block mb-1.5">Notes</label>
+              <label className="text-[13px] font-bold text-ink-900 block mb-1.5">Notas</label>
               <textarea
                 value={form.notes}
                 onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))}
@@ -184,7 +184,7 @@ export default function CustomersPage() {
               disabled={saving}
               className="w-full bg-ASTER-600 hover:bg-ASTER-700 disabled:opacity-60 text-white font-bold py-3.5 rounded-full transition-all"
             >
-              {saving ? 'Saving…' : editing ? 'Save changes' : 'Create customer'}
+              {saving ? 'Salvando…' : editing ? 'Salvar alterações' : 'Criar cliente'}
             </button>
           </form>
         </Modal>

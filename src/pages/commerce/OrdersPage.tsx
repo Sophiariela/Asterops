@@ -4,15 +4,8 @@ import { Plus, Trash2 } from 'lucide-react';
 import { api, ApiError } from '../../lib/api';
 import { formatBRL } from '../../lib/currency';
 import type { CommerceCustomer, CommerceOrder, OrderChannel, OrderStatus, Product } from '../../lib/commerce/types';
+import { ORDER_CHANNEL_LABEL, ORDER_STATUS_LABEL, ORDER_STATUS_STYLE } from '../../lib/commerce/labels';
 import Modal from '../../components/commerce/Modal';
-
-const STATUS_STYLE: Record<OrderStatus, string> = {
-  PENDING: 'bg-amber-100 text-amber-700',
-  PROCESSING: 'bg-blue-100 text-blue-700',
-  FULFILLED: 'bg-emerald-100 text-emerald-700',
-  CANCELLED: 'bg-slate-200 text-slate-500',
-  REFUNDED: 'bg-rose-100 text-rose-600',
-};
 
 type LineItem = { productId: string; quantity: string };
 
@@ -62,7 +55,7 @@ export default function OrdersPage() {
     setError('');
     const validItems = items.filter((i) => i.productId && Number(i.quantity) > 0);
     if (!customerId || validItems.length === 0) {
-      setError('Pick a customer and at least one product.');
+      setError('Escolha um cliente e pelo menos um produto.');
       return;
     }
     setSaving(true);
@@ -75,7 +68,7 @@ export default function OrdersPage() {
       setShowForm(false);
       load();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Could not create this order.');
+      setError(err instanceof ApiError ? err.message : 'Não foi possível criar este pedido.');
     } finally {
       setSaving(false);
     }
@@ -84,12 +77,12 @@ export default function OrdersPage() {
   return (
     <div>
       <div className="flex items-center justify-between gap-4 flex-wrap">
-        <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-ink-900">Orders</h1>
+        <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-ink-900">Pedidos</h1>
         <button
           onClick={openCreate}
           className="flex items-center gap-2 bg-ASTER-600 hover:bg-ASTER-700 text-white font-bold px-5 py-2.5 rounded-full transition-all"
         >
-          <Plus size={16} /> New order
+          <Plus size={16} /> Novo pedido
         </button>
       </div>
 
@@ -98,9 +91,9 @@ export default function OrdersPage() {
         onChange={(e) => setStatusFilter(e.target.value)}
         className="mt-6 border-2 border-ASTER-100 rounded-full px-4 py-2.5 text-sm outline-none"
       >
-        <option value="">All statuses</option>
+        <option value="">Todos os status</option>
         {(['PENDING', 'PROCESSING', 'FULFILLED', 'CANCELLED', 'REFUNDED'] as OrderStatus[]).map((s) => (
-          <option key={s} value={s}>{s}</option>
+          <option key={s} value={s}>{ORDER_STATUS_LABEL[s]}</option>
         ))}
       </select>
 
@@ -108,12 +101,12 @@ export default function OrdersPage() {
         <table className="w-full text-sm">
           <thead className="bg-slate-50 text-slate-400 text-left">
             <tr>
-              <th className="px-6 py-3 font-semibold">Order</th>
-              <th className="px-6 py-3 font-semibold">Customer</th>
-              <th className="px-6 py-3 font-semibold">Channel</th>
+              <th className="px-6 py-3 font-semibold">Pedido</th>
+              <th className="px-6 py-3 font-semibold">Cliente</th>
+              <th className="px-6 py-3 font-semibold">Canal</th>
               <th className="px-6 py-3 font-semibold">Total</th>
               <th className="px-6 py-3 font-semibold">Status</th>
-              <th className="px-6 py-3 font-semibold">Placed</th>
+              <th className="px-6 py-3 font-semibold">Realizado em</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-ASTER-100">
@@ -123,20 +116,20 @@ export default function OrdersPage() {
                   <Link to={`/commerce/orders/${o.id}`} className="font-semibold text-ASTER-600 hover:text-ASTER-700">
                     #{o.id.slice(-8)}
                   </Link>
-                  <p className="text-slate-400 text-xs">{o.items.length} item(s)</p>
+                  <p className="text-slate-400 text-xs">{o.items.length} item(ns)</p>
                 </td>
                 <td className="px-6 py-4 text-slate-600">{o.customer.name}</td>
-                <td className="px-6 py-4 text-slate-600">{o.channel}</td>
+                <td className="px-6 py-4 text-slate-600">{ORDER_CHANNEL_LABEL[o.channel]}</td>
                 <td className="px-6 py-4 font-semibold text-ink-900 tabular-nums">{formatBRL(o.total)}</td>
                 <td className="px-6 py-4">
-                  <span className={`text-xs font-bold px-3 py-1.5 rounded-full ${STATUS_STYLE[o.status]}`}>{o.status}</span>
+                  <span className={`text-xs font-bold px-3 py-1.5 rounded-full ${ORDER_STATUS_STYLE[o.status]}`}>{ORDER_STATUS_LABEL[o.status]}</span>
                 </td>
                 <td className="px-6 py-4 text-slate-400 text-xs">{new Date(o.createdAt).toLocaleDateString()}</td>
               </tr>
             ))}
             {orders && orders.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-6 py-10 text-center text-slate-400">No orders yet.</td>
+                <td colSpan={6} className="px-6 py-10 text-center text-slate-400">Nenhum pedido ainda.</td>
               </tr>
             )}
           </tbody>
@@ -144,43 +137,43 @@ export default function OrdersPage() {
       </div>
 
       {showForm && (
-        <Modal title="New order" onClose={() => setShowForm(false)}>
+        <Modal title="Novo pedido" onClose={() => setShowForm(false)}>
           <form onSubmit={onSubmit} className="space-y-4">
             <div>
-              <label className="text-[13px] font-bold text-ink-900 block mb-1.5">Customer *</label>
+              <label className="text-[13px] font-bold text-ink-900 block mb-1.5">Cliente *</label>
               <select
                 required
                 value={customerId}
                 onChange={(e) => setCustomerId(e.target.value)}
                 className="w-full border-2 border-ASTER-100 focus:border-ASTER-600 rounded-2xl px-4 py-3 text-[15px] outline-none transition-colors"
               >
-                <option value="">Select a customer…</option>
+                <option value="">Selecione um cliente…</option>
                 {customers.map((c) => (
                   <option key={c.id} value={c.id}>{c.name}</option>
                 ))}
               </select>
               {customers.length === 0 && (
                 <p className="text-xs text-slate-400 mt-1.5">
-                  No customers yet — add one on the <Link to="/commerce/customers" className="text-ASTER-600 font-semibold">Customers</Link> tab.
+                  Nenhum cliente ainda — adicione um na aba <Link to="/commerce/customers" className="text-ASTER-600 font-semibold">Clientes</Link>.
                 </p>
               )}
             </div>
 
             <div>
-              <label className="text-[13px] font-bold text-ink-900 block mb-1.5">Channel</label>
+              <label className="text-[13px] font-bold text-ink-900 block mb-1.5">Canal</label>
               <select
                 value={channel}
                 onChange={(e) => setChannel(e.target.value as OrderChannel)}
                 className="w-full border-2 border-ASTER-100 focus:border-ASTER-600 rounded-2xl px-4 py-3 text-[15px] outline-none transition-colors"
               >
                 <option value="MANUAL">Manual</option>
-                <option value="POS">Point of sale</option>
+                <option value="POS">Ponto de venda</option>
                 <option value="ONLINE">Online</option>
               </select>
             </div>
 
             <div>
-              <label className="text-[13px] font-bold text-ink-900 block mb-1.5">Items *</label>
+              <label className="text-[13px] font-bold text-ink-900 block mb-1.5">Itens *</label>
               <div className="space-y-2.5">
                 {items.map((item, i) => {
                   const product = products.find((p) => p.id === item.productId);
@@ -191,10 +184,10 @@ export default function OrdersPage() {
                         onChange={(e) => updateItem(i, { productId: e.target.value })}
                         className="flex-1 border-2 border-ASTER-100 focus:border-ASTER-600 rounded-2xl px-3 py-2.5 text-sm outline-none transition-colors"
                       >
-                        <option value="">Select a product…</option>
+                        <option value="">Selecione um produto…</option>
                         {products.map((p) => (
                           <option key={p.id} value={p.id} disabled={p.stockQuantity <= 0}>
-                            {p.name} — {formatBRL(p.price)} ({p.stockQuantity} in stock)
+                            {p.name} — {formatBRL(p.price)} ({p.stockQuantity} em estoque)
                           </option>
                         ))}
                       </select>
@@ -206,7 +199,7 @@ export default function OrdersPage() {
                         onChange={(e) => updateItem(i, { quantity: e.target.value })}
                         className="w-20 border-2 border-ASTER-100 focus:border-ASTER-600 rounded-2xl px-3 py-2.5 text-sm outline-none transition-colors"
                       />
-                      <button type="button" onClick={() => removeItem(i)} className="p-2 text-slate-400 hover:text-rose-500 transition-colors" aria-label="Remove item">
+                      <button type="button" onClick={() => removeItem(i)} className="p-2 text-slate-400 hover:text-rose-500 transition-colors" aria-label="Remover item">
                         <Trash2 size={16} />
                       </button>
                     </div>
@@ -218,7 +211,7 @@ export default function OrdersPage() {
                 onClick={() => setItems((rows) => [...rows, { productId: '', quantity: '1' }])}
                 className="mt-2.5 text-xs font-bold text-ASTER-600 hover:text-ASTER-700"
               >
-                + Add another item
+                + Adicionar outro item
               </button>
             </div>
 
@@ -233,7 +226,7 @@ export default function OrdersPage() {
               disabled={saving}
               className="w-full bg-ASTER-600 hover:bg-ASTER-700 disabled:opacity-60 text-white font-bold py-3.5 rounded-full transition-all"
             >
-              {saving ? 'Placing order…' : 'Place order'}
+              {saving ? 'Realizando pedido…' : 'Realizar pedido'}
             </button>
           </form>
         </Modal>

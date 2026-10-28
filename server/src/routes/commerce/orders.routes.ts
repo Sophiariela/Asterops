@@ -22,7 +22,7 @@ ordersRouter.get('/:id', async (req, res) => {
 ordersRouter.post('/', async (req, res) => {
   const parsed = createOrderSchema.safeParse(req.body);
   if (!parsed.success) {
-    return res.status(400).json({ error: parsed.error.issues[0]?.message ?? 'Invalid input.' });
+    return res.status(400).json({ error: parsed.error.issues[0]?.message ?? 'Entrada inválida.' });
   }
   const order = await ordersService.createOrder(req.user!.userId, parsed.data);
   res.status(201).json({ order });
@@ -31,7 +31,7 @@ ordersRouter.post('/', async (req, res) => {
 ordersRouter.patch('/:id/status', async (req, res) => {
   const parsed = updateOrderStatusSchema.safeParse(req.body);
   if (!parsed.success) {
-    return res.status(400).json({ error: parsed.error.issues[0]?.message ?? 'Invalid input.' });
+    return res.status(400).json({ error: parsed.error.issues[0]?.message ?? 'Entrada inválida.' });
   }
   const order = await ordersService.updateOrderStatus(req.user!.userId, req.params.id, parsed.data.status);
   res.json({ order });

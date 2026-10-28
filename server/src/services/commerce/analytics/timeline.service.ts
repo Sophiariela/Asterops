@@ -1,5 +1,20 @@
+import type { CommerceOrderChannel, CommerceOrderStatus } from '@prisma/client';
 import { prisma } from '../../../lib/prisma.js';
 import { CommerceError } from '../../../lib/commerceError.js';
+
+const ORDER_CHANNEL_LABEL: Record<CommerceOrderChannel, string> = {
+  ONLINE: 'online',
+  POS: 'ponto de venda',
+  MANUAL: 'manual',
+};
+
+const ORDER_STATUS_LABEL: Record<CommerceOrderStatus, string> = {
+  PENDING: 'pendente',
+  PROCESSING: 'processando',
+  FULFILLED: 'entregue',
+  CANCELLED: 'cancelado',
+  REFUNDED: 'reembolsado',
+};
 
 // Event types the brief asked for that ASTER doesn't have data sources for
 // yet (site visits, lead capture, campaigns, cart abandonment) are kept in
@@ -29,18 +44,18 @@ export async function getCustomerTimeline(ownerId: string, customerId: string): 
     where: { id: customerId, ownerId },
     include: { orders: { orderBy: { createdAt: 'asc' }, include: { items: true } } },
   });
-  if (!customer) throw new CommerceError(404, 'Customer not found.');
+  if (!customer) throw new CommerceError(404, 'Cliente não encontrado.');
 
   const events: TimelineEvent[] = [
-    { type: 'CUSTOMER_CREATED', at: customer.createdAt.toISOString(), label: 'Added to CommerceOS' },
+    { type: 'CUSTOMER_CREATED', at: customer.createdAt.toISOString(), label: 'Adicionado ao CommerceOS' },
   ];
 
   customer.orders.forEach((order, index) => {
     events.push({
       type: 'ORDER_PLACED',
       at: order.createdAt.toISOString(),
-      label: index === 0 ? 'First purchase' : `Repeat purchase #${index + 1}`,
-      detail: `${order.items.length} item(s) via ${order.channel.toLowerCase()}`,
+      label: index === 0 ? 'Primeira compra' : `Compra recorrente #${index + 1}`,
+      detail: `${order.items.length} item(ns) via ${ORDER_CHANNEL_LABEL[order.channel]}`,
       orderId: order.id,
     });
 
@@ -50,7 +65,7 @@ export async function getCustomerTimeline(ownerId: string, customerId: string): 
       events.push({
         type: 'ORDER_STATUS_CHANGED',
         at: order.updatedAt.toISOString(),
-        label: `Order ${order.status.toLowerCase()}`,
+        label: `Pedido ${ORDER_STATUS_LABEL[order.status]}`,
         orderId: order.id,
       });
     }
