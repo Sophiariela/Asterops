@@ -5,7 +5,8 @@ import { api, ApiError } from '../../lib/api';
 import { formatBRL } from '../../lib/currency';
 import type { BusinessPulse } from '../../lib/commerce/types';
 
-function Trend({ value }: { value: number | null }) {
+function Trend({ current, previous, value }: { current: number; previous: number; value: number | null }) {
+  if (current === 0 && previous === 0) return <span className="text-slate-400 text-xs font-semibold">Sem dados neste período</span>;
   if (value === null) return <span className="text-slate-400 text-xs font-semibold">sem base de comparação ainda</span>;
   const Icon = value > 0 ? TrendingUp : value < 0 ? TrendingDown : Minus;
   const color = value > 0 ? 'text-emerald-600' : value < 0 ? 'text-rose-600' : 'text-slate-400';
@@ -66,17 +67,17 @@ export default function PulsePage() {
         <div className="bg-white rounded-2xl card-shadow-sm border border-ASTER-100 p-5">
           <p className="text-xs font-bold text-slate-400 uppercase tracking-wide">Receita (7 dias)</p>
           <p className="font-display font-extrabold text-2xl text-ink-900 mt-2 tabular-nums">{formatBRL(pulse.revenue.current)}</p>
-          <div className="mt-1.5"><Trend value={pulse.revenue.pctChange} /></div>
+          <div className="mt-1.5"><Trend current={pulse.revenue.current} previous={pulse.revenue.previous} value={pulse.revenue.pctChange} /></div>
         </div>
         <div className="bg-white rounded-2xl card-shadow-sm border border-ASTER-100 p-5">
           <p className="text-xs font-bold text-slate-400 uppercase tracking-wide">Pedidos (7 dias)</p>
           <p className="font-display font-extrabold text-2xl text-ink-900 mt-2 tabular-nums">{pulse.orders.current}</p>
-          <div className="mt-1.5"><Trend value={pulse.orders.pctChange} /></div>
+          <div className="mt-1.5"><Trend current={pulse.orders.current} previous={pulse.orders.previous} value={pulse.orders.pctChange} /></div>
         </div>
         <div className="bg-white rounded-2xl card-shadow-sm border border-ASTER-100 p-5">
           <p className="text-xs font-bold text-slate-400 uppercase tracking-wide">Novos clientes (7 dias)</p>
           <p className="font-display font-extrabold text-2xl text-ink-900 mt-2 tabular-nums">{pulse.newCustomers.current}</p>
-          <div className="mt-1.5"><Trend value={pulse.newCustomers.pctChange} /></div>
+          <div className="mt-1.5"><Trend current={pulse.newCustomers.current} previous={pulse.newCustomers.previous} value={pulse.newCustomers.pctChange} /></div>
         </div>
       </div>
 
@@ -86,7 +87,9 @@ export default function PulsePage() {
             <p className="text-xs font-bold text-slate-400 uppercase tracking-wide flex items-center gap-1.5">
               <AlertTriangle size={14} className="text-amber-500" /> Alertas de estoque
             </p>
-            <Link to="/commerce/inventory" className="text-xs font-bold text-ASTER-600 hover:text-ASTER-700">Ver todos →</Link>
+            {pulse.lowStockProducts.length > 0 && (
+              <Link to="/commerce/inventory" className="text-xs font-bold text-ASTER-600 hover:text-ASTER-700">Ver todos →</Link>
+            )}
           </div>
           {pulse.lowStockProducts.length === 0 ? (
             <p className="text-sm text-slate-400">Nada está acabando.</p>
@@ -105,7 +108,9 @@ export default function PulsePage() {
         <div className="bg-white rounded-[28px] card-shadow border border-ASTER-100 p-6">
           <div className="flex items-center justify-between mb-4">
             <p className="text-xs font-bold text-slate-400 uppercase tracking-wide">Produtos mais vendidos (30 dias)</p>
-            <Link to="/commerce/products" className="text-xs font-bold text-ASTER-600 hover:text-ASTER-700">Ver todos →</Link>
+            {pulse.topProducts.length > 0 && (
+              <Link to="/commerce/products" className="text-xs font-bold text-ASTER-600 hover:text-ASTER-700">Ver todos →</Link>
+            )}
           </div>
           {pulse.topProducts.length === 0 ? (
             <p className="text-sm text-slate-400">Ainda não há vendas nos últimos 30 dias.</p>
