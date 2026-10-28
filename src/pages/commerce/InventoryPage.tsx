@@ -4,6 +4,7 @@ import { api, ApiError } from '../../lib/api';
 import type { InventoryRow, ManualStockReason, StockMovement } from '../../lib/commerce/types';
 import { MANUAL_STOCK_REASON_LABEL, STOCK_REASON_LABEL } from '../../lib/commerce/labels';
 import Modal from '../../components/commerce/Modal';
+import EmptyState from '../../components/commerce/EmptyState';
 
 export default function InventoryPage() {
   const [rows, setRows] = useState<InventoryRow[] | null>(null);
@@ -102,8 +103,16 @@ export default function InventoryPage() {
             ))}
             {rows && rows.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-6 py-10 text-center text-slate-400">
-                  {lowStockOnly ? 'Nada está com estoque baixo.' : 'Nenhum produto ainda.'}
+                <td colSpan={5}>
+                  {lowStockOnly ? (
+                    <p className="px-6 py-10 text-center text-slate-400 text-sm">Nada está com estoque baixo.</p>
+                  ) : (
+                    <EmptyState
+                      message="Você ainda não tem produtos para gerenciar o estoque."
+                      cta="Cadastre seu primeiro produto"
+                      to="/commerce/products"
+                    />
+                  )}
                 </td>
               </tr>
             )}

@@ -1,7 +1,8 @@
-import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { Trash2 } from 'lucide-react';
 import { api, ApiError } from '../../lib/api';
 import type { Category } from '../../lib/commerce/types';
+import EmptyState from '../../components/commerce/EmptyState';
 
 export default function CategoriesPage() {
   const [categories, setCategories] = useState<Category[] | null>(null);
@@ -9,6 +10,9 @@ export default function CategoriesPage() {
   const [description, setDescription] = useState('');
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
+  const nameInputRef = useRef<HTMLInputElement>(null);
+
+  const focusNameInput = () => nameInputRef.current?.focus();
 
   const load = () => {
     api.get<{ categories: Category[] }>('/commerce/categories').then((data) => setCategories(data.categories)).catch(() => setCategories([]));
@@ -70,7 +74,13 @@ export default function CategoriesPage() {
               ))}
               {categories && categories.length === 0 && (
                 <tr>
-                  <td colSpan={3} className="px-6 py-10 text-center text-slate-400">Nenhuma categoria ainda.</td>
+                  <td colSpan={3}>
+                    <EmptyState
+                      message="Você ainda não tem categorias cadastradas."
+                      cta="Crie sua primeira categoria"
+                      onAction={focusNameInput}
+                    />
+                  </td>
                 </tr>
               )}
             </tbody>
@@ -83,6 +93,7 @@ export default function CategoriesPage() {
             <div>
               <label className="text-[13px] font-bold text-ink-900 block mb-1.5">Nome *</label>
               <input
+                ref={nameInputRef}
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}

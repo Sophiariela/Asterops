@@ -6,6 +6,7 @@ import { formatBRL } from '../../lib/currency';
 import type { Category, Product, ProductHealth, ProductStatus } from '../../lib/commerce/types';
 import { PRODUCT_STATUS_LABEL } from '../../lib/commerce/labels';
 import Modal from '../../components/commerce/Modal';
+import EmptyState from '../../components/commerce/EmptyState';
 
 type FormState = {
   name: string;
@@ -224,8 +225,16 @@ export default function ProductsPage() {
             ))}
             {products && products.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-6 py-10 text-center text-slate-400">
-                  Nenhum produto ainda. <button onClick={openCreate} className="text-ASTER-600 font-bold">Cadastre o primeiro</button>.
+                <td colSpan={7}>
+                  {search ? (
+                    <p className="px-6 py-10 text-center text-slate-400 text-sm">Nenhum produto encontrado para "{search}".</p>
+                  ) : (
+                    <EmptyState
+                      message="Você ainda não tem produtos cadastrados."
+                      cta="Cadastre seu primeiro produto"
+                      onAction={openCreate}
+                    />
+                  )}
                 </td>
               </tr>
             )}

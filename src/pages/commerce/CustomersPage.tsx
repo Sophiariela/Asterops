@@ -4,6 +4,7 @@ import { Plus, Search, Pencil, Trash2 } from 'lucide-react';
 import { api, ApiError } from '../../lib/api';
 import type { CommerceCustomer } from '../../lib/commerce/types';
 import Modal from '../../components/commerce/Modal';
+import EmptyState from '../../components/commerce/EmptyState';
 
 type FormState = { name: string; email: string; phone: string; notes: string };
 const emptyForm: FormState = { name: '', email: '', phone: '', notes: '' };
@@ -131,7 +132,17 @@ export default function CustomersPage() {
             ))}
             {customers && customers.length === 0 && (
               <tr>
-                <td colSpan={4} className="px-6 py-10 text-center text-slate-400">Nenhum cliente ainda.</td>
+                <td colSpan={4}>
+                  {search ? (
+                    <p className="px-6 py-10 text-center text-slate-400 text-sm">Nenhum cliente encontrado para "{search}".</p>
+                  ) : (
+                    <EmptyState
+                      message="Você ainda não tem clientes cadastrados."
+                      cta="Cadastre seu primeiro cliente"
+                      onAction={openCreate}
+                    />
+                  )}
+                </td>
               </tr>
             )}
           </tbody>
