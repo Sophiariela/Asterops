@@ -42,7 +42,8 @@ export default function OpportunitiesPage() {
                 <p className="font-display font-extrabold text-2xl text-emerald-600 tabular-nums whitespace-nowrap">+{formatBRL(o.estimate)}</p>
               ) : (
                 <span className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-400 bg-slate-50 border border-ASTER-100 rounded-full px-3 py-1.5 whitespace-nowrap">
-                  <Lock size={12} /> Not yet available
+                  <Lock size={12} />
+                  {o.key === 'cart-recovery' ? 'Ainda não disponível — requer rastreamento de carrinho' : 'Disponível assim que houver pedidos registrados'}
                 </span>
               )}
             </div>
