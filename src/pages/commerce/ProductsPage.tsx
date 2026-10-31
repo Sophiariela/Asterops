@@ -7,6 +7,7 @@ import type { Category, Product, ProductHealth, ProductStatus } from '../../lib/
 import { PRODUCT_STATUS_LABEL } from '../../lib/commerce/labels';
 import Modal from '../../components/commerce/Modal';
 import EmptyState from '../../components/commerce/EmptyState';
+import { EditableImage } from '../../components/webos/editable';
 
 type FormState = {
   name: string;
@@ -137,6 +138,18 @@ export default function ProductsPage() {
     }
   };
 
+  const uploadProductImage = async (product: Product, file: File) => {
+    const fd = new FormData();
+    fd.append('image', file);
+    await api.postForm(`/commerce/products/${product.id}/image`, fd);
+    load();
+  };
+
+  const removeProductImage = async (product: Product) => {
+    await api.del(`/commerce/products/${product.id}/image`);
+    load();
+  };
+
   const onDelete = async (product: Product) => {
     if (!confirm(`Excluir "${product.name}"? Isso não pode ser desfeito.`)) return;
     try {
@@ -173,6 +186,7 @@ export default function ProductsPage() {
         <table className="w-full text-sm">
           <thead className="bg-slate-50 text-slate-400 text-left">
             <tr>
+              <th className="px-6 py-3 font-semibold"></th>
               <th className="px-6 py-3 font-semibold">Produto</th>
               <th className="px-6 py-3 font-semibold">Categoria</th>
               <th className="px-6 py-3 font-semibold">Preço</th>
@@ -185,6 +199,16 @@ export default function ProductsPage() {
           <tbody className="divide-y divide-ASTER-100">
             {products?.map((p) => (
               <tr key={p.id}>
+                <td className="px-6 py-4">
+                  <EditableImage
+                    src={p.imageUrl}
+                    onUpload={(f) => uploadProductImage(p, f)}
+                    onRemove={() => removeProductImage(p)}
+                    className="w-12 h-12"
+                    rounded="rounded-lg"
+                    label=""
+                  />
+                </td>
                 <td className="px-6 py-4">
                   <p className="font-semibold text-ink-900">{p.name}</p>
                   <p className="text-slate-400 text-xs">{p.sku}</p>
@@ -225,7 +249,7 @@ export default function ProductsPage() {
             ))}
             {products && products.length === 0 && (
               <tr>
-                <td colSpan={7}>
+                <td colSpan={8}>
                   {search ? (
                     <p className="px-6 py-10 text-center text-slate-400 text-sm">Nenhum produto encontrado para "{search}".</p>
                   ) : (

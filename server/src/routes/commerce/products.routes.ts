@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { authenticate, requireRole } from '../../middleware/auth.js';
+import { upload, resizeUploadedImage, persistUpload, getUploadedUrl, handleUploadError } from '../../middleware/upload.js';
 import { createProductSchema, updateProductSchema } from '../../validation/commerce.js';
 import * as productsService from '../../services/commerce/products.service.js';
 
@@ -39,3 +40,18 @@ productsRouter.delete('/:id', async (req, res) => {
   await productsService.deleteProduct(req.user!.userId, req.params.id);
   res.status(204).send();
 });
+
+productsRouter.post('/:id/image', upload.single('image'), resizeUploadedImage, persistUpload, async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: 'No file uploaded.' });
+  }
+  const product = await productsService.updateProduct(req.user!.userId, req.params.id, { imageUrl: getUploadedUrl(req) });
+  res.json({ product });
+});
+
+productsRouter.delete('/:id/image', async (req, res) => {
+  const product = await productsService.updateProduct(req.user!.userId, req.params.id, { imageUrl: null });
+  res.json({ product });
+});
+
+productsRouter.use(handleUploadError);

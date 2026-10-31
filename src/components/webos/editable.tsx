@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type DragEvent, type ElementType, type KeyboardEvent, type MouseEvent } from 'react';
-import { Image as ImageIcon, Loader2, Check, AlertCircle } from 'lucide-react';
+import { Image as ImageIcon, Loader2, Check, AlertCircle, X } from 'lucide-react';
 import { resolveUploadUrl } from '../../lib/api';
 
 const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
@@ -83,12 +83,14 @@ export function EditableText({
 export function EditableImage({
   src,
   onUpload,
+  onRemove,
   className = '',
   label = 'Add photo',
   rounded = 'rounded-2xl',
 }: {
   src: string | null | undefined;
   onUpload: (file: File) => Promise<void>;
+  onRemove?: () => Promise<void>;
   className?: string;
   label?: string;
   rounded?: string;
@@ -97,6 +99,7 @@ export function EditableImage({
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [removing, setRemoving] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
@@ -147,10 +150,22 @@ export function EditableImage({
     if (file) handleFile(file);
   };
 
+  const handleRemove = (e: MouseEvent) => {
+    e.stopPropagation();
+    if (!onRemove || removing) return;
+    setRemoving(true);
+    setError('');
+    onRemove()
+      .catch(() => setError('Could not remove this photo. Try again.'))
+      .finally(() => setRemoving(false));
+  };
+
+  const busy = uploading || removing;
+
   return (
     <div
       className={`relative group ${rounded} overflow-hidden bg-gradient-to-br from-ASTER-100 to-ASTER-50 cursor-pointer transition-shadow ${dragOver ? 'ring-2 ring-ASTER-500 ring-offset-2' : ''} ${className}`}
-      onClick={() => !uploading && inputRef.current?.click()}
+      onClick={() => !busy && inputRef.current?.click()}
       onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
       onDragLeave={() => setDragOver(false)}
       onDrop={onDrop}
@@ -164,7 +179,7 @@ export function EditableImage({
         </div>
       )}
 
-      {!uploading && (
+      {!busy && (
         <div className="absolute inset-0 bg-ink-950/0 group-hover:bg-ink-950/35 transition-colors flex items-center justify-center">
           <span className="text-white text-[11px] font-bold bg-ink-950/70 px-3 py-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
             {resolved ? 'Replace photo' : label}
@@ -172,7 +187,18 @@ export function EditableImage({
         </div>
       )}
 
-      {uploading && (
+      {resolved && onRemove && !busy && (
+        <button
+          type="button"
+          onClick={handleRemove}
+          title="Remove photo"
+          className="absolute top-1.5 right-1.5 bg-ink-950/70 hover:bg-rose-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+        >
+          <X size={12} strokeWidth={3} />
+        </button>
+      )}
+
+      {busy && (
         <div className="absolute inset-0 bg-ink-950/45 flex items-center justify-center">
           <Loader2 size={20} className="text-white animate-spin" />
         </div>

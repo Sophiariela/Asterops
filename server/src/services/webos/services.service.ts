@@ -41,6 +41,13 @@ export async function updateService(
   return prisma.service.update({ where: { id }, data });
 }
 
+export async function setServiceImage(ownerId: string, siteId: string, id: string, imageUrl: string | null) {
+  await assertSiteOwned(ownerId, siteId);
+  const existing = await prisma.service.findFirst({ where: { id, siteId } });
+  if (!existing) throw new CommerceError(404, 'Service not found.');
+  return prisma.service.update({ where: { id }, data: { imageUrl } });
+}
+
 export async function deleteService(ownerId: string, siteId: string, id: string) {
   await assertSiteOwned(ownerId, siteId);
   const existing = await prisma.service.findFirst({ where: { id, siteId } });

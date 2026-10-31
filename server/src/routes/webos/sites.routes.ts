@@ -63,6 +63,11 @@ sitesRouter.post('/:id/logo', upload.single('logo'), resizeUploadedImage, persis
   res.json({ site });
 });
 
+sitesRouter.delete('/:id/logo', async (req, res) => {
+  const site = await sitesService.setSiteLogo(req.user!.userId, req.params.id, null);
+  res.json({ site });
+});
+
 sitesRouter.delete('/:id', async (req, res) => {
   await sitesService.deleteSite(req.user!.userId, req.params.id);
   res.status(204).send();

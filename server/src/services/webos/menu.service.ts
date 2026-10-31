@@ -70,7 +70,7 @@ export async function updateItem(
   return prisma.menuItem.update({ where: { id }, data });
 }
 
-export async function setItemImage(ownerId: string, siteId: string, id: string, imageUrl: string) {
+export async function setItemImage(ownerId: string, siteId: string, id: string, imageUrl: string | null) {
   const item = await prisma.menuItem.findFirst({ where: { id, category: { siteId, site: { ownerId } } } });
   if (!item) throw new CommerceError(404, 'Menu item not found.');
   return prisma.menuItem.update({ where: { id }, data: { imageUrl } });

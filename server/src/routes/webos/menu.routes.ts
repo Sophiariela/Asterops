@@ -68,6 +68,11 @@ menuRouter.post('/items/:id/image', upload.single('image'), resizeUploadedImage,
   res.json({ item });
 });
 
+menuRouter.delete('/items/:id/image', async (req: Request<SiteParams & { id: string }>, res) => {
+  const item = await menuService.setItemImage(req.user!.userId, req.params.siteId, req.params.id, null);
+  res.json({ item });
+});
+
 menuRouter.use(handleUploadError);
 
 // Unauthenticated: kept for callers that only need the menu, though the

@@ -3,6 +3,7 @@ import { Plus, Trash2, Pencil, Clock } from 'lucide-react';
 import { api, ApiError } from '../../lib/api';
 import { formatMoney } from '../../lib/webos/currency';
 import Modal from '../commerce/Modal';
+import { EditableImage } from './editable';
 import type { Currency, Service } from '../../lib/webos/types';
 
 type FormState = { name: string; description: string; price: string; duration: string; active: boolean };
@@ -84,6 +85,20 @@ export default function ServicesManager({ siteId, currency, onChanged }: { siteI
     onChanged?.();
   };
 
+  const uploadServiceImage = async (id: string, file: File) => {
+    const fd = new FormData();
+    fd.append('image', file);
+    await api.postForm(`/webos/sites/${siteId}/services/${id}/image`, fd);
+    load();
+    onChanged?.();
+  };
+
+  const removeServiceImage = async (id: string) => {
+    await api.del(`/webos/sites/${siteId}/services/${id}/image`);
+    load();
+    onChanged?.();
+  };
+
   if (!services) return <p className="text-slate-400">Loading services…</p>;
 
   return (
@@ -98,6 +113,13 @@ export default function ServicesManager({ siteId, currency, onChanged }: { siteI
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {services.map((s) => (
           <div key={s.id} className={`rounded-2xl p-4 border ${s.active ? 'bg-slate-50 border-transparent' : 'bg-slate-50/50 border-dashed border-slate-200 opacity-70'}`}>
+            <EditableImage
+              src={s.imageUrl}
+              onUpload={(f) => uploadServiceImage(s.id, f)}
+              onRemove={() => removeServiceImage(s.id)}
+              className="aspect-video mb-3"
+              label="Add photo"
+            />
             <div className="flex items-start justify-between gap-2">
               <p className="font-semibold text-ink-900">{s.name}</p>
               <span className="text-xs font-bold text-ink-900 tabular-nums whitespace-nowrap">{formatMoney(s.priceCents, currency)}</span>

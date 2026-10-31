@@ -82,11 +82,12 @@ export type Service = {
   description: string | null;
   priceCents: number | null;
   durationMinutes: number | null;
+  imageUrl: string | null;
   active: boolean;
   order: number;
 };
 
-export type PublicService = Pick<Service, 'id' | 'name' | 'description' | 'priceCents' | 'durationMinutes'>;
+export type PublicService = Pick<Service, 'id' | 'name' | 'description' | 'priceCents' | 'durationMinutes' | 'imageUrl'>;
 
 export type BlockedDate = {
   id: string;

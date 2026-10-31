@@ -29,12 +29,12 @@ export async function updatePage(ownerId: string, pageId: string, data: UpdatePa
   return prisma.page.update({ where: { id: pageId }, data });
 }
 
-export async function setPageHeroImage(ownerId: string, pageId: string, heroImageUrl: string) {
+export async function setPageHeroImage(ownerId: string, pageId: string, heroImageUrl: string | null) {
   await assertPageOwned(ownerId, pageId);
   return prisma.page.update({ where: { id: pageId }, data: { heroImageUrl } });
 }
 
-export async function setSectionImage(ownerId: string, pageId: string, index: number, imageUrl: string) {
+export async function setSectionImage(ownerId: string, pageId: string, index: number, imageUrl: string | null) {
   const page = await assertPageOwned(ownerId, pageId);
   const sections = (Array.isArray(page.sections) ? page.sections : []) as Section[];
   if (index < 0 || index >= sections.length) throw new CommerceError(404, 'Section not found.');

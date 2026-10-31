@@ -41,4 +41,18 @@ pagesRouter.post('/:id/sections/:index/image', upload.single('image'), resizeUpl
   res.json({ page });
 });
 
+pagesRouter.delete('/:id/hero-image', async (req, res) => {
+  const page = await pagesService.setPageHeroImage(req.user!.userId, req.params.id, null);
+  res.json({ page });
+});
+
+pagesRouter.delete('/:id/sections/:index/image', async (req, res) => {
+  const index = Number(req.params.index);
+  if (!Number.isInteger(index) || index < 0) {
+    return res.status(400).json({ error: 'Invalid section index.' });
+  }
+  const page = await pagesService.setSectionImage(req.user!.userId, req.params.id, index, null);
+  res.json({ page });
+});
+
 pagesRouter.use(handleUploadError);

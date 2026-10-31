@@ -376,13 +376,18 @@ export default function PublicSiteRenderer({
                 <h3 className="font-display font-bold text-xl text-ink-900 mb-5">{section.heading}</h3>
                 <div className="grid sm:grid-cols-2 gap-4">
                   {site.services.map((s) => (
-                    <div key={s.id} className="bg-slate-50 rounded-2xl p-5">
-                      <div className="flex items-start justify-between gap-3">
-                        <p className="text-sm font-bold text-ink-900">{s.name}</p>
-                        {s.priceCents !== null && <span className="text-sm font-bold text-ASTER-600 tabular-nums whitespace-nowrap">{formatMoney(s.priceCents, site.currency)}</span>}
+                    <div key={s.id} className="bg-slate-50 rounded-2xl overflow-hidden">
+                      {s.imageUrl && (
+                        <img src={resolveUploadUrl(s.imageUrl) ?? undefined} alt="" className="w-full aspect-video object-cover" />
+                      )}
+                      <div className="p-5">
+                        <div className="flex items-start justify-between gap-3">
+                          <p className="text-sm font-bold text-ink-900">{s.name}</p>
+                          {s.priceCents !== null && <span className="text-sm font-bold text-ASTER-600 tabular-nums whitespace-nowrap">{formatMoney(s.priceCents, site.currency)}</span>}
+                        </div>
+                        {s.description && <p className="text-xs text-slate-500 mt-1.5">{s.description}</p>}
+                        {s.durationMinutes && <p className="text-[11px] text-slate-400 mt-2 flex items-center gap-1"><Clock size={11} /> {s.durationMinutes} min</p>}
                       </div>
-                      {s.description && <p className="text-xs text-slate-500 mt-1.5">{s.description}</p>}
-                      {s.durationMinutes && <p className="text-[11px] text-slate-400 mt-2 flex items-center gap-1"><Clock size={11} /> {s.durationMinutes} min</p>}
                     </div>
                   ))}
                 </div>

@@ -112,9 +112,9 @@ function sectionBody(type: string, bodyPattern: string, vars: Record<string, str
 // Clearly-generic placeholders so the trust section of a template preview
 // renders populated (what a finished site looks like) instead of empty.
 const EXAMPLE_SERVICES: PublicService[] = [
-  { id: 'preview-svc-1', name: 'Signature service', description: 'Our most popular offering, tailored to you.', priceCents: 8000, durationMinutes: 60 },
-  { id: 'preview-svc-2', name: 'Quick session', description: 'A shorter option when time is tight.', priceCents: 4500, durationMinutes: 30 },
-  { id: 'preview-svc-3', name: 'Premium package', description: 'The full experience, start to finish.', priceCents: 15000, durationMinutes: 90 },
+  { id: 'preview-svc-1', name: 'Signature service', description: 'Our most popular offering, tailored to you.', priceCents: 8000, durationMinutes: 60, imageUrl: null },
+  { id: 'preview-svc-2', name: 'Quick session', description: 'A shorter option when time is tight.', priceCents: 4500, durationMinutes: 30, imageUrl: null },
+  { id: 'preview-svc-3', name: 'Premium package', description: 'The full experience, start to finish.', priceCents: 15000, durationMinutes: 90, imageUrl: null },
 ];
 
 const EXAMPLE_TESTIMONIALS: PublicTestimonial[] = [

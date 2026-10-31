@@ -125,6 +125,11 @@ export default function WebsiteEditor({
     return api.postForm(`/webos/sites/${site.id}/menu/items/${itemId}/image`, fd).then(onRefresh);
   };
 
+  const removeLogo = () => api.del(`/webos/sites/${site.id}/logo`).then(onRefresh);
+  const removeHeroImage = (pageId: string) => api.del(`/webos/pages/${pageId}/hero-image`).then(onRefresh);
+  const removeSectionImage = (pageId: string, index: number) => api.del(`/webos/pages/${pageId}/sections/${index}/image`).then(onRefresh);
+  const removeMenuItemImage = (itemId: string) => api.del(`/webos/sites/${site.id}/menu/items/${itemId}/image`).then(onRefresh);
+
   const saveSectionField = (p: Page, index: number, field: 'heading' | 'body', value: string) => {
     const sections = p.sections.map((s, i) => (i === index ? { ...s, [field]: value } : s));
     patchPage(p.id, { sections });
@@ -218,7 +223,7 @@ export default function WebsiteEditor({
         {/* Navbar */}
         <div className="flex items-center justify-between gap-4 px-6 py-4 border-b border-ASTER-100 flex-wrap">
           <div className="flex items-center gap-3 min-w-0">
-            <EditableImage src={site.logoUrl} onUpload={uploadLogo} className="w-10 h-10 shrink-0" rounded="rounded-xl" label="Logo" />
+            <EditableImage src={site.logoUrl} onUpload={uploadLogo} onRemove={removeLogo} className="w-10 h-10 shrink-0" rounded="rounded-xl" label="Logo" />
             <EditableText
               value={site.businessName}
               onSave={(v) => patchSite({ businessName: v })}
@@ -241,7 +246,7 @@ export default function WebsiteEditor({
 
         {/* Hero */}
         <div className="relative h-72 sm:h-96">
-          <EditableImage src={page.heroImageUrl} onUpload={(f) => uploadHeroImage(page.id, f)} className="absolute inset-0" rounded="rounded-none" label="Add hero photo" />
+          <EditableImage src={page.heroImageUrl} onUpload={(f) => uploadHeroImage(page.id, f)} onRemove={() => removeHeroImage(page.id)} className="absolute inset-0" rounded="rounded-none" label="Add hero photo" />
           <div className="absolute inset-0 bg-gradient-to-t from-ink-950/80 via-ink-950/30 to-ink-950/10 pointer-events-none" />
           <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-10 gap-3">
             <EditableText
@@ -289,7 +294,7 @@ export default function WebsiteEditor({
             <div className="grid sm:grid-cols-3 gap-4">
               {featuredItems.map((item) => (
                 <div key={item.id} className="bg-slate-50 rounded-2xl overflow-hidden">
-                  <EditableImage src={item.imageUrl} onUpload={(f) => uploadMenuItemImage(item.id, f)} className="aspect-video" rounded="rounded-none" />
+                  <EditableImage src={item.imageUrl} onUpload={(f) => uploadMenuItemImage(item.id, f)} onRemove={() => removeMenuItemImage(item.id)} className="aspect-video" rounded="rounded-none" />
                   <div className="p-4">
                     <div className="flex items-center justify-between gap-2">
                       <EditableText value={item.name} onSave={(v) => patchMenuItem(item.id, { name: v })} as="p" className="text-sm font-bold text-ink-900" />
@@ -324,7 +329,7 @@ export default function WebsiteEditor({
                     <div className="space-y-2">
                       {cat.items.map((item) => (
                         <div key={item.id} className={`flex items-center gap-3 py-2 border-b border-ASTER-50 ${!item.available ? 'opacity-50' : ''}`}>
-                          <EditableImage src={item.imageUrl} onUpload={(f) => uploadMenuItemImage(item.id, f)} className="w-12 h-12 shrink-0" rounded="rounded-lg" label="" />
+                          <EditableImage src={item.imageUrl} onUpload={(f) => uploadMenuItemImage(item.id, f)} onRemove={() => removeMenuItemImage(item.id)} className="w-12 h-12 shrink-0" rounded="rounded-lg" label="" />
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-semibold text-ink-900 flex items-center gap-1.5">
                               <EditableText value={item.name} onSave={(v) => patchMenuItem(item.id, { name: v })} as="span" />
@@ -377,7 +382,7 @@ export default function WebsiteEditor({
               </div>
             ) : (
               <div key={i} className={`p-6 sm:p-10 grid sm:grid-cols-2 gap-6 items-center ${i % 2 === 1 ? 'sm:[&>*:first-child]:order-2' : ''}`}>
-                <EditableImage src={section.imageUrl} onUpload={(f) => uploadSectionImage(page.id, i, f)} className="aspect-video" />
+                <EditableImage src={section.imageUrl} onUpload={(f) => uploadSectionImage(page.id, i, f)} onRemove={() => removeSectionImage(page.id, i)} className="aspect-video" />
                 <div>
                   <EditableText
                     value={section.heading}

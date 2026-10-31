@@ -308,7 +308,7 @@ export async function updateSite(
   return omitSecrets(site);
 }
 
-export async function setSiteLogo(ownerId: string, id: string, logoUrl: string) {
+export async function setSiteLogo(ownerId: string, id: string, logoUrl: string | null) {
   const existing = await prisma.site.findFirst({ where: { id, ownerId } });
   if (!existing) throw new CommerceError(404, 'Site not found.');
   const site = await prisma.site.update({ where: { id }, data: { logoUrl } });

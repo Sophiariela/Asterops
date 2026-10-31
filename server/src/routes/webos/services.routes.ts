@@ -1,5 +1,6 @@
 import { Router, type Request } from 'express';
 import { authenticate, requireRole } from '../../middleware/auth.js';
+import { upload, resizeUploadedImage, persistUpload, getUploadedUrl, handleUploadError } from '../../middleware/upload.js';
 import { createServiceSchema, updateServiceSchema } from '../../validation/webos.js';
 import * as servicesService from '../../services/webos/services.service.js';
 
@@ -37,6 +38,21 @@ servicesRouter.delete('/:id', async (req: Request<SiteParams & { id: string }>, 
   await servicesService.deleteService(req.user!.userId, req.params.siteId, req.params.id);
   res.status(204).send();
 });
+
+servicesRouter.post('/:id/image', upload.single('image'), resizeUploadedImage, persistUpload, async (req: Request<SiteParams & { id: string }>, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: 'No file uploaded.' });
+  }
+  const service = await servicesService.setServiceImage(req.user!.userId, req.params.siteId, req.params.id, getUploadedUrl(req));
+  res.json({ service });
+});
+
+servicesRouter.delete('/:id/image', async (req: Request<SiteParams & { id: string }>, res) => {
+  const service = await servicesService.setServiceImage(req.user!.userId, req.params.siteId, req.params.id, null);
+  res.json({ service });
+});
+
+servicesRouter.use(handleUploadError);
 
 // Unauthenticated: the live public site renderer's service catalog /
 // booking form.
