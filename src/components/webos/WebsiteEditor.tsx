@@ -248,22 +248,29 @@ export default function WebsiteEditor({
         <div className="relative h-72 sm:h-96">
           <EditableImage src={page.heroImageUrl} onUpload={(f) => uploadHeroImage(page.id, f)} onRemove={() => removeHeroImage(page.id)} className="absolute inset-0" rounded="rounded-none" label="Add hero photo" />
           <div className="absolute inset-0 bg-gradient-to-t from-ink-950/80 via-ink-950/30 to-ink-950/10 pointer-events-none" />
-          <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-10 gap-3">
+          {/* pointer-events-none: this box spans the full hero (inset-0) so
+              its headline/subheadline/CTA can sit at the bottom via
+              justify-end, but that means it also covers the empty upper
+              two-thirds where there's nothing to click — without this, it
+              sat on top of the EditableImage below and silently ate every
+              click there, so "Add hero photo" never opened the file picker.
+              Each actual control gets pointer-events-auto back. */}
+          <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-10 gap-3 pointer-events-none">
             <EditableText
               value={page.heroHeadline}
               onSave={(v) => patchPage(page.id, { heroHeadline: v })}
               as="h1"
-              className="font-display font-extrabold text-2xl sm:text-4xl text-white max-w-2xl px-1"
+              className="font-display font-extrabold text-2xl sm:text-4xl text-white max-w-2xl px-1 pointer-events-auto"
               multiline
             />
             <EditableText
               value={page.heroSubheadline}
               onSave={(v) => patchPage(page.id, { heroSubheadline: v })}
               as="p"
-              className="text-white/90 text-sm sm:text-base max-w-xl px-1"
+              className="text-white/90 text-sm sm:text-base max-w-xl px-1 pointer-events-auto"
               multiline
             />
-            <div className="mt-1 flex items-center gap-2">
+            <div className="mt-1 flex items-center gap-2 pointer-events-auto">
               <span className="inline-block bg-ASTER-600 rounded-full">
                 <EditableText
                   value={page.ctaLabel}
