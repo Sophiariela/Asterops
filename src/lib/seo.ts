@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import { siteConfig } from "@/config/site";
-import { contactEmail, instagramUrl } from "@/config/socials";
-import type { CaseStudy, Product } from "@/types";
 
 interface PageMetadataInput {
   title: string;
@@ -37,7 +35,7 @@ export function buildMetadata({ title, description, path, image }: PageMetadataI
   };
 }
 
-export function organizationJsonLd() {
+export function organizationJsonLd(contactEmail: string) {
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
@@ -52,41 +50,5 @@ export function organizationJsonLd() {
       email: contactEmail,
       contactType: "customer support",
     },
-    sameAs: [instagramUrl],
-  };
-}
-
-export function caseStudyJsonLd(caseStudy: CaseStudy) {
-  return {
-    "@context": "https://schema.org",
-    "@type": "CreativeWork",
-    name: `${caseStudy.client} — Case Study`,
-    description: caseStudy.hero.summary,
-    url: `${siteConfig.url}/case-studies/${caseStudy.slug}`,
-    creator: {
-      "@type": "Organization",
-      name: siteConfig.name,
-    },
-    about: caseStudy.client,
-    genre: caseStudy.industry,
-  };
-}
-
-export function productJsonLd(product: Product) {
-  return {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    name: product.name,
-    applicationCategory: "BusinessApplication",
-    operatingSystem: "Web",
-    description: product.hero.description,
-    url: `${siteConfig.url}/product/${product.slug}`,
-    offers: product.pricing?.tiers.map((tier) => ({
-      "@type": "Offer",
-      name: tier.name,
-      price: tier.price.replace(/[^0-9.]/g, "") || undefined,
-      priceCurrency: tier.price.startsWith("$") ? "USD" : undefined,
-      description: tier.description,
-    })),
   };
 }

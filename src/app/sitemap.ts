@@ -1,21 +1,23 @@
 import type { MetadataRoute } from "next";
 
 import { siteConfig } from "@/config/site";
-import { getProductSlugs } from "@/config/products";
-import { getCaseStudySlugs } from "@/config/case-studies";
+import { prisma } from "@/lib/prisma";
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  const staticRoutes = ["", "/products", "/about", "/contact", "/legal/privacy", "/legal/terms"];
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const staticRoutes = ["", "/services", "/portfolio", "/about", "/contact", "/legal/privacy", "/legal/terms"];
 
-  const productRoutes = getProductSlugs().map((slug) => `/product/${slug}`);
-  const caseStudyRoutes = getCaseStudySlugs().map((slug) => `/case-studies/${slug}`);
+  const projects = await prisma.portfolioProject.findMany({
+    where: { published: true },
+    select: { slug: true },
+  });
+  const portfolioRoutes = projects.map((project) => `/portfolio/${project.slug}`);
 
-  const routes = [...staticRoutes, ...productRoutes, ...caseStudyRoutes];
+  const routes = [...staticRoutes, ...portfolioRoutes];
 
   return routes.map((route) => ({
     url: `${siteConfig.url}${route}`,
     lastModified: new Date(),
     changeFrequency: route === "" ? "weekly" : "monthly",
-    priority: route === "" ? 1 : route.startsWith("/product/") || route.startsWith("/case-studies/") ? 0.8 : 0.6,
+    priority: route === "" ? 1 : route.startsWith("/portfolio/") ? 0.8 : 0.6,
   }));
 }

@@ -2,20 +2,18 @@ export const siteConfig = {
   name: "Aster",
   legalName: "Aster Studio Ltda.",
   author: "Aster",
-  tagline: "Intelligent digital systems for ambitious businesses.",
+  tagline: "Digital solutions built around your business.",
   description:
-    "Aster builds intelligent digital systems that help businesses attract customers, automate operations, and scale — the technology infrastructure behind modern companies, not just a website.",
+    "Aster is a digital development studio. We design and develop websites, e-commerce, custom software and AI-powered systems for businesses, entrepreneurs, and individuals.",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://aster.studio",
   ogImage: "/opengraph-image",
-  locales: ["en", "pt", "es"] as const,
-  defaultLocale: "en" as const,
   keywords: [
-    "digital systems studio",
-    "AI automation",
-    "business intelligence",
-    "digital infrastructure",
-    "e-commerce systems",
-    "AI powered workflows",
+    "digital development studio",
+    "website development",
+    "custom software development",
+    "web applications",
+    "e-commerce development",
+    "business automation",
   ],
 };
 

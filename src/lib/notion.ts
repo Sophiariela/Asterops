@@ -1,11 +1,13 @@
 import { Client } from "@notionhq/client";
 
-export interface ContactSubmission {
+export interface InquirySubmission {
   name: string;
   email: string;
-  company?: string;
-  productInterest: string;
+  businessName?: string;
+  service?: string;
+  budget?: string;
   message: string;
+  timeline?: string;
 }
 
 let client: Client | null = null;
@@ -21,12 +23,16 @@ function getClient(): Client {
   return client;
 }
 
+export function isNotionConfigured(): boolean {
+  return Boolean(process.env.NOTION_API_KEY && process.env.NOTION_DATABASE_ID);
+}
+
 /**
- * Creates a new page (row) in the Notion CRM database for a contact form submission.
- * Field names below must match the Notion database properties exactly —
- * see the setup guide for how the database is expected to be structured.
+ * Optional secondary export: mirrors an inquiry into the Notion CRM database.
+ * The database is the source of truth (see `Inquiry` in prisma/schema.prisma)
+ * — this is best-effort and never blocks a submission from succeeding.
  */
-export async function createLeadInNotion(submission: ContactSubmission): Promise<void> {
+export async function mirrorInquiryToNotion(submission: InquirySubmission): Promise<void> {
   const databaseId = process.env.NOTION_DATABASE_ID;
   if (!databaseId) {
     throw new Error("NOTION_DATABASE_ID is not set.");
@@ -35,27 +41,13 @@ export async function createLeadInNotion(submission: ContactSubmission): Promise
   await getClient().pages.create({
     parent: { database_id: databaseId },
     properties: {
-      Name: {
-        title: [{ text: { content: submission.name } }],
-      },
-      Email: {
-        email: submission.email,
-      },
-      Company: {
-        rich_text: submission.company ? [{ text: { content: submission.company } }] : [],
-      },
-      "Product Interest": {
-        select: { name: submission.productInterest },
-      },
-      Message: {
-        rich_text: [{ text: { content: submission.message } }],
-      },
-      "Created At": {
-        date: { start: new Date().toISOString() },
-      },
-      Status: {
-        select: { name: "New Lead" },
-      },
+      Name: { title: [{ text: { content: submission.name } }] },
+      Email: { email: submission.email },
+      Company: { rich_text: submission.businessName ? [{ text: { content: submission.businessName } }] : [] },
+      Service: { select: submission.service ? { name: submission.service } : null },
+      Message: { rich_text: [{ text: { content: submission.message } }] },
+      "Created At": { date: { start: new Date().toISOString() } },
+      Status: { select: { name: "New" } },
     },
   });
 }

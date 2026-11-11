@@ -8,55 +8,53 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { productInterestOptions } from "@/config/contact";
 
-const contactSchema = z.object({
+const inquirySchema = z.object({
   name: z.string().min(2, "Enter your full name."),
   email: z.string().email("Enter a valid email address."),
-  company: z.string().optional(),
-  productInterest: z.enum(productInterestOptions, {
-    errorMap: () => ({ message: "Select the product you're interested in." }),
-  }),
+  businessName: z.string().optional(),
+  service: z.string().min(1, "Select the service you need."),
+  budget: z.string().optional(),
   message: z.string().min(10, "Tell us a bit more — at least 10 characters."),
+  timeline: z.string().optional(),
 });
 
-type ContactFormValues = z.infer<typeof contactSchema>;
+type InquiryValues = z.infer<typeof inquirySchema>;
 type Status = "idle" | "submitting" | "success" | "error";
 
 const DEFAULT_ERROR_MESSAGE = "Something went wrong. Please try again.";
 
 export interface ContactFormProps {
-  /** Preselects the product dropdown — validated against the allowed options. */
-  defaultProductInterest?: string;
-  /** Seeds the message field, e.g. when arriving from a template page. */
-  defaultMessage?: string;
-  /** Short line above the form explaining the prefilled context. */
-  contextNote?: string;
+  serviceOptions: string[];
+  defaultService?: string;
 }
 
-export function ContactForm({ defaultProductInterest, defaultMessage, contextNote }: ContactFormProps = {}) {
+export function ContactForm({ serviceOptions, defaultService }: ContactFormProps) {
   const [status, setStatus] = React.useState<Status>("idle");
-  const [errors, setErrors] = React.useState<Partial<Record<keyof ContactFormValues, string>>>({});
+  const [errors, setErrors] = React.useState<Partial<Record<keyof InquiryValues, string>>>({});
   const [errorMessage, setErrorMessage] = React.useState(DEFAULT_ERROR_MESSAGE);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (status === "submitting") return;
     setErrors({});
 
     const formData = new FormData(event.currentTarget);
     const values = {
       name: String(formData.get("name") ?? ""),
       email: String(formData.get("email") ?? ""),
-      company: String(formData.get("company") ?? ""),
-      productInterest: String(formData.get("productInterest") ?? ""),
+      businessName: String(formData.get("businessName") ?? ""),
+      service: String(formData.get("service") ?? ""),
+      budget: String(formData.get("budget") ?? ""),
       message: String(formData.get("message") ?? ""),
+      timeline: String(formData.get("timeline") ?? ""),
     };
 
-    const parsed = contactSchema.safeParse(values);
+    const parsed = inquirySchema.safeParse(values);
     if (!parsed.success) {
-      const fieldErrors: Partial<Record<keyof ContactFormValues, string>> = {};
+      const fieldErrors: Partial<Record<keyof InquiryValues, string>> = {};
       for (const issue of parsed.error.issues) {
-        const field = issue.path[0] as keyof ContactFormValues;
+        const field = issue.path[0] as keyof InquiryValues;
         fieldErrors[field] = issue.message;
       }
       setErrors(fieldErrors);
@@ -86,7 +84,8 @@ export function ContactForm({ defaultProductInterest, defaultMessage, contextNot
     return (
       <div className="flex flex-col gap-2 rounded-lg border border-accent/30 bg-accent/[0.04] p-8">
         <p className="text-sm leading-relaxed text-foreground">
-          Thank you. Your request has been received. We will contact you within one business day.
+          Thank you. Your project inquiry has been received. We&apos;ll review it and get back to you within one
+          business day.
         </p>
       </div>
     );
@@ -94,12 +93,6 @@ export function ContactForm({ defaultProductInterest, defaultMessage, contextNot
 
   return (
     <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
-      {contextNote ? (
-        <p className="rounded-md border border-accent/30 bg-accent/[0.06] px-4 py-3 text-sm leading-relaxed text-foreground">
-          {contextNote}
-        </p>
-      ) : null}
-
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
         <div className="flex flex-col gap-2">
           <Label htmlFor="name">Full name</Label>
@@ -114,38 +107,46 @@ export function ContactForm({ defaultProductInterest, defaultMessage, contextNot
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor="company">Company (optional)</Label>
-        <Input id="company" name="company" placeholder="Company name" autoComplete="organization" />
+        <Label htmlFor="businessName">Business name (optional)</Label>
+        <Input id="businessName" name="businessName" placeholder="Company name" autoComplete="organization" />
       </div>
 
-      <div className="flex flex-col gap-2">
-        <Label htmlFor="productInterest">Product interest</Label>
-        <select
-          id="productInterest"
-          name="productInterest"
-          defaultValue={defaultProductInterest ?? ""}
-          className="flex h-11 w-full rounded-md border border-border bg-secondary px-4 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          <option value="" disabled>
-            Select a product
-          </option>
-          {productInterestOptions.map((option) => (
-            <option key={option} value={option}>
-              {option}
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="service">Service required</Label>
+          <select
+            id="service"
+            name="service"
+            defaultValue={defaultService ?? ""}
+            className="flex h-11 w-full rounded-md border border-border bg-secondary px-4 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <option value="" disabled>
+              Select a service
             </option>
-          ))}
-        </select>
-        {errors.productInterest ? <p className="text-xs text-red-400">{errors.productInterest}</p> : null}
+            {serviceOptions.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+            <option value="Not sure yet">Not sure yet</option>
+          </select>
+          {errors.service ? <p className="text-xs text-red-400">{errors.service}</p> : null}
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="budget">Estimated budget (optional)</Label>
+          <Input id="budget" name="budget" placeholder="e.g. $2,000 – $5,000" />
+        </div>
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor="message">What are you trying to build?</Label>
-        <Textarea
-          id="message"
-          name="message"
-          defaultValue={defaultMessage}
-          placeholder="Tell us about your business and what you need."
-        />
+        <Label htmlFor="timeline">Expected timeline (optional)</Label>
+        <Input id="timeline" name="timeline" placeholder="e.g. Launch in 6 weeks" />
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="message">Project description</Label>
+        <Textarea id="message" name="message" placeholder="Tell us about your business and what you need." />
         {errors.message ? <p className="text-xs text-red-400">{errors.message}</p> : null}
       </div>
 
@@ -159,7 +160,7 @@ export function ContactForm({ defaultProductInterest, defaultMessage, contextNot
           </>
         ) : (
           <>
-            Send Message
+            Send Project Inquiry
             <Send className="h-4 w-4" />
           </>
         )}

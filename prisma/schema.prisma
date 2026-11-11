@@ -1,0 +1,110 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum InquiryStatus {
+  NEW
+  CONTACTED
+  DISCOVERY
+  PROPOSAL_SENT
+  IN_PROGRESS
+  COMPLETED
+  LOST
+}
+
+enum ProjectClassification {
+  CLIENT_PROJECT
+  INTERNAL_PRODUCT
+  PROTOTYPE
+}
+
+enum ProjectStatus {
+  LIVE
+  DELIVERED
+  IN_PROGRESS
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+}
+
+model Service {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  description String
+  icon        String   @default("Sparkles")
+  active      Boolean  @default(true)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([active, order])
+}
+
+model PortfolioProject {
+  id               String                 @id @default(cuid())
+  name             String
+  slug             String                 @unique
+  category         String
+  shortDescription String
+  fullDescription  String
+  coverImage       String?
+  gallery          String[]               @default([])
+  projectUrl       String?
+  technologies     String[]               @default([])
+  classification   ProjectClassification  @default(CLIENT_PROJECT)
+  status           ProjectStatus          @default(DELIVERED)
+  published        Boolean                @default(true)
+  order            Int                    @default(0)
+  createdAt        DateTime               @default(now())
+  updatedAt        DateTime               @updatedAt
+
+  @@index([published, order])
+}
+
+model Inquiry {
+  id           String        @id @default(cuid())
+  name         String
+  email        String
+  businessName String?
+  service      String?
+  budget       String?
+  message      String
+  timeline     String?
+  status       InquiryStatus @default(NEW)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  notes        InquiryNote[]
+
+  @@index([status, createdAt])
+}
+
+model InquiryNote {
+  id        String   @id @default(cuid())
+  inquiryId String
+  inquiry   Inquiry  @relation(fields: [inquiryId], references: [id], onDelete: Cascade)
+  content   String
+  createdAt DateTime @default(now())
+}
+
+model SiteSettings {
+  id           String   @id @default("default")
+  studioName   String   @default("Aster")
+  contactEmail String   @default("contact@aster.studio")
+  whatsapp     String?
+  instagramUrl String?
+  ctaLabel     String   @default("Start a Project")
+  ctaHref      String   @default("/contact")
+  footerNote   String   @default("Digital solutions built around your business.")
+  updatedAt    DateTime @updatedAt
+}

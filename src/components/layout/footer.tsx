@@ -1,45 +1,40 @@
 import Link from "next/link";
-import { Instagram, Linkedin, Mail, Twitter } from "lucide-react";
+import { Instagram, Mail } from "lucide-react";
+import type { SiteSettings } from "@prisma/client";
 
 import { Logo } from "@/components/shared/logo";
-import { footerColumns } from "@/config/navigation";
-import { socials } from "@/config/socials";
+import { buildFooterColumns } from "@/config/navigation";
 import { siteConfig } from "@/config/site";
-import type { SocialLink } from "@/types";
 
-const socialIcons: Record<SocialLink["icon"], typeof Instagram> = {
-  instagram: Instagram,
-  mail: Mail,
-  linkedin: Linkedin,
-  twitter: Twitter,
-};
+export function Footer({ settings }: { settings: SiteSettings }) {
+  const footerColumns = buildFooterColumns(settings.contactEmail);
 
-export function Footer() {
   return (
     <footer className="border-t border-border/60">
       <div className="mx-auto max-w-container px-6 py-16">
         <div className="grid grid-cols-2 gap-10 md:grid-cols-6">
           <div className="col-span-2 flex flex-col gap-4">
             <Logo />
-            <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">
-              {siteConfig.tagline}
-            </p>
+            <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">{settings.footerNote}</p>
             <div className="mt-2 flex items-center gap-3">
-              {socials.map((social) => {
-                const Icon = socialIcons[social.icon];
-                return (
-                  <Link
-                    key={social.label}
-                    href={social.href}
-                    className="flex h-9 w-9 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:border-accent/40 hover:text-accent"
-                    aria-label={social.label}
-                    target={social.href.startsWith("http") ? "_blank" : undefined}
-                    rel={social.href.startsWith("http") ? "noopener noreferrer" : undefined}
-                  >
-                    <Icon className="h-4 w-4" />
-                  </Link>
-                );
-              })}
+              <Link
+                href={`mailto:${settings.contactEmail}`}
+                className="flex h-9 w-9 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:border-accent/40 hover:text-accent"
+                aria-label="Email"
+              >
+                <Mail className="h-4 w-4" />
+              </Link>
+              {settings.instagramUrl ? (
+                <Link
+                  href={settings.instagramUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex h-9 w-9 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:border-accent/40 hover:text-accent"
+                  aria-label="Instagram"
+                >
+                  <Instagram className="h-4 w-4" />
+                </Link>
+              ) : null}
             </div>
           </div>
 

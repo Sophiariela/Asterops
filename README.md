@@ -1,107 +1,110 @@
 # Aster
 
-Aster builds intelligent digital systems that help businesses attract customers, automate operations, and scale — the technology infrastructure behind modern companies, not just a website.
+Aster is a digital development studio. We design and build custom websites, e-commerce, software, dashboards and automation for businesses, entrepreneurs, and individuals — not a template marketplace, not a page builder.
 
-This repository is the Aster marketing site: a Next.js 15 (App Router) application covering the product pages (Foundation / Automation / Intelligence), the Design Inspirations section, the case study library, and the lead-capture contact flow.
+This repository is the Aster marketing site and its internal admin panel: a Next.js 15 (App Router) application covering the public services/portfolio/about/contact pages, the project-inquiry flow, and an authenticated admin panel for managing services, portfolio projects, inquiries and site settings.
 
 ## Tech stack
 
 - **Framework** — Next.js 15 (App Router, React 19, TypeScript)
+- **Database** — PostgreSQL (Neon) via Prisma — see `prisma/schema.prisma`
+- **Auth** — Minimal cookie-based admin session (HMAC-signed via Web Crypto, enforced in `src/middleware.ts`), passwords hashed with `bcryptjs`
 - **Styling** — Tailwind CSS + `tailwindcss-animate`, tokens defined in `src/app/globals.css` and mirrored in `src/config/theme.ts`
 - **UI primitives** — Radix UI (accordion, dialog, navigation menu, tabs, etc.), `class-variance-authority`, `lucide-react` icons
 - **Motion** — Framer Motion (`src/components/shared/reveal.tsx`)
-- **Forms & validation** — Zod, submitted to a Notion database via `@notionhq/client`
+- **Forms & validation** — Zod. Contact submissions persist to Postgres (`Inquiry` model) and optionally mirror to Notion (`src/lib/notion.ts`) if `NOTION_API_KEY`/`NOTION_DATABASE_ID` are set.
 - **Theming** — `next-themes` (light/dark, see `src/components/shared/theme-toggle.tsx`)
 
 ## Getting started
 
 ```bash
 npm install
-cp .env.example .env.local   # fill in NOTION_API_KEY / NOTION_DATABASE_ID — see docs/notion-crm-setup.md
+cp .env.example .env.local   # fill in DATABASE_URL, DIRECT_URL, ADMIN_SESSION_SECRET, ADMIN_SEED_EMAIL/PASSWORD
+npm run db:push              # create tables in the database
+npm run db:seed              # seed services, portfolio projects, site settings, and the first admin user
 npm run dev                  # http://localhost:3000
 ```
 
 Other scripts:
 
 ```bash
-npm run build   # production build
-npm run start   # serve the production build
-npm run lint    # eslint
+npm run build       # prisma generate + production build
+npm run start        # serve the production build
+npm run lint          # eslint
+npm run db:push        # sync prisma/schema.prisma to the database (no migration history)
+npm run db:seed         # re-run prisma/seed.ts
+npm run db:studio        # open Prisma Studio against the configured database
 ```
+
+Admin panel: `/admin` (redirects to `/admin/login` if not authenticated). Sign in with `ADMIN_SEED_EMAIL`/`ADMIN_SEED_PASSWORD` after seeding, then change the password by re-seeding with a new `ADMIN_SEED_PASSWORD` (there is currently no in-app "change password" form).
 
 ## Environment variables
 
 | Variable | Purpose |
 | --- | --- |
-| `NOTION_API_KEY` | Server-side Notion integration secret used by `/api/contact` to write new leads. |
-| `NOTION_DATABASE_ID` | Target Notion database for contact form submissions. |
+| `DATABASE_URL` | Pooled Postgres connection string used at runtime. |
+| `DIRECT_URL` | Direct (non-pooled) Postgres connection string, used by Prisma for schema migrations. |
+| `ADMIN_SESSION_SECRET` | Long random string used to sign admin session cookies. |
+| `ADMIN_SEED_EMAIL` / `ADMIN_SEED_PASSWORD` | Only read by `npm run db:seed` to create/update the first admin login. |
+| `NOTION_API_KEY` / `NOTION_DATABASE_ID` | Optional — if set, each inquiry is also mirrored into a Notion database (best-effort, never blocks a submission). |
 | `NEXT_PUBLIC_SITE_URL` | Canonical site URL used for metadata, sitemap and JSON-LD (`src/config/site.ts`). Defaults to `https://aster.studio`. |
-
-Full Notion setup walkthrough: [`docs/notion-crm-setup.md`](docs/notion-crm-setup.md).
 
 ## Project structure
 
 ```
+prisma/
+  schema.prisma           Service, PortfolioProject, Inquiry, InquiryNote, SiteSettings, AdminUser
+  seed.ts                  Seeds services, portfolio projects, site settings and the first admin user
+
 src/
-  app/                    Routes (App Router)
-    page.tsx              Homepage
-    products/              Solutions index
-    product/[slug]/        Individual product page (Foundation / Automation / Intelligence)
-    case-studies/[slug]/   Individual case study page
-    about/, contact/, legal/
-    api/contact/            Notion lead-capture endpoint
+  app/
+    (site)/                 Public site — layout adds the public Header/Footer
+      page.tsx               Homepage
+      services/               Full services list
+      portfolio/[slug]/        Portfolio list + detail
+      about/, contact/, legal/
+    admin/
+      login/                 Standalone login page (no admin shell)
+      (protected)/             Dashboard, services/portfolio/inquiries/settings CRUD — behind src/middleware.ts
+    api/
+      contact/                 Public inquiry submission (persists to Postgres, optional Notion mirror)
+      admin/                   Services/portfolio/inquiries/settings CRUD + login/logout — behind src/middleware.ts
     sitemap.ts, robots.ts, opengraph-image.tsx
 
   components/
-    sections/               Homepage sections (hero, problems, industries, design inspirations, case studies, ...)
-    product/                 Product page building blocks (hero, features, pricing, FAQ, gallery, ...)
-    inspiration/               Design Inspirations card (visual reference + "Build Something Similar")
-    case-study/               Case study page building blocks (hero, challenge, solution,
-                               deliverables, gallery, technology, results, CTA)
-    layout/                   Header, footer, mobile nav
-    shared/                   Cross-page primitives (reveal/animation, lightbox, section heading, ...)
-    ui/                       Design-system primitives (button, badge, card, tabs, accordion, ...)
+    sections/                 Homepage sections (hero, services preview, portfolio preview, cta)
+    services/, portfolio/      Public service/portfolio cards
+    admin/                     Admin forms, nav, delete button, status select, notes
+    contact/                    Project inquiry form
+    layout/                     Header, footer, mobile nav
+    shared/                     Cross-page primitives (reveal/animation, section heading, theme toggle, ...)
+    ui/                         Design-system primitives (button, badge, card, tabs, accordion, ...)
 
-  config/                   Content & data — the source of truth for copy and structured content
-    site.ts                  Global site metadata (name, url, description, keywords)
-    theme.ts                  Canonical design tokens (mirrors globals.css, used for OG image generation)
-    navigation.ts              Header/footer links
-    content.ts                  Homepage / about / contact copy
-    products.ts                  The three Aster products (Foundation, Automation, Intelligence)
-    inspirations.ts                Design Inspirations library (visual references, not products)
-    case-studies.ts               Case study library (currently empty)
-    contact.ts, socials.ts
+  config/                    Static copy — content that isn't admin-editable
+    site.ts, theme.ts, navigation.ts, content.ts
 
-  types/                    Shared TypeScript types for the content model above
-  lib/                      seo.ts (metadata + JSON-LD builders), notion.ts, utils.ts
+  lib/
+    prisma.ts                 Prisma client singleton
+    auth.ts, session.ts         Admin auth: bcrypt password hashing + edge-safe signed session cookie
+    settings.ts                 Cached SiteSettings reader
+    service-icons.tsx            Lucide icon registry for admin-selectable service icons
+    seo.ts, notion.ts, utils.ts
+
+  middleware.ts              Protects /admin/* and /api/admin/* (except /admin/login, /api/admin/login)
 ```
 
 ## Content model
 
-Pages are rendered from typed data in `src/config/`, not hardcoded per-page — adding a new product or case study means adding an entry to the config array, not writing new page markup.
+Services and portfolio projects are **database-backed and admin-editable** — not static config. The public `/services` and `/portfolio` pages, the homepage previews, and the contact form's service dropdown all read live from Postgres via Prisma. Managing them is done through `/admin`, not by editing files.
 
-- **Products** (`src/config/products.ts`) — each entry drives `/product/[slug]` via `getProductBySlug` / `getProductSlugs`.
-- **Case studies** (`src/config/case-studies.ts`) — each entry drives `/case-studies/[slug]` via `getCaseStudyBySlug` / `getCaseStudySlugs`. To add one, add a `CaseStudy` object (see `src/types/case-study.ts`) with its own gallery assets under `public/case-studies/<slug>/`, then link it from `homeContent.caseStudies.items` in `src/config/content.ts` if it should appear on the homepage.
+Static marketing copy that isn't part of day-to-day content ops (hero headlines, about page copy) lives in `src/config/content.ts`.
 
-Both route trees follow the same pattern: `generateStaticParams` from the config's slug list, `generateMetadata` via `buildMetadata()` in `src/lib/seo.ts`, and a per-slug `opengraph-image.tsx`.
+## Admin panel
 
-## Design Inspirations
+- **Dashboard** (`/admin`) — total/new inquiries, in-progress projects, published portfolio count, recent inquiries.
+- **Services** (`/admin/services`) — create/edit/delete, publish toggle, display order, icon picker.
+- **Portfolio** (`/admin/portfolio`) — create/edit/delete, publish toggle, classification (client project / internal product / prototype), status, cover image + gallery (by URL), technologies, display order.
+- **Inquiries** (`/admin/inquiries`) — filter by status/service, search by name/email, per-inquiry status updates and internal notes, delete.
+- **Settings** (`/admin/settings`) — studio name, contact email, WhatsApp, Instagram, main CTA, footer note. Changes reflect immediately on the public site (footer, contact page, JSON-LD).
 
-**Aster does not sell templates.** Design Inspirations is a homepage section (`src/components/sections/design-inspirations.tsx`, mounted on `/`) that shows visual references — past design directions and craft quality — to demonstrate the standard Aster builds to. It is explicitly not a catalog of products: there is no pricing, no "buy" action, and no dedicated per-item page.
-
-**Adding a reference is a config entry.** Add a `DesignInspiration` object to `designInspirations` in `src/config/inspirations.ts` (type: `src/types/inspiration.ts`) and the card renders automatically — no new routes or components needed.
-
-Required fields: `slug`, `name`, `category`, `description`, `status`, `icon`.
-
-- `status: "live"` — set `image` (a representative visual, under `public/design-inspirations/<slug>/`) and `demoUrl` (a real, browsable experience). The card renders both a **View Experience** button (opens `demoUrl` in a new tab) and a **Build Something Similar** button.
-- `status: "concept"` — omit `image`/`demoUrl`. The card renders the `icon` as a placeholder mark and only the **Build Something Similar** button, since there's no live reference to view yet.
-
-Every card's **Build Something Similar** button routes through `inspirationContactHref(slug)` → `/contact?inspiration=<slug>`, which pre-frames the contact form's message with that reference — it never changes what's being sold, only the opening context of the conversation.
-
-The section always renders `designInspirationsContent.disclaimer` under the grid, stating plainly that these are references, not products. Keep that line intact when editing copy — it's the explicit counter to any "template marketplace" reading of the section.
-
-## Notes
-
-- The Fulô Crochet build is presented as a Design Inspirations reference (`fulo-crochet` in `src/config/inspirations.ts`), not a template, product, or a standalone case study page. `/case-studies/fulo` permanently redirects to `/#design-inspirations` (`next.config.ts`).
-- Case studies for projects that aren't ready to be shown publicly should keep `isPublicLink: false` and must not link out to the live project.
-- Legacy product slugs (`website-os`, `commerce-os`, `launch-os`, `growth-os`, `operations-os`) redirect to their current equivalents in `next.config.ts`.
+Cover/gallery images are entered as URLs rather than uploaded as files — there's no file-storage integration (e.g. Vercel Blob) wired up yet. If that's needed, it should be added deliberately rather than assumed.

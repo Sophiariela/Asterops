@@ -1,39 +1,39 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
-import { createLeadInNotion } from "@/lib/notion";
-import { productInterestOptions } from "@/config/contact";
+import { prisma } from "@/lib/prisma";
+import { isNotionConfigured, mirrorInquiryToNotion } from "@/lib/notion";
 
-const contactSchema = z.object({
+const inquirySchema = z.object({
   name: z.string().min(2),
   email: z.string().email(),
-  company: z.string().optional(),
-  productInterest: z.enum(productInterestOptions),
+  businessName: z.string().optional(),
+  service: z.string().optional(),
+  budget: z.string().optional(),
   message: z.string().min(10),
+  timeline: z.string().optional(),
 });
 
 /**
- * Validates contact submissions and stores each one as a new lead in the
- * Notion CRM database. See docs/notion-crm-setup.md for how to provision
- * the database and integration credentials.
+ * Validates project inquiries and persists each one as an `Inquiry` row —
+ * the source of truth surfaced in the admin panel. Notion is a best-effort
+ * secondary mirror and never blocks a successful submission.
  */
 export async function POST(request: Request) {
   const body = await request.json().catch(() => null);
-  const parsed = contactSchema.safeParse(body);
+  const parsed = inquirySchema.safeParse(body);
 
   if (!parsed.success) {
     return NextResponse.json({ error: "Invalid submission." }, { status: 400 });
   }
 
-  try {
-    await createLeadInNotion(parsed.data);
-  } catch (error) {
-    console.error("Failed to store contact submission in Notion:", error);
-    return NextResponse.json(
-      { error: "We couldn't process your request right now. Please try again shortly." },
-      { status: 502 },
-    );
+  const inquiry = await prisma.inquiry.create({ data: parsed.data });
+
+  if (isNotionConfigured()) {
+    mirrorInquiryToNotion(parsed.data).catch((error) => {
+      console.error("Failed to mirror inquiry to Notion:", error);
+    });
   }
 
-  return NextResponse.json({ success: true });
+  return NextResponse.json({ success: true, id: inquiry.id });
 }

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, PlayCircle } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Reveal } from "@/components/shared/reveal";
@@ -27,10 +27,8 @@ export function Hero() {
         </Reveal>
 
         <Reveal>
-          <p className="flex flex-col text-lg leading-relaxed text-muted-foreground sm:text-xl">
-            {hero.subheadlineLines.map((line) => (
-              <span key={line}>{line}</span>
-            ))}
+          <p className="max-w-2xl text-lg leading-relaxed text-muted-foreground sm:text-xl">
+            {hero.description}
           </p>
         </Reveal>
 
@@ -42,10 +40,7 @@ export function Hero() {
             </Link>
           </Button>
           <Button asChild variant="outline" size="lg">
-            <Link href={hero.secondaryCta.href}>
-              <PlayCircle className="h-4 w-4" />
-              {hero.secondaryCta.label}
-            </Link>
+            <Link href={hero.secondaryCta.href}>{hero.secondaryCta.label}</Link>
           </Button>
         </Reveal>
       </div>
