@@ -19,7 +19,7 @@ export default async function TermsPage() {
     <section className="px-6 pb-24 pt-28 sm:pt-36">
       <div className="mx-auto max-w-3xl">
         <div className="flex flex-col gap-4 pb-12">
-          <span className="font-mono text-xs font-medium uppercase tracking-[0.25em] text-accent">Legal</span>
+          <span className="font-mono text-xs font-medium uppercase tracking-[0.25em] text-accent-ink">Legal</span>
           <h1 className="text-4xl font-medium tracking-tight text-foreground">Terms of Service</h1>
           <p className="text-sm text-muted-foreground">Last updated: {LAST_UPDATED}</p>
         </div>
@@ -110,7 +110,7 @@ export default async function TermsPage() {
         <LegalSection title="12. Contact Us">
           <p>
             Questions about these Terms can be sent to{" "}
-            <a href={`mailto:${contactEmail}`} className="text-accent hover:underline">
+            <a href={`mailto:${contactEmail}`} className="text-accent-ink hover:underline">
               {contactEmail}
             </a>
             .

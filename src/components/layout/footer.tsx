@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { Instagram, Mail } from "lucide-react";
+import { Instagram, Mail, MessageCircle } from "lucide-react";
 import type { SiteSettings } from "@prisma/client";
 
 import { Logo } from "@/components/shared/logo";
+import { toWhatsAppHref } from "@/components/shared/whatsapp-link";
 import { buildFooterColumns } from "@/config/navigation";
 import { siteConfig } from "@/config/site";
 
@@ -19,17 +20,28 @@ export function Footer({ settings }: { settings: SiteSettings }) {
             <div className="mt-2 flex items-center gap-3">
               <Link
                 href={`mailto:${settings.contactEmail}`}
-                className="flex h-9 w-9 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:border-accent/40 hover:text-accent"
-                aria-label="Email"
+                className="flex h-9 w-9 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:border-accent/40 hover:text-accent-ink"
+                aria-label="Enviar e-mail"
               >
                 <Mail className="h-4 w-4" />
               </Link>
+              {settings.whatsapp ? (
+                <Link
+                  href={toWhatsAppHref(settings.whatsapp, settings.whatsappMessage)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex h-9 w-9 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:border-accent/40 hover:text-accent-ink"
+                  aria-label="Falar no WhatsApp"
+                >
+                  <MessageCircle className="h-4 w-4" />
+                </Link>
+              ) : null}
               {settings.instagramUrl ? (
                 <Link
                   href={settings.instagramUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex h-9 w-9 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:border-accent/40 hover:text-accent"
+                  className="flex h-9 w-9 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:border-accent/40 hover:text-accent-ink"
                   aria-label="Instagram"
                 >
                   <Instagram className="h-4 w-4" />
@@ -66,7 +78,7 @@ export function Footer({ settings }: { settings: SiteSettings }) {
 
         <div className="mt-16 flex flex-col gap-4 border-t border-border/60 pt-8 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
           <p>
-            &copy; {new Date().getFullYear()} {siteConfig.legalName}. All rights reserved.
+            &copy; {new Date().getFullYear()} {siteConfig.legalName}. Todos os direitos reservados.
           </p>
           <p className="font-mono uppercase tracking-[0.2em]">{siteConfig.tagline}</p>
         </div>

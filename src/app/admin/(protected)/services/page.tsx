@@ -43,7 +43,7 @@ export default async function AdminServicesPage() {
                 <tr key={service.id} className="border-b border-border last:border-0">
                   <td className="px-4 py-3 text-muted-foreground">{service.order}</td>
                   <td className="px-4 py-3">
-                    <Link href={`/admin/services/${service.id}`} className="font-medium text-foreground hover:text-accent">
+                    <Link href={`/admin/services/${service.id}`} className="font-medium text-foreground hover:text-accent-ink">
                       {service.title}
                     </Link>
                   </td>

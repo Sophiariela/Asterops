@@ -8,18 +8,19 @@ export function ServiceCard({ service }: { service: ServiceSummary }) {
   const Icon = getServiceIcon(service.icon);
 
   return (
-    <div className="flex flex-col gap-4 rounded-lg border border-border bg-card p-8">
-      <span className="flex h-11 w-11 items-center justify-center rounded-md border border-accent/30 bg-accent/10 text-accent">
-        <Icon className="h-5 w-5" />
+    <div className="flex h-full flex-col gap-4 p-8">
+      <span className="flex h-10 w-10 items-center justify-center rounded-md border border-accent/30 bg-accent/10 text-accent-ink">
+        <Icon className="h-[18px] w-[18px]" aria-hidden />
       </span>
       <h3 className="text-base font-medium text-foreground">{service.title}</h3>
       <p className="text-sm leading-relaxed text-muted-foreground">{service.description}</p>
+      {/* O serviço já vai preenchido no formulário — ver ContactForm. */}
       <Link
-        href={`/contact?service=${encodeURIComponent(service.title)}`}
-        className="mt-2 inline-flex w-fit items-center gap-1.5 text-sm font-medium text-accent transition-colors hover:text-accent/80"
+        href={`/contato?servico=${encodeURIComponent(service.title)}`}
+        className="mt-auto inline-flex w-fit items-center gap-1.5 pt-2 text-sm font-medium text-accent-ink transition-opacity hover:opacity-80"
       >
-        Start a project
-        <ArrowRight className="h-3.5 w-3.5" />
+        Quero isso no meu negócio
+        <ArrowRight className="h-3.5 w-3.5" aria-hidden />
       </Link>
     </div>
   );

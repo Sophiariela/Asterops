@@ -2,13 +2,24 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, Briefcase, FolderKanban, Inbox, Settings, LogOut } from "lucide-react";
+import {
+  LayoutDashboard,
+  Briefcase,
+  FolderKanban,
+  HelpCircle,
+  Inbox,
+  Layers,
+  Settings,
+  LogOut,
+} from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
 const links = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/services", label: "Services", icon: Briefcase },
+  { href: "/admin/tiers", label: "Tiers", icon: Layers },
+  { href: "/admin/faq", label: "FAQ", icon: HelpCircle },
   { href: "/admin/portfolio", label: "Portfolio", icon: FolderKanban },
   { href: "/admin/inquiries", label: "Inquiries", icon: Inbox },
   { href: "/admin/settings", label: "Settings", icon: Settings },
@@ -35,7 +46,7 @@ export function AdminNav() {
             href={link.href}
             className={cn(
               "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
-              active ? "bg-accent/10 text-accent" : "text-muted-foreground hover:bg-secondary hover:text-foreground",
+              active ? "bg-accent/10 text-accent-ink" : "text-muted-foreground hover:bg-secondary hover:text-foreground",
             )}
           >
             <Icon className="h-4 w-4" />

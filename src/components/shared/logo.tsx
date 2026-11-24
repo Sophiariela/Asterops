@@ -13,7 +13,7 @@ export function Logo({ className }: { className?: string }) {
         className,
       )}
     >
-      <span className="flex h-7 w-7 items-center justify-center rounded-md border border-accent/30 bg-accent/10 text-accent transition-colors group-hover:bg-accent/20">
+      <span className="flex h-7 w-7 items-center justify-center rounded-md border border-accent/30 bg-accent/10 text-accent-ink transition-colors group-hover:bg-accent/20">
         <Asterisk className="h-4 w-4" strokeWidth={2.5} />
       </span>
       {siteConfig.name}

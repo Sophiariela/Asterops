@@ -76,10 +76,16 @@ model Inquiry {
   id           String        @id @default(cuid())
   name         String
   email        String
+  whatsapp     String?
   businessName String?
+  /// Segmento informado pelo lead ("Salão de beleza", "Studio de unhas"…).
+  businessType String?
   service      String?
   budget       String?
+  /// "O que você precisa" — descrição do pedido.
   message      String
+  /// "Qual é o problema hoje" — a dor operacional, separada do pedido.
+  problem      String?
   timeline     String?
   status       InquiryStatus @default(NEW)
   createdAt    DateTime      @default(now())
@@ -87,6 +93,8 @@ model Inquiry {
   notes        InquiryNote[]
 
   @@index([status, createdAt])
+  // Usado pela trava de envio duplicado em /api/contact.
+  @@index([email, createdAt])
 }
 
 model InquiryNote {
@@ -100,11 +108,63 @@ model InquiryNote {
 model SiteSettings {
   id           String   @id @default("default")
   studioName   String   @default("Aster")
-  contactEmail String   @default("contact@aster.studio")
+  contactEmail String   @default("contato@aster.studio")
   whatsapp     String?
+  /// Mensagem que já vem escrita ao abrir o WhatsApp a partir do site.
+  whatsappMessage String @default("Oi! Vim pelo site da Aster e quero automatizar meu negócio.")
   instagramUrl String?
-  ctaLabel     String   @default("Start a Project")
-  ctaHref      String   @default("/contact")
-  footerNote   String   @default("Digital solutions built around your business.")
+  ctaLabel     String   @default("Solicitar diagnóstico")
+  ctaHref      String   @default("/contato")
+  footerNote   String   @default("Tecnologia implementada para o seu negócio agendar, responder e vender.")
+
+  // Hero editável pelo painel — ver /admin/settings.
+  heroEyebrow       String @default("Estúdio de automação e software")
+  heroHeadline      String @default("Seu negócio agenda, responde e vende. Sem você precisar fazer tudo manualmente.")
+  heroSubheadline   String @default("Sites profissionais, agendamento online, WhatsApp automatizado e sistemas personalizados. Nós configuramos a tecnologia para você.")
+  heroPrimaryCta    String @default("Quero automatizar meu negócio")
+  heroSecondaryCta  String @default("Ver o que podemos fazer")
+
   updatedAt    DateTime @updatedAt
+}
+
+/// Os três níveis comerciais (Presença, Agenda, Operação). Ficam no banco
+/// para que preço e escopo sejam editados pelo painel — o site nunca
+/// inventa valor: sem preço definido, mostra "Solicite uma proposta".
+model SolutionTier {
+  id             String   @id @default(cuid())
+  name           String
+  slug           String   @unique
+  /// Para quem é.
+  audience       String
+  /// Que problema resolve.
+  problem        String
+  /// Resultado principal, na voz do cliente.
+  outcome        String
+  inclusions     String[] @default([])
+  /// O que é customizado caso a caso.
+  customization  String
+  /// Como a implementação acontece.
+  implementation String
+  priceLabel     String   @default("Solicite uma proposta personalizada.")
+  /// Taxa de implementação — cobrada à parte, explicada no cartão.
+  setupLabel     String   @default("Implementação sob escopo, orçada no diagnóstico.")
+  featured       Boolean  @default(false)
+  published      Boolean  @default(true)
+  order          Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([published, order])
+}
+
+model FaqEntry {
+  id        String   @id @default(cuid())
+  question  String
+  answer    String
+  published Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([published, order])
 }

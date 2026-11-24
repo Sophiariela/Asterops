@@ -15,7 +15,7 @@ export function MobileNav() {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="md:hidden" aria-label="Open menu">
+        <Button variant="ghost" size="icon" className="md:hidden" aria-label="Abrir menu">
           <Menu className="h-5 w-5" />
         </Button>
       </SheetTrigger>
@@ -28,7 +28,7 @@ export function MobileNav() {
             <SheetClose asChild key={link.href}>
               <Link
                 href={link.href}
-                className="text-lg font-medium text-foreground transition-colors hover:text-accent"
+                className="text-lg font-medium text-foreground transition-colors hover:text-accent-ink"
               >
                 {link.label}
               </Link>

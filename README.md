@@ -1,8 +1,19 @@
 # Aster
 
-Aster is a digital development studio. We design and build custom websites, e-commerce, software, dashboards and automation for businesses, entrepreneurs, and individuals — not a template marketplace, not a page builder.
+Aster is a digital automation and software implementation studio. We build and configure the digital infrastructure a business runs on — website, online booking, WhatsApp workflows, customer management, online sales and custom software. We sell implemented outcomes, not templates and not a self-serve platform.
 
-This repository is the Aster marketing site and its internal admin panel: a Next.js 15 (App Router) application covering the public services/portfolio/about/contact pages, the project-inquiry flow, and an authenticated admin panel for managing services, portfolio projects, inquiries and site settings.
+The public site is **pt-BR** and speaks to the beauty & aesthetics niche (salons, nail studios, lash/brow artists, estheticians, spas). That focus lives in copy and seed data, not in the architecture: opening another vertical later means new `Service`/`SolutionTier`/`FaqEntry` rows and a copy pass in `src/config/content.ts` — not a rebuild.
+
+This repository is the Aster site and its internal admin panel: a Next.js 15 (App Router) application covering the public pages (`/`, `/solucoes`, `/como-funciona`, `/projetos`, `/sobre`, `/contato`), the project-inquiry flow, and an authenticated admin panel for managing inquiries, services, solution tiers, FAQ, portfolio projects and site settings.
+
+### Honesty rules baked into the content
+
+These are product decisions, not style preferences — keep them when editing copy:
+
+- **No invented pricing.** `SolutionTier.priceLabel` is free text; while no figure is approved it reads "Solicite uma proposta personalizada." The implementation fee is a separate label.
+- **No invented delivery times.** The site never promises "seven days" — the FAQ and the implementation section say the timeline comes out of the diagnosis.
+- **No fake integrations.** WhatsApp button/link is standard; automated flows are labelled *sob escopo* because they depend on the official WhatsApp Business API, a verified account and approved templates. Pix is presented the same way, tied to the payment provider chosen per project.
+- **No fake proof.** No testimonials, client logos, revenue figures or conversion statistics. Credibility comes from real projects that can be opened — screenshots in `public/projects/` are our own captures of the live sites.
 
 ## Tech stack
 
@@ -47,14 +58,15 @@ Admin panel: `/admin` (redirects to `/admin/login` if not authenticated). Sign i
 | `ADMIN_SESSION_SECRET` | Long random string used to sign admin session cookies. |
 | `ADMIN_SEED_EMAIL` / `ADMIN_SEED_PASSWORD` | Only read by `npm run db:seed` to create/update the first admin login. |
 | `NOTION_API_KEY` / `NOTION_DATABASE_ID` | Optional — if set, each inquiry is also mirrored into a Notion database (best-effort, never blocks a submission). |
+| `RESEND_API_KEY` / `INQUIRY_FROM_EMAIL` / `INQUIRY_NOTIFY_EMAIL` | Optional — all three must be set for new-inquiry email notifications (`src/lib/email.ts`). Unset means no email is attempted; the inquiry still persists. |
 | `NEXT_PUBLIC_SITE_URL` | Canonical site URL used for metadata, sitemap and JSON-LD (`src/config/site.ts`). Defaults to `https://aster.studio`. |
 
 ## Project structure
 
 ```
 prisma/
-  schema.prisma           Service, PortfolioProject, Inquiry, InquiryNote, SiteSettings, AdminUser
-  seed.ts                  Seeds services, portfolio projects, site settings and the first admin user
+  schema.prisma           Service, SolutionTier, FaqEntry, PortfolioProject, Inquiry, InquiryNote, SiteSettings, AdminUser
+  seed.ts                  Seeds solutions, tiers, FAQ, portfolio projects, site settings and the first admin user
 
 src/
   app/

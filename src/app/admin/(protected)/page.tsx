@@ -54,7 +54,7 @@ export default async function AdminDashboardPage() {
                 {recentInquiries.map((inquiry) => (
                   <tr key={inquiry.id} className="border-b border-border last:border-0">
                     <td className="px-4 py-3">
-                      <Link href={`/admin/inquiries/${inquiry.id}`} className="font-medium text-foreground hover:text-accent">
+                      <Link href={`/admin/inquiries/${inquiry.id}`} className="font-medium text-foreground hover:text-accent-ink">
                         {inquiry.name}
                       </Link>
                       <p className="text-xs text-muted-foreground">{inquiry.email}</p>

@@ -2,22 +2,39 @@ import type { MetadataRoute } from "next";
 
 import { siteConfig } from "@/config/site";
 import { prisma } from "@/lib/prisma";
+import { safeQuery } from "@/lib/safe-query";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const staticRoutes = ["", "/services", "/portfolio", "/about", "/contact", "/legal/privacy", "/legal/terms"];
+  const staticRoutes = [
+    "",
+    "/solucoes",
+    "/como-funciona",
+    "/projetos",
+    "/sobre",
+    "/contato",
+    "/legal/privacy",
+    "/legal/terms",
+  ];
 
-  const projects = await prisma.portfolioProject.findMany({
-    where: { published: true },
-    select: { slug: true },
-  });
-  const portfolioRoutes = projects.map((project) => `/portfolio/${project.slug}`);
+  // Banco fora do ar não deve deixar o sitemap inteiro fora do ar: as
+  // rotas fixas continuam sendo publicadas sem as de projeto.
+  const projects = await safeQuery(
+    "sitemap projects",
+    () =>
+      prisma.portfolioProject.findMany({
+        where: { published: true },
+        select: { slug: true },
+      }),
+    [] as { slug: string }[],
+  );
+  const projectRoutes = projects.map((project) => `/projetos/${project.slug}`);
 
-  const routes = [...staticRoutes, ...portfolioRoutes];
+  const routes = [...staticRoutes, ...projectRoutes];
 
   return routes.map((route) => ({
     url: `${siteConfig.url}${route}`,
     lastModified: new Date(),
     changeFrequency: route === "" ? "weekly" : "monthly",
-    priority: route === "" ? 1 : route.startsWith("/portfolio/") ? 0.8 : 0.6,
+    priority: route === "" ? 1 : route === "/contato" ? 0.9 : route.startsWith("/projetos/") ? 0.7 : 0.6,
   }));
 }

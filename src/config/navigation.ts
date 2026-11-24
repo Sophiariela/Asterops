@@ -1,45 +1,47 @@
 import type { FooterColumn, NavLink } from "@/types";
 
 export const headerNav: NavLink[] = [
-  { label: "Services", href: "/services" },
-  { label: "Work", href: "/portfolio" },
-  { label: "About", href: "/about" },
-  { label: "Contact", href: "/contact" },
+  { label: "Soluções", href: "/solucoes" },
+  { label: "Como funciona", href: "/como-funciona" },
+  { label: "Projetos", href: "/projetos" },
+  { label: "Sobre", href: "/sobre" },
+  { label: "Contato", href: "/contato" },
 ];
 
 export const headerCta: NavLink = {
-  label: "Start a Project",
-  href: "/contact",
+  label: "Solicitar diagnóstico",
+  href: "/contato",
 };
 
 export function buildFooterColumns(contactEmail: string): FooterColumn[] {
   return [
     {
-      title: "Company",
+      title: "Soluções",
       links: [
-        { label: "About", href: "/about" },
-        { label: "Work", href: "/portfolio" },
+        { label: "O que implementamos", href: "/solucoes" },
+        { label: "Níveis de solução", href: "/solucoes#niveis" },
+        { label: "Como funciona", href: "/como-funciona" },
       ],
     },
     {
-      title: "Services",
+      title: "Estúdio",
       links: [
-        { label: "All Services", href: "/services" },
-        { label: "Start a Project", href: "/contact" },
+        { label: "Sobre a Aster", href: "/sobre" },
+        { label: "Projetos", href: "/projetos" },
       ],
     },
     {
-      title: "Contact",
+      title: "Contato",
       links: [
-        { label: "Contact Us", href: "/contact" },
+        { label: "Solicitar diagnóstico", href: "/contato" },
         { label: contactEmail, href: `mailto:${contactEmail}` },
       ],
     },
     {
       title: "Legal",
       links: [
-        { label: "Privacy Policy", href: "/legal/privacy" },
-        { label: "Terms of Service", href: "/legal/terms" },
+        { label: "Privacidade", href: "/legal/privacy" },
+        { label: "Termos", href: "/legal/terms" },
       ],
     },
   ];

@@ -23,7 +23,7 @@ export function buildMetadata({ title, description, path, image }: PageMetadataI
       url,
       siteName: siteConfig.name,
       images: [{ url: ogImage }],
-      locale: "en_US",
+      locale: siteConfig.locale,
       type: "website",
     },
     twitter: {

@@ -5,6 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import { DeleteButton } from "@/components/admin/delete-button";
 import { InquiryStatusSelect } from "@/components/admin/inquiry-status-select";
 import { InquiryNotes } from "@/components/admin/inquiry-notes";
+import { WhatsAppLink } from "@/components/shared/whatsapp-link";
 import { prisma } from "@/lib/prisma";
 
 interface AdminInquiryDetailPageProps {
@@ -21,11 +22,13 @@ export default async function AdminInquiryDetailPage({ params }: AdminInquiryDet
 
   const fields: { label: string; value: string }[] = [
     { label: "Email", value: inquiry.email },
+    { label: "WhatsApp", value: inquiry.whatsapp ?? "—" },
     { label: "Business name", value: inquiry.businessName ?? "—" },
-    { label: "Service", value: inquiry.service ?? "—" },
-    { label: "Estimated budget", value: inquiry.budget ?? "—" },
-    { label: "Expected timeline", value: inquiry.timeline ?? "—" },
-    { label: "Received", value: inquiry.createdAt.toLocaleString() },
+    { label: "Business type", value: inquiry.businessType ?? "—" },
+    { label: "Needs", value: inquiry.service ?? "—" },
+    { label: "Budget", value: inquiry.budget ?? "—" },
+    { label: "Timeline", value: inquiry.timeline ?? "—" },
+    { label: "Received", value: inquiry.createdAt.toLocaleString("pt-BR") },
   ];
 
   return (
@@ -42,8 +45,15 @@ export default async function AdminInquiryDetailPage({ params }: AdminInquiryDet
         />
       </div>
 
-      <div>
+      <div className="flex flex-wrap items-center gap-4">
         <h1 className="text-2xl font-medium text-foreground">{inquiry.name}</h1>
+        {inquiry.whatsapp ? (
+          <WhatsAppLink
+            whatsapp={inquiry.whatsapp}
+            message={`Oi, ${inquiry.name.split(" ")[0]}! Aqui é da Aster, sobre o seu pedido de diagnóstico.`}
+            label="Responder no WhatsApp"
+          />
+        ) : null}
       </div>
 
       <div className="flex flex-col gap-2">
@@ -62,12 +72,23 @@ export default async function AdminInquiryDetailPage({ params }: AdminInquiryDet
 
       <div className="flex flex-col gap-2">
         <span className="font-mono text-xs uppercase tracking-[0.15em] text-muted-foreground">
-          Project description
+          What they want to solve
         </span>
         <p className="whitespace-pre-line rounded-lg border border-border bg-card p-6 text-sm leading-relaxed text-foreground">
           {inquiry.message}
         </p>
       </div>
+
+      {inquiry.problem ? (
+        <div className="flex flex-col gap-2">
+          <span className="font-mono text-xs uppercase tracking-[0.15em] text-muted-foreground">
+            What gets in the way today
+          </span>
+          <p className="whitespace-pre-line rounded-lg border border-border bg-card p-6 text-sm leading-relaxed text-foreground">
+            {inquiry.problem}
+          </p>
+        </div>
+      ) : null}
 
       <div className="flex flex-col gap-3">
         <span className="font-mono text-xs uppercase tracking-[0.15em] text-muted-foreground">Internal notes</span>

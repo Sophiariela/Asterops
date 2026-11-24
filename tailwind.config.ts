@@ -34,6 +34,9 @@ const config: Config = {
         accent: {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
+          // Acento em TEXTO (ver nota em globals.css): o bronze de
+          // superfície não passa AA como texto sobre fundo claro.
+          ink: "hsl(var(--accent-ink))",
         },
         card: {
           DEFAULT: "hsl(var(--card))",

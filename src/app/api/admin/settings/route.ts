@@ -7,10 +7,17 @@ const settingsSchema = z.object({
   studioName: z.string().min(1),
   contactEmail: z.string().email(),
   whatsapp: z.string().optional(),
+  whatsappMessage: z.string().min(1),
   instagramUrl: z.string().url().optional().or(z.literal("")),
   ctaLabel: z.string().min(1),
   ctaHref: z.string().min(1),
   footerNote: z.string().min(1),
+  // Hero da home. Campo vazio = usa o padrão de src/config/content.ts.
+  heroEyebrow: z.string().default(""),
+  heroHeadline: z.string().default(""),
+  heroSubheadline: z.string().default(""),
+  heroPrimaryCta: z.string().default(""),
+  heroSecondaryCta: z.string().default(""),
 });
 
 export async function GET() {

@@ -1,6 +1,16 @@
 import { AdminNav } from "@/components/admin/admin-nav";
 import { Logo } from "@/components/shared/logo";
 
+/**
+ * O painel nunca é pré-renderizado.
+ *
+ * São páginas atrás de sessão que precisam refletir o banco no momento do
+ * acesso: lista de pedido, nível, serviço e projeto mudam pelo próprio
+ * painel. Gerar estático no build deixaria o administrador olhando dado
+ * congelado — e ainda exigiria banco de pé na hora de compilar.
+ */
+export const dynamic = "force-dynamic";
+
 export default function AdminProtectedLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen">

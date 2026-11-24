@@ -44,7 +44,7 @@ export default async function AdminPortfolioPage() {
                 <tr key={project.id} className="border-b border-border last:border-0">
                   <td className="px-4 py-3 text-muted-foreground">{project.order}</td>
                   <td className="px-4 py-3">
-                    <Link href={`/admin/portfolio/${project.id}`} className="font-medium text-foreground hover:text-accent">
+                    <Link href={`/admin/portfolio/${project.id}`} className="font-medium text-foreground hover:text-accent-ink">
                       {project.name}
                     </Link>
                     {!project.published ? <span className="ml-2 text-xs text-muted-foreground">(hidden)</span> : null}
