@@ -7,25 +7,28 @@ import { DeleteButton } from "@/components/admin/delete-button";
 import { prisma } from "@/lib/prisma";
 
 export default async function AdminServicesPage() {
-  const services = await prisma.service.findMany({ orderBy: { order: "asc" } });
+  const services = await prisma.service.findMany({
+    orderBy: { order: "asc" },
+    include: { category: true },
+  });
 
   return (
     <div className="flex flex-col gap-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-medium text-foreground">Services</h1>
-          <p className="text-sm text-muted-foreground">Manage what&apos;s offered on the public services page.</p>
+          <h1 className="text-2xl font-medium text-foreground">Solutions</h1>
+          <p className="text-sm text-muted-foreground">The catalogue shown under /solutions. Each solution has its own public page.</p>
         </div>
         <Button asChild>
           <Link href="/admin/services/new">
             <Plus className="h-4 w-4" />
-            New service
+            New solution
           </Link>
         </Button>
       </div>
 
       {services.length === 0 ? (
-        <p className="text-sm text-muted-foreground">No services yet.</p>
+        <p className="text-sm text-muted-foreground">No solutions yet.</p>
       ) : (
         <div className="overflow-x-auto rounded-lg border border-border">
           <table className="w-full text-left text-sm">
@@ -33,6 +36,7 @@ export default async function AdminServicesPage() {
               <tr>
                 <th className="px-4 py-3">Order</th>
                 <th className="px-4 py-3">Title</th>
+                <th className="px-4 py-3">Category</th>
                 <th className="px-4 py-3">Slug</th>
                 <th className="px-4 py-3">Status</th>
                 <th className="px-4 py-3" />
@@ -46,6 +50,9 @@ export default async function AdminServicesPage() {
                     <Link href={`/admin/services/${service.id}`} className="font-medium text-foreground hover:text-accent-ink">
                       {service.title}
                     </Link>
+                  </td>
+                  <td className="px-4 py-3 text-muted-foreground">
+                    {service.category?.name ?? "—"}
                   </td>
                   <td className="px-4 py-3 font-mono text-xs text-muted-foreground">{service.slug}</td>
                   <td className="px-4 py-3">

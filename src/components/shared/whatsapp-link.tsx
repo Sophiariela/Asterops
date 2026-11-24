@@ -22,7 +22,7 @@ interface WhatsAppLinkProps {
  * é melhor não ter o botão do que ter um botão que abre conversa vazia
  * com número errado.
  */
-export function WhatsAppLink({ whatsapp, message, label = "Falar no WhatsApp", className }: WhatsAppLinkProps) {
+export function WhatsAppLink({ whatsapp, message, label = "Message on WhatsApp", className }: WhatsAppLinkProps) {
   if (!whatsapp) return null;
 
   return (

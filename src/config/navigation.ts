@@ -1,47 +1,48 @@
 import type { FooterColumn, NavLink } from "@/types";
 
 export const headerNav: NavLink[] = [
-  { label: "Soluções", href: "/solucoes" },
-  { label: "Como funciona", href: "/como-funciona" },
-  { label: "Projetos", href: "/projetos" },
-  { label: "Sobre", href: "/sobre" },
-  { label: "Contato", href: "/contato" },
+  { label: "Solutions", href: "/solutions" },
+  { label: "Projects", href: "/projects" },
+  { label: "About", href: "/about" },
+  { label: "Contact", href: "/contact" },
 ];
 
 export const headerCta: NavLink = {
-  label: "Solicitar diagnóstico",
-  href: "/contato",
+  label: "Start a Project",
+  href: "/contact",
 };
 
 export function buildFooterColumns(contactEmail: string): FooterColumn[] {
   return [
     {
-      title: "Soluções",
+      title: "Solutions",
       links: [
-        { label: "O que implementamos", href: "/solucoes" },
-        { label: "Níveis de solução", href: "/solucoes#niveis" },
-        { label: "Como funciona", href: "/como-funciona" },
+        { label: "Web & Digital Experience", href: "/solutions/web-digital-experience" },
+        { label: "Business Software", href: "/solutions/business-software" },
+        { label: "Automation & AI", href: "/solutions/automation-ai" },
+        { label: "Custom Software", href: "/solutions/custom-software-development" },
       ],
     },
     {
-      title: "Estúdio",
+      title: "Studio",
       links: [
-        { label: "Sobre a Aster", href: "/sobre" },
-        { label: "Projetos", href: "/projetos" },
+        { label: "About Aster", href: "/about" },
+        { label: "Projects", href: "/projects" },
+        { label: "Our process", href: "/#process" },
       ],
     },
     {
-      title: "Contato",
+      title: "Contact",
       links: [
-        { label: "Solicitar diagnóstico", href: "/contato" },
+        { label: "Start a Project", href: "/contact" },
         { label: contactEmail, href: `mailto:${contactEmail}` },
       ],
     },
     {
       title: "Legal",
       links: [
-        { label: "Privacidade", href: "/legal/privacy" },
-        { label: "Termos", href: "/legal/terms" },
+        { label: "Privacy", href: "/legal/privacy" },
+        { label: "Terms", href: "/legal/terms" },
       ],
     },
   ];

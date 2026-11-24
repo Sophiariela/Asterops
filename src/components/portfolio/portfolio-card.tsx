@@ -5,16 +5,21 @@ import { ArrowUpRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import type { PortfolioProjectSummary } from "@/types";
 
+/**
+ * Rótulos da regra de honestidade do portfólio: projeto de cliente, produto
+ * interno, protótipo e demonstração nunca aparecem como a mesma coisa.
+ */
 const classificationLabel: Record<PortfolioProjectSummary["classification"], string> = {
-  CLIENT_PROJECT: "Projeto de cliente",
-  INTERNAL_PRODUCT: "Produto interno",
-  PROTOTYPE: "Protótipo",
+  CLIENT_PROJECT: "Client project",
+  INTERNAL_PRODUCT: "Internal product",
+  PROTOTYPE: "Prototype",
+  DEMONSTRATION: "Demonstration",
 };
 
 const statusLabel: Record<PortfolioProjectSummary["status"], string> = {
-  LIVE: "No ar",
-  DELIVERED: "Entregue",
-  IN_PROGRESS: "Em andamento",
+  LIVE: "Live",
+  DELIVERED: "Delivered",
+  IN_PROGRESS: "In progress",
 };
 
 export function PortfolioCard({ project }: { project: PortfolioProjectSummary }) {
@@ -22,7 +27,7 @@ export function PortfolioCard({ project }: { project: PortfolioProjectSummary })
 
   return (
     <Link
-      href={`/projetos/${project.slug}`}
+      href={`/projects/${project.slug}`}
       className="group flex h-full flex-col overflow-hidden rounded-xl border border-border bg-card transition-colors hover:border-accent/50"
     >
       <div className="relative aspect-[16/10] w-full overflow-hidden border-b border-border/60 bg-secondary">
@@ -30,7 +35,7 @@ export function PortfolioCard({ project }: { project: PortfolioProjectSummary })
           isLocal ? (
             <Image
               src={project.coverImage}
-              alt={`Captura de tela do projeto ${project.name}.`}
+              alt={`Screenshot of the ${project.name} project.`}
               fill
               sizes="(min-width: 1024px) 400px, (min-width: 640px) 50vw, 100vw"
               className="object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]"
@@ -39,7 +44,7 @@ export function PortfolioCard({ project }: { project: PortfolioProjectSummary })
             // eslint-disable-next-line @next/next/no-img-element -- capa externa cadastrada no painel; host não está na allowlist do next/image
             <img
               src={project.coverImage}
-              alt={`Captura de tela do projeto ${project.name}.`}
+              alt={`Screenshot of the ${project.name} project.`}
               className="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]"
             />
           )

@@ -1,4 +1,8 @@
-export type ProjectClassification = "CLIENT_PROJECT" | "INTERNAL_PRODUCT" | "PROTOTYPE";
+export type ProjectClassification =
+  | "CLIENT_PROJECT"
+  | "INTERNAL_PRODUCT"
+  | "PROTOTYPE"
+  | "DEMONSTRATION";
 export type ProjectStatus = "LIVE" | "DELIVERED" | "IN_PROGRESS";
 
 export interface PortfolioProjectSummary {
@@ -8,6 +12,7 @@ export interface PortfolioProjectSummary {
   category: string;
   shortDescription: string;
   fullDescription: string;
+  caseStudy: string | null;
   coverImage: string | null;
   gallery: string[];
   projectUrl: string | null;

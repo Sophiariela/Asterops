@@ -22,13 +22,15 @@ export default async function AdminInquiryDetailPage({ params }: AdminInquiryDet
 
   const fields: { label: string; value: string }[] = [
     { label: "Email", value: inquiry.email },
-    { label: "WhatsApp", value: inquiry.whatsapp ?? "—" },
-    { label: "Business name", value: inquiry.businessName ?? "—" },
-    { label: "Business type", value: inquiry.businessType ?? "—" },
-    { label: "Needs", value: inquiry.service ?? "—" },
+    { label: "Phone / WhatsApp", value: inquiry.phone ?? "—" },
+    { label: "Company", value: inquiry.businessName ?? "—" },
+    { label: "Country", value: inquiry.country ?? "—" },
+    { label: "Category", value: inquiry.projectCategory ?? "—" },
+    { label: "Solution", value: inquiry.service ?? "—" },
     { label: "Budget", value: inquiry.budget ?? "—" },
     { label: "Timeline", value: inquiry.timeline ?? "—" },
-    { label: "Received", value: inquiry.createdAt.toLocaleString("pt-BR") },
+    { label: "Reference", value: inquiry.referenceUrl ?? "—" },
+    { label: "Received", value: inquiry.createdAt.toLocaleString("en-GB") },
   ];
 
   return (
@@ -47,11 +49,11 @@ export default async function AdminInquiryDetailPage({ params }: AdminInquiryDet
 
       <div className="flex flex-wrap items-center gap-4">
         <h1 className="text-2xl font-medium text-foreground">{inquiry.name}</h1>
-        {inquiry.whatsapp ? (
+        {inquiry.phone ? (
           <WhatsAppLink
-            whatsapp={inquiry.whatsapp}
-            message={`Oi, ${inquiry.name.split(" ")[0]}! Aqui é da Aster, sobre o seu pedido de diagnóstico.`}
-            label="Responder no WhatsApp"
+            whatsapp={inquiry.phone}
+            message={`Hi ${inquiry.name.split(" ")[0]}, this is Aster about your project inquiry.`}
+            label="Reply on WhatsApp"
           />
         ) : null}
       </div>
@@ -72,23 +74,12 @@ export default async function AdminInquiryDetailPage({ params }: AdminInquiryDet
 
       <div className="flex flex-col gap-2">
         <span className="font-mono text-xs uppercase tracking-[0.15em] text-muted-foreground">
-          What they want to solve
+          What they want to build
         </span>
         <p className="whitespace-pre-line rounded-lg border border-border bg-card p-6 text-sm leading-relaxed text-foreground">
           {inquiry.message}
         </p>
       </div>
-
-      {inquiry.problem ? (
-        <div className="flex flex-col gap-2">
-          <span className="font-mono text-xs uppercase tracking-[0.15em] text-muted-foreground">
-            What gets in the way today
-          </span>
-          <p className="whitespace-pre-line rounded-lg border border-border bg-card p-6 text-sm leading-relaxed text-foreground">
-            {inquiry.problem}
-          </p>
-        </div>
-      ) : null}
 
       <div className="flex flex-col gap-3">
         <span className="font-mono text-xs uppercase tracking-[0.15em] text-muted-foreground">Internal notes</span>

@@ -3,11 +3,16 @@ import { Client } from "@notionhq/client";
 export interface InquirySubmission {
   name: string;
   email: string;
+  /** "Company name" no formulário. */
   businessName?: string;
+  phone?: string;
+  country?: string;
+  projectCategory?: string;
   service?: string;
   budget?: string;
   message: string;
   timeline?: string;
+  referenceUrl?: string;
 }
 
 let client: Client | null = null;
@@ -44,6 +49,9 @@ export async function mirrorInquiryToNotion(submission: InquirySubmission): Prom
       Name: { title: [{ text: { content: submission.name } }] },
       Email: { email: submission.email },
       Company: { rich_text: submission.businessName ? [{ text: { content: submission.businessName } }] : [] },
+      Category: {
+        select: submission.projectCategory ? { name: submission.projectCategory } : null,
+      },
       Service: { select: submission.service ? { name: submission.service } : null },
       Message: { rich_text: [{ text: { content: submission.message } }] },
       "Created At": { date: { start: new Date().toISOString() } },

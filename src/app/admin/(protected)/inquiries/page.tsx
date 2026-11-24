@@ -4,17 +4,18 @@ import { Badge } from "@/components/ui/badge";
 import { prisma } from "@/lib/prisma";
 import type { Prisma } from "@prisma/client";
 
-const statuses = ["NEW", "CONTACTED", "DISCOVERY", "PROPOSAL_SENT", "IN_PROGRESS", "COMPLETED", "LOST"] as const;
+const statuses = ["NEW", "REVIEWING", "DISCOVERY", "PROPOSAL_SENT", "IN_PROGRESS", "COMPLETED", "LOST"] as const;
 
 interface AdminInquiriesPageProps {
-  searchParams: Promise<{ status?: string; service?: string; q?: string }>;
+  searchParams: Promise<{ status?: string; category?: string; service?: string; q?: string }>;
 }
 
 export default async function AdminInquiriesPage({ searchParams }: AdminInquiriesPageProps) {
-  const { status, service, q } = await searchParams;
+  const { status, category, service, q } = await searchParams;
 
   const where: Prisma.InquiryWhereInput = {};
   if (status) where.status = status as Prisma.InquiryWhereInput["status"];
+  if (category) where.projectCategory = category;
   if (service) where.service = service;
   if (q) {
     where.OR = [
@@ -23,9 +24,10 @@ export default async function AdminInquiriesPage({ searchParams }: AdminInquirie
     ];
   }
 
-  const [inquiries, services] = await Promise.all([
+  const [inquiries, services, categories] = await Promise.all([
     prisma.inquiry.findMany({ where, orderBy: { createdAt: "desc" } }),
     prisma.service.findMany({ orderBy: { order: "asc" } }),
+    prisma.serviceCategory.findMany({ orderBy: { order: "asc" } }),
   ]);
 
   return (
@@ -51,8 +53,17 @@ export default async function AdminInquiriesPage({ searchParams }: AdminInquirie
             </option>
           ))}
         </select>
+        <select name="category" defaultValue={category ?? ""} className="h-10 rounded-md border border-border bg-secondary px-3 text-sm text-foreground">
+          <option value="">All categories</option>
+          {categories.map((c) => (
+            <option key={c.id} value={c.name}>
+              {c.name}
+            </option>
+          ))}
+          <option value="Other">Other</option>
+        </select>
         <select name="service" defaultValue={service ?? ""} className="h-10 rounded-md border border-border bg-secondary px-3 text-sm text-foreground">
-          <option value="">All services</option>
+          <option value="">All solutions</option>
           {services.map((s) => (
             <option key={s.id} value={s.title}>
               {s.title}
@@ -72,7 +83,8 @@ export default async function AdminInquiriesPage({ searchParams }: AdminInquirie
             <thead className="border-b border-border bg-secondary/50 text-xs uppercase tracking-wide text-muted-foreground">
               <tr>
                 <th className="px-4 py-3">Name</th>
-                <th className="px-4 py-3">Service</th>
+                <th className="px-4 py-3">Category</th>
+                <th className="px-4 py-3">Solution</th>
                 <th className="px-4 py-3">Status</th>
                 <th className="px-4 py-3">Received</th>
               </tr>
@@ -85,6 +97,9 @@ export default async function AdminInquiriesPage({ searchParams }: AdminInquirie
                       {inquiry.name}
                     </Link>
                     <p className="text-xs text-muted-foreground">{inquiry.email}</p>
+                  </td>
+                  <td className="px-4 py-3 text-muted-foreground">
+                    {inquiry.projectCategory ?? "—"}
                   </td>
                   <td className="px-4 py-3 text-muted-foreground">{inquiry.service ?? "—"}</td>
                   <td className="px-4 py-3">

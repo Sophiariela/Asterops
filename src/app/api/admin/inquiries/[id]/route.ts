@@ -4,7 +4,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 
 const updateSchema = z.object({
-  status: z.enum(["NEW", "CONTACTED", "DISCOVERY", "PROPOSAL_SENT", "IN_PROGRESS", "COMPLETED", "LOST"]),
+  status: z.enum(["NEW", "REVIEWING", "DISCOVERY", "PROPOSAL_SENT", "IN_PROGRESS", "COMPLETED", "LOST"]),
 });
 
 interface Params {

@@ -7,24 +7,22 @@ import { Button } from "@/components/ui/button";
 import { Reveal } from "@/components/shared/reveal";
 import { homeContent } from "@/config/content";
 
-const audience = [
-  "Salões",
-  "Studios de unha",
-  "Lash e brow",
-  "Estética",
-  "Spas",
+/** As três capacidades que a Aster comunica, abaixo do CTA. */
+const capabilities = [
+  "Digital experiences",
+  "Software products & business systems",
+  "Automation & integrations",
 ];
 
 /**
  * Hero da home.
  *
- * O visual é prova real: screenshots dos projetos que estão no ar
- * (Good Vibes Va'a e Fulô Crochet), em moldura de navegador e de celular.
- * Nada de ilustração decorativa de IA nem de interface inventada — se
- * aparece aqui, existe e pode ser aberto pelo visitante na página de
- * projetos.
+ * O visual é prova real: screenshots de projeto que está no ar (Good Vibes
+ * Va’a e Fulô Crochet), em moldura de navegador e de celular. Nada de
+ * ilustração decorativa de IA nem de interface inventada — o que aparece aqui
+ * existe e pode ser aberto na página de projetos.
  *
- * Texto e rótulos saem de `SiteSettings` quando o painel os editou, com
+ * Texto e rótulo saem de `SiteSettings` quando o painel os editou, com
  * `homeContent` como padrão de fábrica.
  */
 export function Hero({ settings }: { settings: SiteSettings }) {
@@ -48,7 +46,7 @@ export function Hero({ settings }: { settings: SiteSettings }) {
           </Reveal>
 
           <Reveal className="w-full">
-            <h1 className="max-w-[18ch] text-4xl font-medium leading-[1.08] tracking-tight text-foreground sm:text-5xl lg:text-[3.4rem]">
+            <h1 className="max-w-[20ch] text-4xl font-medium leading-[1.08] tracking-tight text-foreground sm:text-5xl lg:text-[3.4rem]">
               {headline}
             </h1>
           </Reveal>
@@ -61,7 +59,7 @@ export function Hero({ settings }: { settings: SiteSettings }) {
             <Button asChild size="lg">
               <Link href={hero.primaryCta.href}>
                 {primaryLabel}
-                <ArrowRight className="h-4 w-4" />
+                <ArrowRight className="h-4 w-4" aria-hidden />
               </Link>
             </Button>
             <Button asChild variant="outline" size="lg">
@@ -71,10 +69,10 @@ export function Hero({ settings }: { settings: SiteSettings }) {
 
           <Reveal className="pt-4">
             <p className="font-mono text-xs uppercase tracking-[0.16em] text-muted-foreground">
-              Para quem atende com hora marcada
+              What we build
             </p>
             <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-2">
-              {audience.map((item) => (
+              {capabilities.map((item) => (
                 <li key={item} className="text-sm text-muted-foreground">
                   {item}
                 </li>
@@ -85,7 +83,7 @@ export function Hero({ settings }: { settings: SiteSettings }) {
 
         <Reveal className="w-full">
           <div className="relative">
-            {/* Moldura de navegador — página de agendamento do Good Vibes Va'a */}
+            {/* Moldura de navegador — fluxo de agendamento do Good Vibes Va’a */}
             <figure className="overflow-hidden rounded-xl border border-border bg-card shadow-[0_24px_80px_-32px_rgba(0,0,0,0.6)]">
               <div className="flex items-center gap-2 border-b border-border/70 bg-secondary/60 px-4 py-3">
                 <span className="h-2.5 w-2.5 rounded-full bg-muted-foreground/30" />
@@ -97,7 +95,7 @@ export function Hero({ settings }: { settings: SiteSettings }) {
               </div>
               <Image
                 src="/projects/good-vibes-vaa-agendar.webp"
-                alt="Página de agendamento do Good Vibes Va'a: carrossel de experiências e fluxo de reserva em quatro passos."
+                alt="Booking flow built for Good Vibes Va’a: experience carousel and a four-step reservation journey."
                 width={1600}
                 height={1000}
                 priority
@@ -110,7 +108,7 @@ export function Hero({ settings }: { settings: SiteSettings }) {
             <figure className="absolute -bottom-10 -left-6 hidden w-[150px] overflow-hidden rounded-[20px] border border-border bg-card p-1.5 shadow-[0_20px_60px_-24px_rgba(0,0,0,0.7)] sm:block lg:-left-10 lg:w-[172px]">
               <Image
                 src="/projects/fulo-crochet-mobile.webp"
-                alt="Loja da Fulô Crochet aberta no celular."
+                alt="The Fulô Crochet storefront on a phone."
                 width={560}
                 height={1212}
                 sizes="172px"

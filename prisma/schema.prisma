@@ -10,7 +10,7 @@ datasource db {
 
 enum InquiryStatus {
   NEW
-  CONTACTED
+  REVIEWING
   DISCOVERY
   PROPOSAL_SENT
   IN_PROGRESS
@@ -18,10 +18,30 @@ enum InquiryStatus {
   LOST
 }
 
+/// Como o trabalho é cobrado. Aster vende tipos diferentes de entrega, então
+/// o modelo comercial é por solução — não existe um preço mensal único.
+enum CommercialModel {
+  FIXED_SCOPE
+  CUSTOM_QUOTE
+  SETUP_PLUS_MAINTENANCE
+  SUBSCRIPTION
+}
+
+/// Regra de honestidade do catálogo: separa o que já roda do que é
+/// desenvolvimento sob medida e do que é apenas demonstração. A página de
+/// cada solução mostra isso como rótulo, para nunca vender como pronto algo
+/// que ainda precisa ser construído.
+enum SolutionAvailability {
+  OPERATIONAL_PRODUCT
+  CUSTOM_DEVELOPMENT
+  DEMONSTRATION
+}
+
 enum ProjectClassification {
   CLIENT_PROJECT
   INTERNAL_PRODUCT
   PROTOTYPE
+  DEMONSTRATION
 }
 
 enum ProjectStatus {
@@ -37,60 +57,138 @@ model AdminUser {
   createdAt    DateTime @default(now())
 }
 
+/// As quatro categorias comerciais do catálogo.
+model ServiceCategory {
+  id          String    @id @default(cuid())
+  code        String    @unique
+  name        String
+  slug        String    @unique
+  tagline     String    @default("")
+  description String    @default("")
+  icon        String    @default("Sparkles")
+  order       Int       @default(0)
+  published   Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  services    Service[]
+
+  @@index([published, order])
+}
+
+/// Uma solução do catálogo.
+///
+/// Os campos de cartão (`description`, `outcome`) alimentam as listagens; os
+/// de detalhe alimentam a página própria da solução, que o briefing exige ter
+/// conteúdo real em vez de card raso. Todo campo novo tem default para que a
+/// migração em cima das linhas já existentes seja aditiva.
 model Service {
-  id          String   @id @default(cuid())
+  id          String  @id @default(cuid())
   title       String
-  slug        String   @unique
+  slug        String  @unique
   description String
-  icon        String   @default("Sparkles")
-  active      Boolean  @default(true)
-  order       Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  icon        String  @default("Sparkles")
+  active      Boolean @default(true)
+  order       Int     @default(0)
+
+  categoryId String?
+  category   ServiceCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  /// Resultado em uma linha, para o cartão.
+  outcome String @default("")
+  /// Manchete da página de detalhe.
+  headline String @default("")
+  /// Que problema de negócio isso resolve.
+  problem String @default("")
+  /// Para quem é.
+  idealCustomer String @default("")
+
+  capabilities  String[] @default([])
+  functionality String[] @default([])
+  useCases      String[] @default([])
+  integrations  String[] @default([])
+
+  /// O que depende de escopo, e o que é customizado caso a caso.
+  scopeNotes String @default("")
+  /// Como a implementação acontece nesta solução.
+  implementationNote String @default("")
+
+  commercialModel CommercialModel      @default(CUSTOM_QUOTE)
+  availability    SolutionAvailability @default(CUSTOM_DEVELOPMENT)
+  priceLabel      String               @default("Request a project estimate.")
+  ctaLabel        String               @default("Start a Project")
+
+  previewImage String?
+  /// Legenda do preview — usada para marcar demonstração como demonstração.
+  previewCaption String?
+
+  featured  Boolean      @default(false)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  faqs      ServiceFaq[]
 
   @@index([active, order])
+  @@index([categoryId, order])
+}
+
+/// Dúvidas específicas de uma solução (item 12 do template de detalhe).
+model ServiceFaq {
+  id        String  @id @default(cuid())
+  serviceId String
+  service   Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  question  String
+  answer    String
+  order     Int     @default(0)
+
+  @@index([serviceId, order])
 }
 
 model PortfolioProject {
-  id               String                 @id @default(cuid())
+  id               String                @id @default(cuid())
   name             String
-  slug             String                 @unique
+  slug             String                @unique
   category         String
   shortDescription String
   fullDescription  String
+  /// Conteúdo de case study, quando existe. Opcional de propósito: sem isso
+  /// a página mostra só o que é verificável.
+  caseStudy        String?
   coverImage       String?
-  gallery          String[]               @default([])
+  gallery          String[]              @default([])
   projectUrl       String?
-  technologies     String[]               @default([])
-  classification   ProjectClassification  @default(CLIENT_PROJECT)
-  status           ProjectStatus          @default(DELIVERED)
-  published        Boolean                @default(true)
-  order            Int                    @default(0)
-  createdAt        DateTime               @default(now())
-  updatedAt        DateTime               @updatedAt
+  technologies     String[]              @default([])
+  classification   ProjectClassification @default(CLIENT_PROJECT)
+  status           ProjectStatus         @default(DELIVERED)
+  published        Boolean               @default(true)
+  order            Int                   @default(0)
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
 
   @@index([published, order])
 }
 
 model Inquiry {
-  id           String        @id @default(cuid())
-  name         String
-  email        String
-  whatsapp     String?
+  id    String  @id @default(cuid())
+  name  String
+  email String
+  /// Rótulo "Company name" no formulário; nome da coluna preservado para que
+  /// a migração não precise derrubar coluna existente.
   businessName String?
-  /// Segmento informado pelo lead ("Salão de beleza", "Studio de unhas"…).
-  businessType String?
-  service      String?
-  budget       String?
-  /// "O que você precisa" — descrição do pedido.
-  message      String
-  /// "Qual é o problema hoje" — a dor operacional, separada do pedido.
-  problem      String?
-  timeline     String?
-  status       InquiryStatus @default(NEW)
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  notes        InquiryNote[]
+  phone        String?
+  country      String?
+  /// Uma das quatro categorias do catálogo, ou "Other".
+  projectCategory String?
+  /// Solução específica, pré-selecionada quando o formulário abre a partir
+  /// da página de uma solução.
+  service String?
+  message String
+  budget  String?
+  timeline String?
+  referenceUrl String?
+
+  status    InquiryStatus @default(NEW)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  notes     InquiryNote[]
 
   @@index([status, createdAt])
   // Usado pela trava de envio duplicado em /api/contact.
@@ -106,57 +204,27 @@ model InquiryNote {
 }
 
 model SiteSettings {
-  id           String   @id @default("default")
-  studioName   String   @default("Aster")
-  contactEmail String   @default("contato@aster.studio")
+  id           String  @id @default("default")
+  studioName   String  @default("Aster")
+  contactEmail String  @default("hello@aster.studio")
   whatsapp     String?
-  /// Mensagem que já vem escrita ao abrir o WhatsApp a partir do site.
-  whatsappMessage String @default("Oi! Vim pelo site da Aster e quero automatizar meu negócio.")
   instagramUrl String?
-  ctaLabel     String   @default("Solicitar diagnóstico")
-  ctaHref      String   @default("/contato")
-  footerNote   String   @default("Tecnologia implementada para o seu negócio agendar, responder e vender.")
+  linkedinUrl  String?
+  ctaLabel     String  @default("Start a Project")
+  ctaHref      String  @default("/contact")
+  footerNote   String  @default("Digital products, software and automation built around your business.")
 
   // Hero editável pelo painel — ver /admin/settings.
-  heroEyebrow       String @default("Estúdio de automação e software")
-  heroHeadline      String @default("Seu negócio agenda, responde e vende. Sem você precisar fazer tudo manualmente.")
-  heroSubheadline   String @default("Sites profissionais, agendamento online, WhatsApp automatizado e sistemas personalizados. Nós configuramos a tecnologia para você.")
-  heroPrimaryCta    String @default("Quero automatizar meu negócio")
-  heroSecondaryCta  String @default("Ver o que podemos fazer")
+  heroEyebrow      String @default("Digital Products & Software Studio")
+  heroHeadline     String @default("Digital products. Powerful software. Built around your business.")
+  heroSubheadline  String @default("Aster designs and develops websites, applications, business systems, and automation that turn complex needs into practical digital solutions.")
+  heroPrimaryCta   String @default("Start a Project")
+  heroSecondaryCta String @default("Explore Solutions")
 
-  updatedAt    DateTime @updatedAt
+  updatedAt DateTime @updatedAt
 }
 
-/// Os três níveis comerciais (Presença, Agenda, Operação). Ficam no banco
-/// para que preço e escopo sejam editados pelo painel — o site nunca
-/// inventa valor: sem preço definido, mostra "Solicite uma proposta".
-model SolutionTier {
-  id             String   @id @default(cuid())
-  name           String
-  slug           String   @unique
-  /// Para quem é.
-  audience       String
-  /// Que problema resolve.
-  problem        String
-  /// Resultado principal, na voz do cliente.
-  outcome        String
-  inclusions     String[] @default([])
-  /// O que é customizado caso a caso.
-  customization  String
-  /// Como a implementação acontece.
-  implementation String
-  priceLabel     String   @default("Solicite uma proposta personalizada.")
-  /// Taxa de implementação — cobrada à parte, explicada no cartão.
-  setupLabel     String   @default("Implementação sob escopo, orçada no diagnóstico.")
-  featured       Boolean  @default(false)
-  published      Boolean  @default(true)
-  order          Int      @default(0)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-
-  @@index([published, order])
-}
-
+/// Dúvidas da home. As de cada solução ficam em `ServiceFaq`.
 model FaqEntry {
   id        String   @id @default(cuid())
   question  String

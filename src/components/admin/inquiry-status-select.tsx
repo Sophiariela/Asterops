@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 
-const statuses = ["NEW", "CONTACTED", "DISCOVERY", "PROPOSAL_SENT", "IN_PROGRESS", "COMPLETED", "LOST"] as const;
+const statuses = ["NEW", "REVIEWING", "DISCOVERY", "PROPOSAL_SENT", "IN_PROGRESS", "COMPLETED", "LOST"] as const;
 
 export function InquiryStatusSelect({ inquiryId, status }: { inquiryId: string; status: string }) {
   const router = useRouter();

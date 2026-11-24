@@ -1,5 +1,5 @@
 /**
- * Notificação de novo pedido por e-mail.
+ * Notificação de novo pedido de projeto por e-mail.
  *
  * Opcional e desligada por padrão: só envia quando `RESEND_API_KEY`,
  * `INQUIRY_FROM_EMAIL` e `INQUIRY_NOTIFY_EMAIL` estiverem definidos no
@@ -14,14 +14,15 @@ export interface InquiryEmailPayload {
   id: string;
   name: string;
   email: string;
-  whatsapp: string;
   businessName?: string;
-  businessType: string;
-  service: string;
+  phone: string;
+  country: string;
+  projectCategory: string;
+  service?: string;
   message: string;
-  problem?: string;
   budget?: string;
   timeline?: string;
+  referenceUrl?: string;
 }
 
 export function isEmailConfigured(): boolean {
@@ -41,18 +42,26 @@ export async function notifyAdminOfInquiry(payload: InquiryEmailPayload): Promis
   if (!apiKey || !from || !to) return;
 
   const text =
-    `Novo pedido de diagnóstico\n\n` +
-    line("Nome", payload.name) +
-    line("E-mail", payload.email) +
-    line("WhatsApp", payload.whatsapp) +
-    line("Negócio", payload.businessName) +
-    line("Tipo", payload.businessType) +
-    line("Precisa de", payload.service) +
-    line("Investimento", payload.budget) +
-    line("Prazo", payload.timeline) +
-    `\nO que quer resolver:\n${payload.message}\n` +
-    (payload.problem ? `\nO que atrapalha hoje:\n${payload.problem}\n` : "") +
-    `\nAbrir no painel: /admin/inquiries/${payload.id}\n`;
+    `New project inquiry
+
+` +
+    line("Name", payload.name) +
+    line("Email", payload.email) +
+    line("Phone / WhatsApp", payload.phone) +
+    line("Company", payload.businessName) +
+    line("Country", payload.country) +
+    line("Category", payload.projectCategory) +
+    line("Solution", payload.service) +
+    line("Budget", payload.budget) +
+    line("Timeline", payload.timeline) +
+    line("Reference", payload.referenceUrl) +
+    `
+What they want to build:
+${payload.message}
+` +
+    `
+Open in the admin panel: /admin/inquiries/${payload.id}
+`;
 
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -64,12 +73,12 @@ export async function notifyAdminOfInquiry(payload: InquiryEmailPayload): Promis
       from,
       to: [to],
       reply_to: payload.email,
-      subject: `Novo pedido — ${payload.name} (${payload.businessType})`,
+      subject: `New inquiry — ${payload.name} (${payload.projectCategory})`,
       text,
     }),
   });
 
   if (!response.ok) {
-    throw new Error(`Resend respondeu ${response.status}`);
+    throw new Error(`Resend responded ${response.status}`);
   }
 }

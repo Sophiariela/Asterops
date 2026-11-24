@@ -7,6 +7,9 @@ import { toWhatsAppHref } from "@/components/shared/whatsapp-link";
 import { buildFooterColumns } from "@/config/navigation";
 import { siteConfig } from "@/config/site";
 
+/** Mensagem que já vem escrita ao abrir o WhatsApp a partir do rodapé. */
+const WHATSAPP_MESSAGE = "Hi! I came from the Aster website and I would like to discuss a project.";
+
 export function Footer({ settings }: { settings: SiteSettings }) {
   const footerColumns = buildFooterColumns(settings.contactEmail);
 
@@ -21,17 +24,17 @@ export function Footer({ settings }: { settings: SiteSettings }) {
               <Link
                 href={`mailto:${settings.contactEmail}`}
                 className="flex h-9 w-9 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:border-accent/40 hover:text-accent-ink"
-                aria-label="Enviar e-mail"
+                aria-label="Send an email"
               >
                 <Mail className="h-4 w-4" />
               </Link>
               {settings.whatsapp ? (
                 <Link
-                  href={toWhatsAppHref(settings.whatsapp, settings.whatsappMessage)}
+                  href={toWhatsAppHref(settings.whatsapp, WHATSAPP_MESSAGE)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex h-9 w-9 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:border-accent/40 hover:text-accent-ink"
-                  aria-label="Falar no WhatsApp"
+                  aria-label="Message on WhatsApp"
                 >
                   <MessageCircle className="h-4 w-4" />
                 </Link>

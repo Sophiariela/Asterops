@@ -6,15 +6,13 @@ export interface SectionIntro {
   description: string;
 }
 
-export interface TransformationContent extends SectionIntro {
-  before: { title: string; items: string[] };
-  after: { title: string; items: string[] };
-  /** Ressalva honesta: automação reduz trabalho manual, não elimina o negócio. */
-  note: string;
-}
-
 export interface ProcessStep {
   step: string;
+  title: string;
+  description: string;
+}
+
+export interface ValueItem {
   title: string;
   description: string;
 }
@@ -29,11 +27,11 @@ export interface HomeContent {
     /** Legenda da composição visual — nomeia os projetos reais mostrados. */
     proofCaption: string;
   };
-  transformation: TransformationContent;
-  solutions: SectionIntro;
-  howItWorks: SectionIntro & { steps: ProcessStep[] };
-  tiers: SectionIntro & { note: string };
-  portfolioPreview: SectionIntro;
+  whatWeBuild: SectionIntro;
+  featured: SectionIntro;
+  selectedWork: SectionIntro;
+  process: SectionIntro & { steps: ProcessStep[] };
+  whyAster: SectionIntro & { items: ValueItem[] };
   faq: SectionIntro;
   finalCta: {
     title: string;
@@ -43,32 +41,11 @@ export interface HomeContent {
   };
 }
 
-export interface ImplementationContent extends SectionIntro {
-  promise: string;
-  stages: ProcessStep[];
-  /** O que depende de escopo e não pode ser prometido de antemão. */
-  disclaimer: string;
-}
-
-export interface ChannelsContent extends SectionIntro {
-  items: { title: string; description: string; availability: string }[];
-}
-
 export interface AboutContent {
-  hero: {
-    eyebrow: string;
-    headline: string;
-    description: string;
-  };
-  mission: {
-    eyebrow: string;
-    title: string;
-    description: string;
-  };
-  principles: {
-    title: string;
-    description: string;
-  }[];
+  hero: { eyebrow: string; headline: string; description: string };
+  mission: { eyebrow: string; title: string; description: string };
+  capabilities: ValueItem[];
+  principles: ValueItem[];
   closingCta: {
     title: string;
     description: string;
@@ -78,10 +55,12 @@ export interface AboutContent {
 }
 
 export interface ContactContent {
-  hero: {
-    eyebrow: string;
-    headline: string;
-    description: string;
-  };
+  hero: { eyebrow: string; headline: string; description: string };
   info: { label: string; value: string }[];
+}
+
+/** Modelos comerciais, explicados para o cliente na página da solução. */
+export interface CommercialModelCopy {
+  label: string;
+  description: string;
 }

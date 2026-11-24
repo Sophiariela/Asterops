@@ -1,214 +1,254 @@
-import type {
-  AboutContent,
-  ChannelsContent,
-  ContactContent,
-  HomeContent,
-  ImplementationContent,
-} from "@/types";
+import type { AboutContent, CommercialModelCopy, ContactContent, HomeContent } from "@/types";
 
 /**
- * Copy pública do site, em pt-BR.
+ * Copy pública do site, em inglês.
  *
- * O público de entrada é beleza e estética (salão, studio de unhas, lash,
- * brow, estética, spa). A copy fala dos problemas desse dia a dia em vez de
- * tentar servir todo mercado ao mesmo tempo — a arquitetura (serviços,
- * níveis e projetos vêm do banco) permite abrir outro nicho depois sem
- * reescrever o site.
- *
- * Texto do hero e rótulos de CTA têm versão editável em `SiteSettings`
- * (painel /admin/settings); o que está aqui é o padrão de fábrica.
+ * Catálogo, projetos e dúvidas vêm do banco; o que está aqui é a moldura
+ * editorial das páginas. Texto do hero e rótulo de CTA têm versão editável
+ * em `SiteSettings` (painel /admin/settings) — isto é o padrão de fábrica.
  */
 export const homeContent: HomeContent = {
   hero: {
-    eyebrow: "Estúdio de automação e software",
-    headline: "Seu negócio agenda, responde e vende. Sem você precisar fazer tudo manualmente.",
+    eyebrow: "Digital Products & Software Studio",
+    headline: "Digital products. Powerful software. Built around your business.",
     description:
-      "Sites profissionais, agendamento online, WhatsApp automatizado e sistemas personalizados. Nós configuramos a tecnologia para você.",
-    primaryCta: { label: "Quero automatizar meu negócio", href: "/contato" },
-    secondaryCta: { label: "Ver o que podemos fazer", href: "#solucoes" },
-    proofCaption: "Projetos da Aster no ar — Good Vibes Va'a e Fulô Crochet.",
+      "Aster designs and develops websites, applications, business systems, and automation that turn complex needs into practical digital solutions.",
+    primaryCta: { label: "Start a Project", href: "/contact" },
+    secondaryCta: { label: "Explore Solutions", href: "/solutions" },
+    proofCaption: "Shipped by Aster — Good Vibes Va’a and Fulô Crochet.",
   },
 
-  transformation: {
-    eyebrow: "Antes e depois",
-    title: "O trabalho repetitivo sai do seu colo.",
+  whatWeBuild: {
+    eyebrow: "What we build",
+    title: "Four ways we build digital infrastructure.",
     description:
-      "A maior parte do tempo de um salão ou studio não vai para o atendimento: vai para confirmar horário, repetir preço no WhatsApp e procurar informação perdida na conversa.",
-    before: {
-      title: "Como costuma ser hoje",
-      items: [
-        "Responder cada mensagem no WhatsApp na mão, uma por uma.",
-        "Perder cliente porque a resposta demorou a chegar.",
-        "Confirmar e remarcar horário manualmente, todo dia.",
-        "Esquecer o retorno de quem pediu orçamento e sumiu.",
-        "Agenda numa planilha, clientes no caderno, histórico na conversa.",
-        "Nenhum lugar oficial na internet com serviços, preços e endereço.",
-      ],
-    },
-    after: {
-      title: "Como fica com a Aster",
-      items: [
-        "Quem procura pelo seu nome encontra um site que explica o serviço.",
-        "O cliente solicita ou marca o horário sem depender de conversa.",
-        "Confirmação e lembrete saem sozinhos, no fluxo configurado.",
-        "Ficha de cliente organizada: contato, histórico e observações.",
-        "Processos no lugar de improviso — e menos repetição no seu dia.",
-        "Você continua no comando: a tecnologia tira o trabalho manual, não a sua decisão.",
-      ],
-    },
-    note:
-      "Automação não substitui o atendimento humano e nenhum negócio fica 100% automático. O que a gente tira do caminho é a parte repetitiva.",
+      "Every engagement starts from a business requirement, not from a template. These are the four areas the studio works in — each one has its own catalogue of defined solutions, plus room for custom scope.",
   },
 
-  solutions: {
-    eyebrow: "O que implementamos",
-    title: "Soluções, não ferramentas soltas.",
+  featured: {
+    eyebrow: "Featured solutions",
+    title: "Where most projects start.",
     description:
-      "Você descreve o problema; a gente define, desenvolve e configura o que resolve. Cada item abaixo é entregue implementado e funcionando — não é um software que você precisa aprender a montar.",
+      "A selection of the solutions clients ask for most. Each one has a dedicated page explaining what it does, who it is for, and how it gets built.",
   },
 
-  howItWorks: {
-    eyebrow: "Como funciona",
-    title: "Três passos até a solução no ar.",
-    description: "Sem formulário infinito, sem curso de ferramenta, sem configuração no seu colo.",
+  selectedWork: {
+    eyebrow: "Selected work",
+    title: "What the studio has shipped.",
+    description:
+      "Real projects, labelled for what they are — client work, internal product, or prototype. No invented clients, no borrowed logos, no performance numbers we cannot show you.",
+  },
+
+  process: {
+    eyebrow: "Our process",
+    title: "How a project actually runs.",
+    description:
+      "The same five stages whether we are building a landing page or a custom platform. What changes is the depth of each one, and that gets agreed in writing before development starts.",
     steps: [
       {
         step: "01",
-        title: "Conte sobre o seu negócio",
+        title: "Discovery",
         description:
-          "A gente entende como você trabalha hoje: agenda, atendimento, equipe, o que trava e onde o tempo vai embora.",
+          "We map how the business works today: the goal, the constraints, the people who will use the thing, and what is actually breaking.",
       },
       {
         step: "02",
-        title: "Construímos e configuramos",
+        title: "Strategy & scope",
         description:
-          "A Aster desenha, desenvolve, integra e configura a infraestrutura digital necessária — site, agendamento, automações e sistemas.",
+          "We define the solution, the feature set, and the technical approach — written down, with what is in scope and what is explicitly out of it.",
       },
       {
         step: "03",
-        title: "Entrega e acompanhamento",
+        title: "Design & development",
         description:
-          "Colocamos no ar, mostramos como usar e seguimos com manutenção ou suporte conforme o combinado no contrato.",
+          "Interface and engineering together: the product gets designed and built, with checkpoints you can see rather than a silent build phase.",
+      },
+      {
+        step: "04",
+        title: "Testing & launch",
+        description:
+          "Real flows get exercised before release — then deployment, domain and environment configuration, and handover with documentation.",
+      },
+      {
+        step: "05",
+        title: "Ongoing support",
+        description:
+          "Maintenance, monitoring and improvements, according to the agreement. Optional, and priced separately from the build.",
       },
     ],
   },
 
-  tiers: {
-    eyebrow: "Níveis de solução",
-    title: "Três pontos de partida.",
+  whyAster: {
+    eyebrow: "Why Aster",
+    title: "A studio that commits to the scope it signs.",
     description:
-      "Cada nível é um ponto de partida, não uma caixa fechada: o escopo final sai do diagnóstico. A implementação é cobrada à parte, porque é trabalho de configuração, desenvolvimento e integração.",
-    note:
-      "Valores são definidos por escopo. Quando um nível ainda não tem preço publicado, o cartão mostra isso em vez de inventar número.",
-  },
-
-  portfolioPreview: {
-    eyebrow: "Projetos",
-    title: "O que já está no ar.",
-    description:
-      "Projetos reais entregues pelo estúdio. Sem case inventado, sem logo de cliente que não existe — se está aqui, dá para abrir e conferir.",
+      "No awards to cite and no invented statistics. What we can tell you is how the work is run.",
+    items: [
+      {
+        title: "Built around real requirements",
+        description:
+          "The architecture follows the business process, not the other way around. If a requirement does not survive discovery, it does not get built.",
+      },
+      {
+        title: "Technical decisions with a business reason",
+        description:
+          "Every choice — framework, database, hosting, integration — gets made against cost, maintenance burden and what the team can actually operate.",
+      },
+      {
+        title: "Architecture you can extend",
+        description:
+          "Projects are structured so the next phase is an addition, not a rewrite. You can start with one piece and grow into the rest.",
+      },
+      {
+        title: "A scope you can read",
+        description:
+          "Deliverables, exclusions, commercial model and timeline are written before development starts, so there is no argument about them later.",
+      },
+      {
+        title: "Integrations treated honestly",
+        description:
+          "Anything depending on a third party — payment provider, WhatsApp Business Platform, an external API — is presented as scoped work, never as a feature that already exists.",
+      },
+      {
+        title: "Support after handover",
+        description:
+          "The studio stays reachable once the project is live. Maintenance is a defined agreement, not a favour.",
+      },
+    ],
   },
 
   faq: {
-    eyebrow: "Dúvidas",
-    title: "O que perguntam antes de fechar.",
-    description: "Se a sua pergunta não estiver aqui, mande no formulário — respondemos a mesma coisa que responderíamos numa reunião.",
+    eyebrow: "FAQ",
+    title: "What clients ask before starting.",
+    description:
+      "If your question is not here, send it through the project form — you will get the same answer we would give on a call.",
   },
 
   finalCta: {
-    title: "Seu negócio não precisa continuar funcionando no improviso.",
-    description:
-      "Conte o que você precisa. A Aster encontra a solução e cuida da implementação.",
-    primaryCta: { label: "Solicitar diagnóstico", href: "/contato" },
-    secondaryCta: { label: "Ver projetos", href: "/projetos" },
+    title: "Have a project in mind?",
+    description: "Tell us what you want to build. We’ll help define the right digital solution.",
+    primaryCta: { label: "Start Your Project", href: "/contact" },
+    secondaryCta: { label: "Explore Solutions", href: "/solutions" },
   },
-};
-
-export const implementationContent: ImplementationContent = {
-  eyebrow: "Implementação",
-  title: "Você não precisa aprender a usar uma plataforma.",
-  description:
-    "Esta é a diferença entre contratar a Aster e assinar uma ferramenta: a configuração é nossa. Você recebe a solução funcionando, com o seu conteúdo, o seu serviço e o seu jeito de atender dentro dela.",
-  promise:
-    "Você não precisa aprender a usar uma plataforma ou configurar ferramentas. Nós implementamos a solução para o seu negócio.",
-  stages: [
-    { step: "01", title: "Diagnóstico", description: "Conversa sobre a operação de hoje: agenda, atendimento, equipe e os gargalos reais." },
-    { step: "02", title: "Escopo", description: "O que entra, o que fica para depois, o que é customizado e quanto custa — por escrito, antes de começar." },
-    { step: "03", title: "Design", description: "Estrutura, conteúdo e identidade aplicados ao seu negócio, não a um modelo genérico." },
-    { step: "04", title: "Desenvolvimento", description: "Construção do site, do agendamento, do painel ou do sistema que foi definido." },
-    { step: "05", title: "Integrações", description: "Conexão com WhatsApp, pagamento, agenda e as ferramentas que você já usa, quando suportado." },
-    { step: "06", title: "Testes", description: "Fluxos testados na prática: o cliente consegue agendar, a mensagem chega, o pedido grava." },
-    { step: "07", title: "Publicação", description: "Domínio, hospedagem e a solução no ar, com os ajustes finais feitos por nós." },
-    { step: "08", title: "Treinamento e suporte", description: "Orientação de uso quando faz sentido e manutenção conforme o contrato." },
-  ],
-  disclaimer:
-    "O prazo depende do escopo: uma presença digital enxuta e um sistema sob medida não levam o mesmo tempo. O prazo da sua solução sai no diagnóstico, por escrito — a gente não promete um número antes de saber o que vai construir.",
-};
-
-export const channelsContent: ChannelsContent = {
-  eyebrow: "WhatsApp e Pix",
-  title: "Os dois canais que o cliente brasileiro já usa.",
-  description:
-    "Fazem parte da jornada quando a solução pede. O que é implementação padrão e o que depende de escopo e de aprovação das plataformas está dito abaixo, sem meio-termo.",
-  items: [
-    {
-      title: "Botão e link de WhatsApp",
-      description:
-        "Contato direto a partir do site, com a mensagem já escrita e o serviço identificado. Implementado em qualquer nível.",
-      availability: "Padrão",
-    },
-    {
-      title: "Fluxos de atendimento e lembretes",
-      description:
-        "Confirmação de horário, lembrete e qualificação de interessado. Depende da API oficial do WhatsApp Business, de aprovação de template e de conta verificada.",
-      availability: "Sob escopo",
-    },
-    {
-      title: "Pix no fluxo de pagamento",
-      description:
-        "Sinal de agendamento, cobrança e confirmação via provedor de pagamento integrado. Implementamos junto com o meio de pagamento escolhido no projeto.",
-      availability: "Sob escopo",
-    },
-  ],
 };
 
 export const aboutContent: AboutContent = {
   hero: {
-    eyebrow: "Sobre",
-    headline: "Um estúdio que implementa, não uma plataforma que você configura.",
+    eyebrow: "About",
+    headline: "A studio for the software a business actually runs on.",
     description:
-      "A Aster é um estúdio de automação e software. Juntamos estratégia, design e engenharia para montar a infraestrutura digital de negócios que vivem de atendimento — começando por beleza e estética.",
+      "Aster is a digital products and software studio. We combine product strategy, interface design and engineering to build the digital infrastructure behind modern businesses — from the website a customer sees to the system the team works in.",
   },
   mission: {
-    eyebrow: "Como trabalhamos",
-    title: "Você contrata um time, não uma ferramenta.",
+    eyebrow: "How we work",
+    title: "You hire a team, not a platform.",
     description:
-      "Você conta o que precisa e recebe uma proposta. A partir daí, a gente desenha, desenvolve e configura a solução — site, agendamento, automação, painel ou sistema — em volta do seu negócio. Nada de montar sozinho a partir de um modelo pronto.",
+      "You describe the problem; we define the solution, build it, integrate it and put it into production. There is no toolkit to assemble yourself and no onboarding course — implementation is the service, not your homework.",
   },
+  capabilities: [
+    {
+      title: "We build digital experiences",
+      description:
+        "Websites, landing pages, storefronts and web applications — designed to be used, and built to perform on real devices and real connections.",
+    },
+    {
+      title: "We develop software products and business systems",
+      description:
+        "CRMs, booking systems, dashboards, workflow tools and inventory software, shaped around how a specific business operates.",
+    },
+    {
+      title: "We automate and connect operations",
+      description:
+        "Workflow automation, API and system integrations, and AI-assisted tooling with a defined scope and a human escalation path.",
+    },
+  ],
   principles: [
-    { title: "Resultado antes de ferramenta", description: "O projeto começa pelo problema de operação, não pela tecnologia que vamos usar." },
-    { title: "Implementação é o serviço", description: "Configurar, integrar e colocar no ar faz parte da entrega — não é tarefa do cliente." },
-    { title: "Sem promessa que não cabe no escopo", description: "Integração que depende de aprovação externa é apresentada como escopo, nunca como recurso pronto." },
-    { title: "Feito para rodar", description: "O que entregamos sustenta o dia a dia do negócio, não só o dia do lançamento." },
+    {
+      title: "Outcome before technology",
+      description:
+        "The project starts at the operational problem, not at the stack we would enjoy using.",
+    },
+    {
+      title: "Implementation is the service",
+      description:
+        "Configuring, integrating and deploying is part of the delivery — never handed back to the client.",
+    },
+    {
+      title: "No promise outside the scope",
+      description:
+        "An integration that depends on external approval is presented as scoped work, never as a shipped feature.",
+    },
+    {
+      title: "Built to be operated",
+      description: "What we deliver has to survive daily use, not just look right on launch day.",
+    },
   ],
   closingCta: {
-    title: "Quer saber o que dá para automatizar no seu caso?",
-    description: "Conte como o seu negócio funciona hoje. A gente responde com o caminho e o escopo.",
-    primaryCta: { label: "Solicitar diagnóstico", href: "/contato" },
-    secondaryCta: { label: "Ver projetos", href: "/projetos" },
+    title: "Want to know what this would look like for your business?",
+    description:
+      "Tell us how the operation runs today. You get back a direction, a scope and a next step.",
+    primaryCta: { label: "Start a Project", href: "/contact" },
+    secondaryCta: { label: "See projects", href: "/projects" },
   },
 };
 
 export const contactContent: ContactContent = {
   hero: {
-    eyebrow: "Diagnóstico",
-    headline: "Conte o que trava o seu dia.",
+    eyebrow: "Start a project",
+    headline: "Tell us what you want to build.",
     description:
-      "Quanto mais concreto for o problema — agenda, WhatsApp, cadastro de cliente, venda — mais direto vem o caminho. Respondemos em até um dia útil.",
+      "The more concrete the problem — a website, a booking flow, a system your team lives in, an integration that keeps breaking — the more direct the answer. We reply within one business day.",
   },
   info: [
-    { label: "Resposta", value: "Em até um dia útil" },
-    { label: "Atendimento", value: "Todo o Brasil, remoto" },
-    { label: "Primeiro passo", value: "Diagnóstico sem custo" },
+    { label: "Response", value: "Within one business day" },
+    { label: "Engagements", value: "Remote, worldwide" },
+    { label: "First step", value: "Discovery call, no cost" },
   ],
+};
+
+/**
+ * Explicação de cada modelo comercial.
+ *
+ * O briefing proíbe cartão de preço mensal genérico para todo serviço: o
+ * modelo depende do tipo de trabalho, e a página de cada solução diz qual é
+ * o seu. Preço só aparece quando existe — não se inventa número.
+ */
+export const commercialModelCopy: Record<string, CommercialModelCopy> = {
+  FIXED_SCOPE: {
+    label: "Fixed-scope project",
+    description:
+      "Deliverables are defined up front and quoted as one project. Best when the requirement is clear enough to write down completely before we start.",
+  },
+  CUSTOM_QUOTE: {
+    label: "Custom project quote",
+    description:
+      "Scope comes out of discovery, then gets quoted. Used where the feature set genuinely depends on how your business works.",
+  },
+  SETUP_PLUS_MAINTENANCE: {
+    label: "Setup + recurring maintenance",
+    description:
+      "An implementation fee for the build, plus a recurring fee covering hosting, monitoring, support and any API usage the solution depends on.",
+  },
+  SUBSCRIPTION: {
+    label: "Product subscription",
+    description:
+      "Only used for Aster software that is already operational and commercially available — never for work that still has to be developed.",
+  },
+};
+
+/** Rótulos da regra de honestidade do catálogo. */
+export const availabilityCopy: Record<string, { label: string; description: string }> = {
+  OPERATIONAL_PRODUCT: {
+    label: "Operational product",
+    description: "Already built and running in production. Can be deployed and configured for you.",
+  },
+  CUSTOM_DEVELOPMENT: {
+    label: "Custom development",
+    description:
+      "Built for your project. The studio has delivered this type of work, and each build is scoped from your requirements.",
+  },
+  DEMONSTRATION: {
+    label: "Demonstration",
+    description: "Shown here as a product demonstration. Not a deployed client system.",
+  },
 };

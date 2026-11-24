@@ -7,11 +7,10 @@ import { safeQuery } from "@/lib/safe-query";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes = [
     "",
-    "/solucoes",
-    "/como-funciona",
-    "/projetos",
-    "/sobre",
-    "/contato",
+    "/solutions",
+    "/projects",
+    "/about",
+    "/contact",
     "/legal/privacy",
     "/legal/terms",
   ];
@@ -27,7 +26,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }),
     [] as { slug: string }[],
   );
-  const projectRoutes = projects.map((project) => `/projetos/${project.slug}`);
+  const projectRoutes = projects.map((project) => `/projects/${project.slug}`);
 
   const routes = [...staticRoutes, ...projectRoutes];
 
@@ -35,6 +34,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     url: `${siteConfig.url}${route}`,
     lastModified: new Date(),
     changeFrequency: route === "" ? "weekly" : "monthly",
-    priority: route === "" ? 1 : route === "/contato" ? 0.9 : route.startsWith("/projetos/") ? 0.7 : 0.6,
+    priority: route === "" ? 1 : route === "/contact" ? 0.9 : route.startsWith("/projects/") ? 0.7 : 0.6,
   }));
 }

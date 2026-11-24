@@ -9,16 +9,16 @@ interface EditServicePageProps {
 
 export default async function EditServicePage({ params }: EditServicePageProps) {
   const { id } = await params;
-  const service = await prisma.service.findUnique({ where: { id } });
+  const [service, categories] = await Promise.all([
+    prisma.service.findUnique({ where: { id } }),
+    prisma.serviceCategory.findMany({ orderBy: { order: "asc" }, select: { id: true, name: true } }),
+  ]);
   if (!service) notFound();
 
   return (
     <div className="flex flex-col gap-8">
-      <div>
-        <h1 className="text-2xl font-medium text-foreground">Edit service</h1>
-        <p className="text-sm text-muted-foreground">{service.title}</p>
-      </div>
-      <ServiceForm service={service} />
+      <h1 className="text-2xl font-medium text-foreground">{service.title}</h1>
+      <ServiceForm service={service} categories={categories} />
     </div>
   );
 }

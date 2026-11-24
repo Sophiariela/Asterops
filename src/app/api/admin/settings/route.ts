@@ -7,8 +7,8 @@ const settingsSchema = z.object({
   studioName: z.string().min(1),
   contactEmail: z.string().email(),
   whatsapp: z.string().optional(),
-  whatsappMessage: z.string().min(1),
   instagramUrl: z.string().url().optional().or(z.literal("")),
+  linkedinUrl: z.string().url().optional().or(z.literal("")),
   ctaLabel: z.string().min(1),
   ctaHref: z.string().min(1),
   footerNote: z.string().min(1),
@@ -32,11 +32,18 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid data." }, { status: 400 });
   }
 
-  const { whatsapp, instagramUrl, ...rest } = parsed.data;
+  const { whatsapp, instagramUrl, linkedinUrl, ...rest } = parsed.data;
+  // Campo vazio vira null em vez de string vazia, para o site poder testar
+  // presença do canal com um if simples.
+  const optional = {
+    whatsapp: whatsapp || null,
+    instagramUrl: instagramUrl || null,
+    linkedinUrl: linkedinUrl || null,
+  };
   const settings = await prisma.siteSettings.upsert({
     where: { id: "default" },
-    update: { ...rest, whatsapp: whatsapp || null, instagramUrl: instagramUrl || null },
-    create: { id: "default", ...rest, whatsapp: whatsapp || null, instagramUrl: instagramUrl || null },
+    update: { ...rest, ...optional },
+    create: { id: "default", ...rest, ...optional },
   });
 
   return NextResponse.json({ settings });

@@ -78,18 +78,13 @@ export function SettingsForm({ settings }: { settings: SiteSettings }) {
       </div>
 
       <div className="flex flex-col gap-2">
-        <Label htmlFor="whatsappMessage">WhatsApp prefilled message</Label>
-        <Textarea
-          id="whatsappMessage"
-          name="whatsappMessage"
-          defaultValue={settings.whatsappMessage}
-          rows={2}
-          required
+        <Label htmlFor="linkedinUrl">LinkedIn URL (optional)</Label>
+        <Input
+          id="linkedinUrl"
+          name="linkedinUrl"
+          type="url"
+          defaultValue={settings.linkedinUrl ?? ""}
         />
-        <p className="text-xs text-muted-foreground">
-          Text already typed when someone opens WhatsApp from the site. The button only renders when a number
-          is set above.
-        </p>
       </div>
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">

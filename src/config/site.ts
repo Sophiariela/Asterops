@@ -2,21 +2,26 @@ export const siteConfig = {
   name: "Aster",
   legalName: "Aster Studio Ltda.",
   author: "Aster",
-  tagline: "Tecnologia implementada para o seu negócio",
+  tagline: "Digital Products & Software Studio",
   description:
-    "A Aster implementa a tecnologia do seu negócio: site profissional, agendamento online, WhatsApp automatizado, gestão de clientes e sistemas sob medida. Atendemos salões, studios de unha, lash e brow, estética e spas.",
+    "Aster is a digital products and software studio. We design and develop websites, web applications, business software, and automation that turn complex business needs into practical digital solutions.",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://aster.studio",
   ogImage: "/opengraph-image",
-  locale: "pt_BR",
-  /** Nicho de entrada da operação comercial — orienta copy e SEO. */
-  primaryNiche: "beleza e estética",
+  /**
+   * O site nasce em inglês. `src/i18n/config.ts` mantém a lista de locales
+   * para a localização em pt-BR entrar depois sem reescrever as páginas: a
+   * copy pública vive em `content.ts` e no banco, não embutida no JSX.
+   */
+  locale: "en",
   keywords: [
-    "agendamento online para salão",
-    "automação de whatsapp para salão de beleza",
-    "site para studio de unhas",
-    "sistema para clínica de estética",
-    "automação para profissionais de beleza",
-    "desenvolvimento de software sob medida",
+    "digital product studio",
+    "custom software development",
+    "web application development",
+    "business software development",
+    "booking system development",
+    "custom crm development",
+    "workflow automation",
+    "api integrations",
   ],
 };
 
