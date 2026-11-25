@@ -6,6 +6,7 @@ import LunaSection from '../components/LunaSection';
 import Ecosystem from '../components/Ecosystem';
 import Segments from '../components/Segments';
 import Pricing from '../components/Pricing';
+import CustomServices from '../components/CustomServices';
 import Faq from '../components/Faq';
 import Footer from '../components/Footer';
 import { OrganizationJsonLd, WebSiteJsonLd } from '../components/JsonLd';
@@ -27,10 +28,11 @@ export default function Home() {
       <main>
         <Hero onCta={openCta} />
         <Portfolio />
-        <LunaSection onCta={openCta} />
-        <Ecosystem onCta={openCta} />
+        <LunaSection />
+        <Ecosystem />
         <Segments onCta={openCta} />
         <Pricing onCta={openCta} />
+        <CustomServices />
         <Faq />
         <FinalCta onCta={openCta} />
       </main>

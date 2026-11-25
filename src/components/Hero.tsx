@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+import { trialMessage } from '../config/site';
 import { ArrowRight, Sparkles, CheckCircle2, Layers, Store, Palette } from 'lucide-react';
 
 export default function Hero({ onCta }: { onCta: () => void }) {
@@ -38,6 +40,16 @@ export default function Hero({ onCta }: { onCta: () => void }) {
             Conhecer a plataforma
           </button>
         </div>
+
+        {/*
+          * 4.2 - A linha do teste gratis so aparece com TRIAL_DAYS e
+          * TRIAL_REQUIRES_CARD confirmados em config/site.ts. Enquanto um
+          * dos dois for null, nada e exibido: melhor nao prometer do que
+          * prometer prazo ou condicao de cartao que nao foi verificada.
+          */}
+        {trialMessage() && (
+          <p className="mt-3 text-sm font-semibold text-ASTER-700">{trialMessage()}</p>
+        )}
 
         <div className="flex items-center justify-center gap-5 mt-6 text-[13px] sm:text-sm text-slate-600 font-medium flex-wrap">
           <span className="flex items-center gap-1.5"><CheckCircle2 size={15} className="text-emerald-500" /> Site publicado em minutos</span>
@@ -115,9 +127,12 @@ export default function Hero({ onCta }: { onCta: () => void }) {
                     <span className="text-white/90">Sugestões de título e descrição</span>
                   </div>
                 </div>
-                <button onClick={onCta} className="relative mt-4 w-full bg-volt-400 hover:bg-volt-300 text-ink-950 font-bold text-sm py-2.5 rounded-xl transition-colors">
-                  Ver planos
-                </button>
+                <Link
+                  to="/products/luna-ai"
+                  className="relative mt-4 w-full bg-volt-400 hover:bg-volt-300 text-ink-950 font-bold text-sm py-2.5 rounded-xl transition-colors text-center focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-volt-400/60"
+                >
+                  Testar a Luna
+                </Link>
               </div>
             </div>
           </div>

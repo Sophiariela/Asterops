@@ -5,7 +5,22 @@ import { PRODUCTS } from '../data/products';
 const cols: { title: string; links: { label: string; to: string }[] }[] = [
   {
     title: 'Produtos',
-    links: PRODUCTS.map((p) => ({ label: p.name, to: `/products/${p.slug}` })),
+    /*
+     * 4.4 - So produto operacional entra no rodape.
+     *
+     * LaunchOS e GrowthOS estao marcados com earlyAccess em
+     * src/data/products.ts, ou seja, ainda nao sao funcionalidade entregue.
+     * Eles continuam no menu Produtos, onde aparecem com o selo "EM BREVE",
+     * e a pagina de cada um segue no ar - o que sai e so o link de rodape,
+     * que dava a entender produto disponivel.
+     *
+     * TODO(aster): decidir se LaunchOS e GrowthOS ganham pagina comercial
+     * propria ao sair do acesso antecipado; bastando remover o filtro.
+     */
+    links: PRODUCTS.filter((p) => !p.earlyAccess).map((p) => ({
+      label: p.name,
+      to: `/products/${p.slug}`,
+    })),
   },
   {
     title: 'Plataforma',

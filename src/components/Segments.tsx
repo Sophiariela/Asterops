@@ -1,6 +1,9 @@
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, UtensilsCrossed, Briefcase, Sparkles as SparklesIcon, ShoppingBag, Camera, GraduationCap, Wrench } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
+import { getPortfolioBySegment } from '../data/portfolio';
 
 // The 7 real Template Library categories (see templateCategories.ts) —
 // not a generic retail-segment list.
@@ -31,34 +34,56 @@ export default function Segments({ onCta }: { onCta: () => void }) {
             onClick={onCta}
             className="hidden sm:inline-flex bg-ASTER-600 hover:bg-ASTER-700 text-white font-bold px-7 py-3.5 rounded-full transition-all hover:shadow-lg hover:shadow-ASTER-600/30 items-center gap-2 shrink-0"
           >
-            Ver planos <ArrowRight size={18} />
+            Ver modelos <ArrowRight size={18} aria-hidden="true" />
           </button>
         </motion.div>
 
         <div className="mt-10 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">
           {segments.map((s, i) => (
-            <motion.button
+            <motion.div
               key={s.name}
               initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.01, margin: '0px 0px 240px 0px' }} transition={{ duration: 0.35, delay: Math.min(i * 0.04, 0.12), ease: 'easeOut' }}
-              onClick={onCta}
-              className="group text-left bg-white border border-ASTER-100 rounded-[26px] p-6 hover:-translate-y-1 hover:card-shadow transition-all duration-300"
+              className="group flex flex-col text-left bg-white border border-ASTER-100 rounded-[26px] p-6 hover:-translate-y-1 hover:card-shadow transition-all duration-300"
             >
               <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${s.bg} ${s.accent} flex items-center justify-center`}>
-                <s.icon size={24} />
+                <s.icon size={24} aria-hidden="true" />
               </div>
               <h3 className="font-display font-extrabold text-ink-900 text-lg mt-4">{s.name}</h3>
-              <p className="text-slate-500 text-sm mt-1">{s.desc}</p>
-              <span className="mt-4 inline-flex items-center gap-2 text-ASTER-600 font-bold text-sm group-hover:gap-3 transition-all">
-                Explorar modelos <ArrowRight size={16} />
-              </span>
-            </motion.button>
+              <p className="text-slate-600 text-sm mt-1">{s.desc}</p>
+
+              <Link
+                to="/products/webos"
+                className="mt-4 inline-flex items-center gap-2 text-ASTER-600 font-bold text-sm hover:gap-3 transition-all w-fit rounded-md focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ASTER-600/40"
+              >
+                Ver modelos <ArrowRight size={16} aria-hidden="true" />
+                <span className="sr-only">de {s.name}</span>
+              </Link>
+
+              {/* Setor que já tem projeto real no ar ganha o link do exemplo. */}
+              {getPortfolioBySegment(s.name) && (
+                <a
+                  href={getPortfolioBySegment(s.name)!.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-2 inline-flex items-center gap-1.5 text-[13px] font-bold text-ink-900 hover:text-ASTER-600 transition-colors w-fit rounded-md focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ASTER-600/40"
+                >
+                  Ver exemplo real <ArrowUpRight size={14} aria-hidden="true" />
+                  <span className="sr-only">
+                    — {getPortfolioBySegment(s.name)!.name}, abre em uma nova aba
+                  </span>
+                </a>
+              )}
+            </motion.div>
           ))}
         </div>
 
         <div className="mt-8 sm:hidden">
-          <button onClick={onCta} className="w-full bg-ASTER-600 text-white font-bold px-7 py-4 rounded-full flex items-center justify-center gap-2">
-            Ver planos <ArrowRight size={18} />
-          </button>
+          <Link
+            to="/products/webos"
+            className="w-full bg-ASTER-600 text-white font-bold px-7 py-4 rounded-full flex items-center justify-center gap-2 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ASTER-600/40"
+          >
+            Ver modelos <ArrowRight size={18} aria-hidden="true" />
+          </Link>
         </div>
       </div>
     </section>

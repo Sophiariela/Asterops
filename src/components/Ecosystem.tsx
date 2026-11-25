@@ -1,6 +1,8 @@
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, Layers, Globe2, Store, Sparkles, Check, CalendarCheck } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import { getPortfolioBySegment } from '../data/portfolio';
 
 type Product = {
   icon: LucideIcon;
@@ -9,6 +11,9 @@ type Product = {
   desc: string;
   luna: string;
   cta: string;
+  /** Destino do CTA. Externo quando aponta para um projeto real no ar. */
+  ctaHref: string;
+  ctaExternal?: boolean;
   features: string[];
   accent: string;
   bg: string;
@@ -18,10 +23,12 @@ const products: Product[] = [
   {
     icon: CalendarCheck,
     tag: 'Reservas e Agendamentos',
-    title: 'Reservas de restaurante e agendamentos reais',
+    title: 'Suas reservas e agendamentos, funcionando de verdade',
     desc: 'Cada site inclui o fluxo certo para o seu negócio: reserva de mesa para restaurantes, agendamento por serviço e duração para salões e profissionais, ou pedido de orçamento para serviços locais.',
     luna: 'A Luna ajuda a escrever a descrição de cada serviço oferecido.',
-    cta: 'Ver a Biblioteca de Templates',
+    cta: 'Ver exemplo de reservas',
+    ctaHref: getPortfolioBySegment('Serviços locais')?.url ?? '/portfolio',
+    ctaExternal: true,
     features: ['Confirmação automática por e-mail', 'Bloqueio de horários e folgas', 'Painel de reservas para o dono do negócio'],
     accent: 'text-emerald-500',
     bg: 'bg-emerald-50',
@@ -29,17 +36,18 @@ const products: Product[] = [
   {
     icon: Sparkles,
     tag: 'Luna AI',
-    title: 'Conteúdo e SEO com ajuda de IA',
+    title: 'Seu conteúdo e seu SEO, com ajuda da Luna',
     desc: 'A Luna revisa o texto do seu site, sugere um título melhor para a página inicial e gera metadados de SEO — você sempre revisa antes de aplicar.',
     luna: 'Disponível direto no painel do seu site, sem configuração extra.',
-    cta: 'Ver planos',
+    cta: 'Testar a Luna',
+    ctaHref: '/products/luna-ai',
     features: ['Sugestão de template por setor', 'Melhoria de título e subtítulo', 'Geração de metadados de SEO'],
     accent: 'text-ASTER-600',
     bg: 'bg-ASTER-50',
   },
 ];
 
-export default function Ecosystem({ onCta }: { onCta: () => void }) {
+export default function Ecosystem() {
   return (
     <section id="ecossistema" className="relative bg-cream-50 py-16 sm:py-24 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -67,7 +75,7 @@ export default function Ecosystem({ onCta }: { onCta: () => void }) {
                 <Layers size={14} /> WebOS
               </span>
               <h3 className="font-display font-extrabold text-2xl sm:text-[34px] leading-tight mt-4 text-balance">
-                Mais de 50 templates prontos para o seu setor
+                Seu site, com a estrutura certa para o seu setor
               </h3>
               <p className="text-white/65 mt-3 text-[15px] sm:text-base">
                 Restaurantes, serviços profissionais, beleza e bem-estar, varejo, criadores, educação e serviços locais — cada modelo com a estrutura certa para o negócio.
@@ -78,9 +86,9 @@ export default function Ecosystem({ onCta }: { onCta: () => void }) {
                   <span key={c} className="text-[13px] font-semibold bg-white/10 border border-white/15 rounded-full px-3.5 py-1.5">{c}</span>
                 ))}
               </div>
-              <button onClick={onCta} className="mt-7 inline-flex items-center gap-2 font-bold text-white hover:gap-3 transition-all">
-                Ver planos <ArrowRight size={18} className="text-volt-400" />
-              </button>
+              <Link to="/products/webos" className="mt-7 inline-flex items-center gap-2 font-bold text-white hover:gap-3 transition-all rounded-md focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-volt-400/60">
+                Explorar modelos <ArrowRight size={18} className="text-volt-400" aria-hidden="true" />
+              </Link>
             </div>
           </motion.div>
 
@@ -94,7 +102,7 @@ export default function Ecosystem({ onCta }: { onCta: () => void }) {
                 <Store size={14} /> CommerceOS
               </span>
               <h3 className="font-display font-extrabold text-2xl sm:text-[34px] leading-tight mt-4 text-ink-900 text-balance">
-                Catálogo, estoque e pedidos em um só lugar
+                Sua loja online: catálogo, estoque e pedidos
               </h3>
               <p className="text-slate-600 mt-3 text-[15px] sm:text-base">
                 Organize produtos, categorias, clientes e pedidos da sua loja — conectado ao catálogo que aparece no seu site.
@@ -111,9 +119,9 @@ export default function Ecosystem({ onCta }: { onCta: () => void }) {
                   </div>
                 ))}
               </div>
-              <button onClick={onCta} className="mt-7 inline-flex items-center gap-2 font-bold text-ASTER-600 hover:gap-3 transition-all">
-                Ver planos <ArrowRight size={18} />
-              </button>
+              <Link to="/products/commerceos" className="mt-7 inline-flex items-center gap-2 font-bold text-ASTER-600 hover:gap-3 transition-all rounded-md focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ASTER-600/40">
+                Ver recursos da loja <ArrowRight size={18} aria-hidden="true" />
+              </Link>
             </div>
           </motion.div>
         </div>
@@ -147,9 +155,24 @@ export default function Ecosystem({ onCta }: { onCta: () => void }) {
                   <Sparkles size={18} className="text-ASTER-600 shrink-0 mt-0.5" />
                   <p className="text-[13.5px] text-[#2c1a63] leading-relaxed"><strong>Com a Luna:</strong> {p.luna}</p>
                 </div>
-                <button onClick={onCta} className="mt-6 inline-flex items-center gap-2 font-bold text-ASTER-600 hover:gap-3 transition-all text-[15px]">
-                  {p.cta} <ArrowRight size={18} />
-                </button>
+                {p.ctaExternal ? (
+                  <a
+                    href={p.ctaHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-6 inline-flex items-center gap-2 font-bold text-ASTER-600 hover:gap-3 transition-all text-[15px] rounded-md focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ASTER-600/40"
+                  >
+                    {p.cta} <ArrowRight size={18} aria-hidden="true" />
+                    <span className="sr-only">— abre em uma nova aba</span>
+                  </a>
+                ) : (
+                  <Link
+                    to={p.ctaHref}
+                    className="mt-6 inline-flex items-center gap-2 font-bold text-ASTER-600 hover:gap-3 transition-all text-[15px] rounded-md focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ASTER-600/40"
+                  >
+                    {p.cta} <ArrowRight size={18} aria-hidden="true" />
+                  </Link>
+                )}
               </div>
             </motion.div>
           ))}
