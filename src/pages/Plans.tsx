@@ -8,6 +8,8 @@ import { PLAN_TIERS, FALLBACK_PLANS, findTierForProduct, type BackendPlan } from
 import { readCachedPlans, writeCachedPlans } from '../lib/plansCache';
 import PaymentMethods from '../components/PaymentMethods';
 import Footer from '../components/Footer';
+import { usePageMeta } from '../lib/meta';
+import { ROUTE_META } from '../config/route-meta';
 
 function PricingCardSkeleton() {
   return (
@@ -27,6 +29,7 @@ function PricingCardSkeleton() {
 }
 
 export default function Plans() {
+  usePageMeta(ROUTE_META.plans);
   const { user } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();

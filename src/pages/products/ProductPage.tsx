@@ -2,10 +2,19 @@ import { Navigate, Link, useParams } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Check, Sparkles } from 'lucide-react';
 import { getProduct } from '../../data/products';
 import Footer from '../../components/Footer';
+import { SoftwareApplicationJsonLd } from '../../components/JsonLd';
+import { usePageMeta } from '../../lib/meta';
+import { productMeta, ROUTE_META } from '../../config/route-meta';
 
 export default function ProductPage() {
   const { slug } = useParams<{ slug: string }>();
   const product = getProduct(slug);
+
+  // Hook antes do early return: a ordem dos hooks não pode variar entre
+  // renders. Sem produto, cai para a metadata da home.
+  usePageMeta(
+    product ? productMeta(product.name, product.tagline, product.slug) : ROUTE_META.home,
+  );
 
   if (!product) {
     return <Navigate to="/plans" replace />;
@@ -17,6 +26,11 @@ export default function ProductPage() {
 
   return (
     <div className="min-h-screen bg-white">
+      <SoftwareApplicationJsonLd
+        name={product.name}
+        description={product.tagline}
+        path={`/products/${product.slug}`}
+      />
       <section className="bg-gradient-to-b from-ASTER-50/70 via-white to-white px-4 py-16 sm:py-24">
         <div className="max-w-4xl mx-auto">
           <Link to="/" className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-400 hover:text-ASTER-600 transition-colors mb-8">

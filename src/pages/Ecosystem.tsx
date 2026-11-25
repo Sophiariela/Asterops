@@ -2,10 +2,13 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, ChevronDown } from 'lucide-react';
 import { getProduct } from '../data/products';
 import Footer from '../components/Footer';
+import { usePageMeta } from '../lib/meta';
+import { ROUTE_META } from '../config/route-meta';
 
 const FLOW = ['webos', 'commerceos', 'luna-ai'] as const;
 
 export default function EcosystemPage() {
+  usePageMeta(ROUTE_META.ecosystem);
   return (
     <div className="min-h-screen bg-gradient-to-b from-ASTER-50/60 via-white to-white">
       <div className="py-16 sm:py-24 px-4">

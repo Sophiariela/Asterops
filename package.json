@@ -5,9 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && node scripts/prerender.mjs",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "og": "node scripts/generate-og.mjs",
+    "shots": "node scripts/capture-portfolio.mjs",
+    "verify": "node scripts/verify-ui.mjs"
   },
   "dependencies": {
     "@neon/config": "^1.5.0",

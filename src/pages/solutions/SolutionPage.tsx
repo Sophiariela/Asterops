@@ -3,10 +3,17 @@ import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import { getSolution } from '../../data/solutions';
 import { getProduct } from '../../data/products';
 import Footer from '../../components/Footer';
+import { usePageMeta } from '../../lib/meta';
+import { solutionMeta, ROUTE_META } from '../../config/route-meta';
 
 export default function SolutionPage() {
   const { slug } = useParams<{ slug: string }>();
   const solution = getSolution(slug);
+
+  // Hook antes do early return — ver nota em ProductPage.
+  usePageMeta(
+    solution ? solutionMeta(solution.name, solution.tagline, solution.slug) : ROUTE_META.home,
+  );
 
   if (!solution) {
     return <Navigate to="/plans" replace />;

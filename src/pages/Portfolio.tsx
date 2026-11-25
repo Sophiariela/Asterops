@@ -4,6 +4,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { PORTFOLIO } from '../data/portfolio';
 import { usePageMeta } from '../lib/meta';
+import { ROUTE_META } from '../config/route-meta';
 
 /**
  * /portfolio — a página completa dos projetos reais.
@@ -15,12 +16,7 @@ import { usePageMeta } from '../lib/meta';
 export default function PortfolioPage() {
   const navigate = useNavigate();
 
-  usePageMeta({
-    title: 'Portfólio — sites reais feitos com a ASTER',
-    description:
-      'Projetos desenvolvidos para negócios reais com a ASTER: Good Vibes Va’a, clube de canoa havaiana em Salvador com reservas online, e FULÔ, loja de moda praia em crochê com catálogo e carrinho.',
-    path: '/portfolio',
-  });
+  usePageMeta(ROUTE_META.portfolio);
 
   return (
     <div className="min-h-screen bg-white">
