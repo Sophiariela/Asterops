@@ -16,6 +16,14 @@ enum InquiryStatus {
   IN_PROGRESS
   COMPLETED
   LOST
+  /// Legado do fluxo anterior, substituído por REVIEWING.
+  ///
+  /// Mantido no enum de propósito: removê-lo tornaria a migração
+  /// destrutiva (Postgres precisa reescrever o tipo) sem ganho nenhum. O
+  /// painel não oferece mais este valor — ver o enum em
+  /// src/app/api/admin/inquiries/[id]/route.ts — então nada novo nasce
+  /// com ele, e linha antiga que o tivesse continuaria legível.
+  CONTACTED
 }
 
 /// Como o trabalho é cobrado. Aster vende tipos diferentes de entrega, então
