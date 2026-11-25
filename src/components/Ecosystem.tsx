@@ -44,7 +44,6 @@ export default function Ecosystem({ onCta }: { onCta: () => void }) {
     <section id="ecossistema" className="relative bg-cream-50 py-16 sm:py-24 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <motion.div
-          initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}
           className="text-center max-w-3xl mx-auto"
         >
           <span className="inline-flex items-center gap-2 bg-ASTER-50 border border-ASTER-200 rounded-full px-4 py-1.5 text-sm font-semibold text-ASTER-700">
@@ -59,7 +58,6 @@ export default function Ecosystem({ onCta }: { onCta: () => void }) {
         {/* WebOS + CommerceOS wide cards */}
         <div className="grid lg:grid-cols-2 gap-5 mt-12">
           <motion.div
-            initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}
             className="relative bg-ink-950 text-white rounded-[28px] p-7 sm:p-10 overflow-hidden group"
           >
             <div className="absolute -top-24 -right-24 w-72 h-72 bg-ASTER-600/50 blur-[100px] rounded-full group-hover:scale-125 transition-transform duration-700" />
@@ -87,7 +85,7 @@ export default function Ecosystem({ onCta }: { onCta: () => void }) {
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.1 }}
+            initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.01, margin: '0px 0px 240px 0px' }} transition={{ duration: 0.35, delay: 0.1, ease: 'easeOut' }}
             className="relative bg-white rounded-[28px] p-7 sm:p-10 overflow-hidden card-shadow border border-ASTER-100 group"
           >
             <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-volt-400/30 blur-[100px] rounded-full group-hover:scale-125 transition-transform duration-700" />
@@ -125,7 +123,7 @@ export default function Ecosystem({ onCta }: { onCta: () => void }) {
           {products.map((p, i) => (
             <motion.div
               key={p.tag}
-              initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: (i % 2) * 0.1 }}
+              initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.01, margin: '0px 0px 240px 0px' }} transition={{ duration: 0.35, delay: (i % 2) * 0.05, ease: 'easeOut' }}
               className="bg-white rounded-[28px] card-shadow-sm border border-ASTER-100 overflow-hidden hover:card-shadow hover:-translate-y-1 transition-all duration-300 flex flex-col"
             >
               <div className="p-7 sm:p-8 flex-1 flex flex-col">

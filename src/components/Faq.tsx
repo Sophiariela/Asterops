@@ -36,7 +36,6 @@ export default function Faq() {
     <section className="py-16 sm:py-24 bg-cream-50">
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
         <motion.div
-          initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}
           className="text-center"
         >
           <span className="inline-flex items-center gap-2 bg-white border border-ASTER-200 rounded-full px-4 py-1.5 text-sm font-semibold text-ASTER-700 card-shadow-sm">
@@ -51,7 +50,7 @@ export default function Faq() {
           {faqs.map((f, i) => (
             <motion.div
               key={i}
-              initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: i * 0.05 }}
+              initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.01, margin: '0px 0px 240px 0px' }} transition={{ duration: 0.35, delay: Math.min(i * 0.03, 0.12), ease: 'easeOut' }}
               className={`bg-white rounded-2xl border transition-colors overflow-hidden ${open === i ? 'border-ASTER-300 card-shadow-sm' : 'border-ASTER-100'}`}
             >
               <button

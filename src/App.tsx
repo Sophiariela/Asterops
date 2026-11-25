@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { MotionConfig } from 'framer-motion';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
@@ -39,6 +40,9 @@ import PublicSitePage from './pages/webos/PublicSitePage';
 export default function App() {
   return (
     <AuthProvider>
+      {/* reducedMotion="user" faz todo framer-motion do app respeitar
+          prefers-reduced-motion sem precisar tratar componente a componente. */}
+      <MotionConfig reducedMotion="user">
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
@@ -87,6 +91,7 @@ export default function App() {
           <Route path="/admin" element={<Admin />} />
         </Route>
       </Routes>
+      </MotionConfig>
     </AuthProvider>
   );
 }

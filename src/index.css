@@ -50,6 +50,36 @@
 
 html {
   scroll-behavior: smooth;
+  /* Header colado no topo = barra de aviso (~41px) + nav (68px).
+     Sem isto, a âncora para atrás do header e a primeira linha da seção
+     fica escondida. Vale para link de menu e para hash na URL. */
+  scroll-padding-top: 124px;
+}
+
+/* Toda seção com id é alvo de âncora; o offset acompanha o header. */
+section[id],
+[id].scroll-anchor {
+  scroll-margin-top: 124px;
+}
+
+/*
+ * prefers-reduced-motion: entrega tudo no estado final, imediatamente.
+ * O framer-motion já é coberto pelo MotionConfig reducedMotion="user" em
+ * App.tsx; isto cobre transição e animação de CSS puro.
+ */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 body {

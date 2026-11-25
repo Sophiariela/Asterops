@@ -19,7 +19,6 @@ export default function Segments({ onCta }: { onCta: () => void }) {
     <section className="py-16 sm:py-24 bg-white overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <motion.div
-          initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}
           className="flex flex-col sm:flex-row sm:items-end justify-between gap-6"
         >
           <div className="max-w-2xl">
@@ -40,7 +39,7 @@ export default function Segments({ onCta }: { onCta: () => void }) {
           {segments.map((s, i) => (
             <motion.button
               key={s.name}
-              initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: Math.min(i * 0.07, 0.3) }}
+              initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.01, margin: '0px 0px 240px 0px' }} transition={{ duration: 0.35, delay: Math.min(i * 0.04, 0.12), ease: 'easeOut' }}
               onClick={onCta}
               className="group text-left bg-white border border-ASTER-100 rounded-[26px] p-6 hover:-translate-y-1 hover:card-shadow transition-all duration-300"
             >

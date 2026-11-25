@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import { ArrowRight, Sparkles, CheckCircle2, Layers, Store, Palette } from 'lucide-react';
 
 export default function Hero({ onCta }: { onCta: () => void }) {
@@ -9,55 +8,44 @@ export default function Hero({ onCta }: { onCta: () => void }) {
       <div className="absolute top-40 -right-40 w-[500px] h-[500px] bg-volt-400/20 blur-[120px] rounded-full pointer-events-none" />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 pt-12 sm:pt-20 pb-10 text-center">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-          <button onClick={() => document.getElementById('luna')?.scrollIntoView({ behavior: 'smooth' })} className="inline-flex items-center gap-2 bg-white border border-ASTER-200 rounded-full pl-2 pr-4 py-1.5 text-[13px] sm:text-sm font-semibold text-ASTER-700 card-shadow-sm hover:shadow-md transition-shadow">
+        <div>
+          <button onClick={() => document.getElementById('luna')?.scrollIntoView({ behavior: 'smooth' })} className="inline-flex max-w-full flex-wrap items-center justify-center gap-x-2 gap-y-1 bg-white border border-ASTER-200 rounded-3xl sm:rounded-full px-3 py-2 sm:pl-2 sm:pr-4 sm:py-1.5 text-[13px] sm:text-sm font-semibold text-ASTER-700 card-shadow-sm hover:shadow-md transition-shadow focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ASTER-600/40">
             <span className="bg-ASTER-600 text-white text-[11px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
               <Sparkles size={12} /> LUNA
             </span>
             A IA que ajuda a construir o seu site
             <ArrowRight size={14} />
           </button>
-        </motion.div>
+        </div>
 
-        <motion.h1
-          initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.1 }}
+        <h1
           className="font-display font-extrabold text-balance text-ink-900 mt-6 text-4xl sm:text-6xl lg:text-[76px] leading-[1.02] tracking-tight max-w-5xl mx-auto"
         >
           O site profissional do seu negócio, <span className="text-transparent bg-clip-text bg-gradient-to-r from-ASTER-600 to-ASTER-400">pronto hoje</span>
-        </motion.h1>
+        </h1>
 
-        <motion.p
-          initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.2 }}
+        <p
           className="text-slate-600 text-base sm:text-xl mt-5 max-w-2xl mx-auto text-balance"
         >
           Mais de 50 modelos prontos para o seu setor, reservas e agendamentos reais, captação de clientes e um catálogo de produtos — tudo em uma plataforma, com a Luna te ajudando a escrever o conteúdo.
-        </motion.p>
+        </p>
 
-        <motion.div
-          initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.3 }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-8"
-        >
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-8">
           <button onClick={onCta} className="w-full sm:w-auto bg-ASTER-600 hover:bg-ASTER-700 text-white font-bold text-base sm:text-lg px-9 py-4 rounded-full transition-all hover:shadow-xl hover:shadow-ASTER-600/30 hover:-translate-y-0.5 flex items-center justify-center gap-2">
             Ver planos <ArrowRight size={20} />
           </button>
           <button onClick={() => document.getElementById('ecossistema')?.scrollIntoView({ behavior: 'smooth' })} className="w-full sm:w-auto bg-white border-2 border-ASTER-200 hover:border-ASTER-600 text-ASTER-700 font-bold text-base sm:text-lg px-9 py-[14px] rounded-full transition-all flex items-center justify-center gap-2">
             Conhecer a plataforma
           </button>
-        </motion.div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5, duration: 0.6 }}
-          className="flex items-center justify-center gap-5 mt-6 text-[13px] sm:text-sm text-slate-500 font-medium flex-wrap"
-        >
+        <div className="flex items-center justify-center gap-5 mt-6 text-[13px] sm:text-sm text-slate-600 font-medium flex-wrap">
           <span className="flex items-center gap-1.5"><CheckCircle2 size={15} className="text-emerald-500" /> Site publicado em minutos</span>
           <span className="flex items-center gap-1.5"><CheckCircle2 size={15} className="text-emerald-500" /> Reservas e agendamentos reais</span>
           <span className="flex items-center gap-1.5"><CheckCircle2 size={15} className="text-emerald-500" /> Sem precisar programar</span>
-        </motion.div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 60 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, delay: 0.4 }}
-          className="relative mt-12 sm:mt-16 max-w-5xl mx-auto"
-        >
+        <div className="relative mt-12 sm:mt-16 max-w-5xl mx-auto">
           <div className="absolute -inset-x-8 top-8 bottom-0 bg-gradient-to-b from-ASTER-200/50 to-transparent blur-2xl rounded-[40px] pointer-events-none" />
           <div className="relative bg-white rounded-2xl sm:rounded-[28px] card-shadow border border-ASTER-100 overflow-hidden text-left">
             <div className="flex items-center gap-2 px-4 sm:px-5 py-3.5 border-b border-slate-100 bg-slate-50/60">
@@ -133,7 +121,7 @@ export default function Hero({ onCta }: { onCta: () => void }) {
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

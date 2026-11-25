@@ -6,7 +6,6 @@ export default function FinalCta({ onCta }: { onCta: () => void }) {
     <section className="py-16 sm:py-24 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <motion.div
-          initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}
           className="relative bg-gradient-to-br from-ASTER-700 via-ASTER-600 to-ASTER-500 rounded-[32px] overflow-hidden"
         >
           <div className="absolute inset-0 hero-grid opacity-60" style={{ filter: 'invert(1)' }} />

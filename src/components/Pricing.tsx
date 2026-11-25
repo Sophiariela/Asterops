@@ -34,7 +34,6 @@ export default function Pricing({ onCta }: { onCta: () => void }) {
     <section id="planos" className="py-16 sm:py-24 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <motion.div
-          initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}
           className="text-center max-w-2xl mx-auto"
         >
           <span className="inline-flex items-center gap-2 bg-ASTER-50 border border-ASTER-200 rounded-full px-4 py-1.5 text-sm font-semibold text-ASTER-700">
@@ -67,7 +66,7 @@ export default function Pricing({ onCta }: { onCta: () => void }) {
             return (
               <motion.div
                 key={p.slug}
-                initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: i * 0.1 }}
+                initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.01, margin: '0px 0px 240px 0px' }} transition={{ duration: 0.35, delay: Math.min(i * 0.04, 0.12), ease: 'easeOut' }}
                 className={`relative rounded-[28px] p-7 sm:p-8 flex flex-col transition-transform hover:-translate-y-1.5 duration-300 ${
                   highlight
                     ? 'bg-ink-950 text-white card-shadow lg:scale-[1.04] border-2 border-ASTER-600'
