@@ -10,6 +10,8 @@
  * Usa a API HTTP da Resend via `fetch`, sem SDK, para não acrescentar
  * dependência a um recurso que pode nunca ser ligado.
  */
+import { hasEnv, optionalEnv } from "@/lib/env";
+
 export interface InquiryEmailPayload {
   id: string;
   name: string;
@@ -26,9 +28,7 @@ export interface InquiryEmailPayload {
 }
 
 export function isEmailConfigured(): boolean {
-  return Boolean(
-    process.env.RESEND_API_KEY && process.env.INQUIRY_FROM_EMAIL && process.env.INQUIRY_NOTIFY_EMAIL,
-  );
+  return hasEnv("RESEND_API_KEY", "INQUIRY_FROM_EMAIL", "INQUIRY_NOTIFY_EMAIL");
 }
 
 function line(label: string, value?: string): string {
@@ -36,9 +36,9 @@ function line(label: string, value?: string): string {
 }
 
 export async function notifyAdminOfInquiry(payload: InquiryEmailPayload): Promise<void> {
-  const apiKey = process.env.RESEND_API_KEY;
-  const from = process.env.INQUIRY_FROM_EMAIL;
-  const to = process.env.INQUIRY_NOTIFY_EMAIL;
+  const apiKey = optionalEnv("RESEND_API_KEY");
+  const from = optionalEnv("INQUIRY_FROM_EMAIL");
+  const to = optionalEnv("INQUIRY_NOTIFY_EMAIL");
   if (!apiKey || !from || !to) return;
 
   const text =

@@ -1,5 +1,7 @@
 import { Client } from "@notionhq/client";
 
+import { hasEnv, optionalEnv } from "@/lib/env";
+
 export interface InquirySubmission {
   name: string;
   email: string;
@@ -18,7 +20,7 @@ export interface InquirySubmission {
 let client: Client | null = null;
 
 function getClient(): Client {
-  const apiKey = process.env.NOTION_API_KEY;
+  const apiKey = optionalEnv("NOTION_API_KEY");
   if (!apiKey) {
     throw new Error("NOTION_API_KEY is not set.");
   }
@@ -29,7 +31,7 @@ function getClient(): Client {
 }
 
 export function isNotionConfigured(): boolean {
-  return Boolean(process.env.NOTION_API_KEY && process.env.NOTION_DATABASE_ID);
+  return hasEnv("NOTION_API_KEY", "NOTION_DATABASE_ID");
 }
 
 /**
@@ -38,7 +40,7 @@ export function isNotionConfigured(): boolean {
  * — this is best-effort and never blocks a submission from succeeding.
  */
 export async function mirrorInquiryToNotion(submission: InquirySubmission): Promise<void> {
-  const databaseId = process.env.NOTION_DATABASE_ID;
+  const databaseId = optionalEnv("NOTION_DATABASE_ID");
   if (!databaseId) {
     throw new Error("NOTION_DATABASE_ID is not set.");
   }
