@@ -10,6 +10,7 @@ const cols: { title: string; links: { label: string; to: string }[] }[] = [
   {
     title: 'Plataforma',
     links: [
+      { label: 'Portfólio', to: '/portfolio' },
       { label: 'Biblioteca de Templates', to: '/plans' },
       { label: 'Planos', to: '/plans' },
       { label: 'Ecossistema', to: '/ecosystem' },

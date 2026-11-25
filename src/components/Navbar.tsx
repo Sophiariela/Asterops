@@ -55,6 +55,7 @@ export default function Navbar({ onCta }: { onCta: () => void }) {
             <Link to="/products/luna-ai" onClick={closeAll} className="px-4 py-2.5 rounded-full hover:bg-ASTER-50 transition-colors flex items-center gap-1.5">
               Luna AI <span className="text-[10px] font-bold bg-volt-400 text-ink-950 px-1.5 py-0.5 rounded-md">NOVO</span>
             </Link>
+            <Link to="/portfolio" onClick={closeAll} className="px-4 py-2.5 rounded-full hover:bg-ASTER-50 transition-colors">Portfólio</Link>
             <Link to="/plans" onClick={closeAll} className="px-4 py-2.5 rounded-full hover:bg-ASTER-50 transition-colors">Planos</Link>
             <Link to="/ecosystem" onClick={closeAll} className="px-4 py-2.5 rounded-full hover:bg-ASTER-50 transition-colors">Ecossistema</Link>
           </div>
@@ -184,6 +185,9 @@ export default function Navbar({ onCta }: { onCta: () => void }) {
 
                 <Link to="/products/luna-ai" onClick={closeAll} className="block py-3 px-3 font-semibold text-[#2c1a63] border-b border-ASTER-50">
                   Luna AI
+                </Link>
+                <Link to="/portfolio" onClick={closeAll} className="block py-3 px-3 font-semibold text-[#2c1a63] border-b border-ASTER-50">
+                  Portfólio
                 </Link>
                 <Link to="/plans" onClick={closeAll} className="block py-3 px-3 font-semibold text-[#2c1a63] border-b border-ASTER-50">
                   Planos

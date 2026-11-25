@@ -7,6 +7,7 @@ import Register from './pages/auth/Register';
 import ForgotPassword from './pages/auth/ForgotPassword';
 import ResetPassword from './pages/auth/ResetPassword';
 import Plans from './pages/Plans';
+import PortfolioPage from './pages/Portfolio';
 import Checkout from './pages/Checkout';
 import CheckoutSuccess from './pages/checkout/Success';
 import Onboarding from './pages/Onboarding';
@@ -45,6 +46,7 @@ export default function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/plans" element={<Plans />} />
+        <Route path="/portfolio" element={<PortfolioPage />} />
         <Route path="/products/:slug" element={<ProductPage />} />
         <Route path="/solutions/:slug" element={<SolutionPage />} />
         <Route path="/ecosystem" element={<EcosystemPage />} />

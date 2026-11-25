@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Hero from '../components/Hero';
+import Portfolio from '../components/Portfolio';
 import LunaSection from '../components/LunaSection';
 import Ecosystem from '../components/Ecosystem';
 import Segments from '../components/Segments';
@@ -18,6 +19,7 @@ export default function Home() {
       <Navbar onCta={openCta} />
       <main>
         <Hero onCta={openCta} />
+        <Portfolio />
         <LunaSection onCta={openCta} />
         <Ecosystem onCta={openCta} />
         <Segments onCta={openCta} />
