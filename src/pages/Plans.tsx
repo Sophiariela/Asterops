@@ -83,7 +83,7 @@ export default function Plans() {
     <div className="min-h-screen bg-gradient-to-b from-ASTER-50/60 via-white to-white">
       <div className="py-16 sm:py-24 px-4">
       <div className="max-w-6xl mx-auto">
-        <Link to="/" className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-400 hover:text-ASTER-600 transition-colors mb-8">
+        <Link to="/" className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-600 hover:text-ASTER-600 transition-colors mb-8">
           <ArrowLeft size={16} /> Voltar para a home
         </Link>
 
@@ -97,15 +97,15 @@ export default function Plans() {
           <h1 className="font-display font-extrabold text-3xl sm:text-5xl text-ink-900 leading-tight">
             Escolha o plano da sua operação
           </h1>
-          <p className="text-slate-500 mt-4 text-base sm:text-lg">
+          <p className="text-slate-600 mt-4 text-base sm:text-lg">
             Assine o plano ASTER que acompanha o seu momento — sem contrato de fidelidade.
           </p>
 
           <div className="inline-flex items-center gap-3 mt-7 bg-ASTER-50 rounded-full p-1.5 pl-5">
-            <button onClick={() => setAnnual(false)} className={`text-sm font-bold px-2 py-1.5 transition-colors ${!annual ? 'text-ASTER-700' : 'text-slate-400'}`}>
+            <button onClick={() => setAnnual(false)} className={`text-sm font-bold px-2 py-1.5 transition-colors ${!annual ? 'text-ASTER-700' : 'text-slate-600'}`}>
               Mensal
             </button>
-            <button onClick={() => setAnnual(true)} className={`text-sm font-bold px-2 py-1.5 transition-colors ${annual ? 'text-ASTER-700' : 'text-slate-400'}`}>
+            <button onClick={() => setAnnual(true)} className={`text-sm font-bold px-2 py-1.5 transition-colors ${annual ? 'text-ASTER-700' : 'text-slate-600'}`}>
               Anual
             </button>
             <span className="bg-volt-400 text-ink-950 text-xs font-extrabold px-3 py-2 rounded-full">-15%</span>
@@ -146,22 +146,22 @@ export default function Plans() {
                     </span>
                   )}
                   <h2 className="font-display font-extrabold text-2xl text-ink-900">{tier.name}</h2>
-                  <p className="text-slate-500 text-sm mt-2 min-h-[40px]">{tier.description}</p>
+                  <p className="text-slate-600 text-sm mt-2 min-h-[40px]">{tier.description}</p>
 
                   <div className="mt-5 flex items-end gap-1.5">
-                    <span className="text-sm font-semibold mb-2 text-slate-400">R$</span>
+                    <span className="text-sm font-semibold mb-2 text-slate-600">R$</span>
                     <span className="font-display font-extrabold text-4xl text-ink-900">
                       {(price / 100).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </span>
-                    <span className="text-sm font-medium mb-1.5 text-slate-400">/mês</span>
+                    <span className="text-sm font-medium mb-1.5 text-slate-600">/mês</span>
                   </div>
                   {annual ? (
                     <div className="mt-1.5 space-y-0.5">
-                      <p className="text-xs font-medium text-slate-400">Cobrado anualmente · {formatBRL(annualTotal)}/ano</p>
+                      <p className="text-xs font-medium text-slate-600">Cobrado anualmente · {formatBRL(annualTotal)}/ano</p>
                       <p className="text-xs font-bold text-ASTER-600">Economize {annualSavingsPct}% no plano anual</p>
                     </div>
                   ) : (
-                    <p className="text-xs font-medium mt-1.5 text-slate-400">Cobrança mensal · cancele quando quiser</p>
+                    <p className="text-xs font-medium mt-1.5 text-slate-600">Cobrança mensal · cancele quando quiser</p>
                   )}
 
                   <ul className="mt-6 space-y-3 flex-1">
@@ -187,7 +187,7 @@ export default function Plans() {
         )}
 
         {backendPlans && (
-          <p className="text-center text-sm text-slate-500 mt-8">
+          <p className="text-center text-sm text-slate-600 mt-8">
             Precisa de uma necessidade maior ou condições específicas no plano Scale?{' '}
             <a href="mailto:vendas@aster.com.br?subject=Plano%20Scale%20personalizado" className="font-bold text-ASTER-600 hover:underline">
               Fale com vendas

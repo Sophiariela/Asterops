@@ -185,7 +185,7 @@ export default function LunaSection() {
                     <span className="block font-display font-bold text-[15px] sm:text-base">
                       0{i + 1} · {t.label}
                     </span>
-                    <span className={`hidden sm:block text-[13px] mt-0.5 ${i === active ? 'text-slate-600' : 'text-white/70'}`}>
+                    <span className={`hidden sm:block text-[13px] mt-0.5 ${i === active ? 'text-slate-600' : 'text-white/80'}`}>
                       {t.summary}
                     </span>
                   </span>
@@ -209,13 +209,13 @@ export default function LunaSection() {
                 <div>
                   <p className="font-display font-bold">Luna</p>
                   {/* Rótulo honesto: exemplo pré-definido, não geração ao vivo. */}
-                  <p className="text-xs text-white/70 font-semibold">
+                  <p className="text-xs text-white/80 font-semibold">
                     Demonstração · exemplos pré-definidos
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold text-white/70 mr-1">
+                <span className="text-xs font-semibold text-white/80 mr-1">
                   0{active + 1} de 0{tabs.length}
                 </span>
                 <button
@@ -259,7 +259,7 @@ export default function LunaSection() {
                 {/* Antes e depois: é o que deixa o resultado concreto. */}
                 <div className="mt-5 grid sm:grid-cols-[1fr_auto_1fr] gap-3 sm:gap-4 items-stretch">
                   <div className="bg-white/[0.04] border border-white/10 rounded-2xl p-4">
-                    <p className="text-[11px] font-bold uppercase tracking-wider text-white/60">
+                    <p className="text-[11px] font-bold uppercase tracking-wider text-white/80">
                       {tab.beforeLabel}
                     </p>
                     <p className="text-sm text-white/75 mt-2 leading-relaxed">{tab.before}</p>

@@ -13,7 +13,7 @@ const segments: { name: string; icon: LucideIcon; desc: string; accent: string; 
   { name: 'Beleza e Bem-estar', icon: SparklesIcon, desc: 'Salões, estética e academias', accent: 'text-violet-600', bg: 'from-violet-50 to-violet-100' },
   { name: 'Varejo', icon: ShoppingBag, desc: 'Catálogo de produtos e pedidos', accent: 'text-amber-600', bg: 'from-amber-50 to-amber-100' },
   { name: 'Criadores', icon: Camera, desc: 'Portfólio, fotógrafos e marca pessoal', accent: 'text-blue-600', bg: 'from-blue-50 to-blue-100' },
-  { name: 'Educação', icon: GraduationCap, desc: 'Cursos e programas de ensino', accent: 'text-emerald-600', bg: 'from-emerald-50 to-emerald-100' },
+  { name: 'Educação', icon: GraduationCap, desc: 'Cursos e programas de ensino', accent: 'text-emerald-700', bg: 'from-emerald-50 to-emerald-100' },
   { name: 'Serviços Locais', icon: Wrench, desc: 'Orçamentos e área de atendimento', accent: 'text-cyan-600', bg: 'from-cyan-50 to-cyan-100' },
 ];
 

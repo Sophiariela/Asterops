@@ -33,7 +33,7 @@ export default function ProductPage() {
       />
       <section className="bg-gradient-to-b from-ASTER-50/70 via-white to-white px-4 py-16 sm:py-24">
         <div className="max-w-4xl mx-auto">
-          <Link to="/" className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-400 hover:text-ASTER-600 transition-colors mb-8">
+          <Link to="/" className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-600 hover:text-ASTER-600 transition-colors mb-8">
             <ArrowLeft size={16} /> Back to home
           </Link>
           <div className="w-14 h-14 rounded-2xl bg-ASTER-600 text-white flex items-center justify-center">
@@ -48,7 +48,7 @@ export default function ProductPage() {
           )}
           <div className="mt-4 max-w-2xl space-y-4">
             {subheadlineParagraphs.map((paragraph) => (
-              <p key={paragraph} className="text-slate-500 text-base sm:text-lg">
+              <p key={paragraph} className="text-slate-600 text-base sm:text-lg">
                 {paragraph}
               </p>
             ))}

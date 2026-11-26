@@ -103,7 +103,7 @@ export default function Navbar({ onCta }: { onCta: () => void }) {
                           <span className="block font-display font-semibold text-[15px] text-ink-900">{p.name}</span>
                           {p.earlyAccess && <span className="text-[9px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded-md">EM BREVE</span>}
                         </span>
-                        <span className="block text-[13px] text-slate-500 mt-0.5">{p.tagline}</span>
+                        <span className="block text-[13px] text-slate-600 mt-0.5">{p.tagline}</span>
                       </span>
                     </Link>
                   ))}
@@ -129,8 +129,8 @@ export default function Navbar({ onCta }: { onCta: () => void }) {
                     {SOLUTIONS.map((s) => (
                       <Link key={s.slug} to={`/solutions/${s.slug}`} onClick={closeAll} className="flex flex-col gap-0.5 p-4 rounded-2xl hover:bg-ASTER-50 transition-colors">
                         <span className="font-display font-semibold text-[15px] text-ink-900">{s.name}</span>
-                        <span className="text-[13px] text-slate-500">{s.tagline}</span>
-                        <span className="text-[11px] text-slate-400 mt-1">
+                        <span className="text-[13px] text-slate-600">{s.tagline}</span>
+                        <span className="text-[11px] text-slate-600 mt-1">
                           Powered by {s.poweredBy.map((slug) => getProduct(slug)?.name).filter(Boolean).join(', ')}
                         </span>
                       </Link>

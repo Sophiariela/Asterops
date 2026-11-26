@@ -77,15 +77,11 @@ export default function Ecosystem() {
               <h3 className="font-display font-extrabold text-2xl sm:text-[34px] leading-tight mt-4 text-balance">
                 Seu site, com a estrutura certa para o seu setor
               </h3>
-              <p className="text-white/65 mt-3 text-[15px] sm:text-base">
-                Restaurantes, serviços profissionais, beleza e bem-estar, varejo, criadores, educação e serviços locais — cada modelo com a estrutura certa para o negócio.
+              <p className="text-white/80 mt-3 text-[15px] sm:text-base">
+                Cada modelo já vem com a estrutura certa para o tipo de negócio — e a lista
+                completa de setores fica logo abaixo, em um lugar só.
               </p>
               <p className="font-display font-bold text-volt-400 mt-4 text-lg">7 categorias de templates</p>
-              <div className="flex flex-wrap gap-2 mt-5">
-                {['Restaurantes', 'Serviços profissionais', 'Beleza e bem-estar', 'Varejo', 'Criadores', 'Educação', 'Serviços locais'].map((c) => (
-                  <span key={c} className="text-[13px] font-semibold bg-white/10 border border-white/15 rounded-full px-3.5 py-1.5">{c}</span>
-                ))}
-              </div>
               <Link to="/products/webos" className="mt-7 inline-flex items-center gap-2 font-bold text-white hover:gap-3 transition-all rounded-md focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-volt-400/60">
                 Explorar modelos <ArrowRight size={18} className="text-volt-400" aria-hidden="true" />
               </Link>
@@ -115,7 +111,7 @@ export default function Ecosystem() {
                 ].map((s) => (
                   <div key={s.l} className="bg-ASTER-50 rounded-2xl p-3 text-center">
                     <p className="font-display font-extrabold text-ASTER-700 text-lg sm:text-xl">{s.v}</p>
-                    <p className="text-[11px] sm:text-xs text-slate-500 font-medium">{s.l}</p>
+                    <p className="text-[11px] sm:text-xs text-slate-600 font-medium">{s.l}</p>
                   </div>
                 ))}
               </div>
@@ -139,7 +135,7 @@ export default function Ecosystem() {
                   <span className={`w-12 h-12 rounded-2xl ${p.bg} ${p.accent} flex items-center justify-center`}>
                     <p.icon size={22} />
                   </span>
-                  <span className="text-[13px] font-bold uppercase tracking-wider text-slate-400">{p.tag}</span>
+                  <span className="text-[13px] font-bold uppercase tracking-wider text-slate-600">{p.tag}</span>
                 </div>
                 <h3 className="font-display font-extrabold text-xl sm:text-2xl text-ink-900 mt-4 text-balance">{p.title}</h3>
                 <p className="text-slate-600 mt-2.5 text-[15px] leading-relaxed">{p.desc}</p>

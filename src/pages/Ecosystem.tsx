@@ -13,11 +13,11 @@ export default function EcosystemPage() {
     <div className="min-h-screen bg-gradient-to-b from-ASTER-50/60 via-white to-white">
       <div className="py-16 sm:py-24 px-4">
       <div className="max-w-2xl mx-auto text-center">
-        <Link to="/" className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-400 hover:text-ASTER-600 transition-colors mb-8">
+        <Link to="/" className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-600 hover:text-ASTER-600 transition-colors mb-8">
           <ArrowLeft size={16} /> Back to home
         </Link>
         <h1 className="font-display font-extrabold text-3xl sm:text-5xl text-ink-900 leading-tight">The ASTER ecosystem</h1>
-        <p className="text-slate-500 mt-4 text-base sm:text-lg">
+        <p className="text-slate-600 mt-4 text-base sm:text-lg">
           Every ASTER product is built to connect to the next one — so your systems compound instead of stacking up.
         </p>
       </div>
@@ -38,7 +38,7 @@ export default function EcosystemPage() {
                 </span>
                 <span>
                   <span className="block font-display font-bold text-lg text-ink-900">{product.name}</span>
-                  <span className="block text-sm text-slate-500">{product.tagline}</span>
+                  <span className="block text-sm text-slate-600">{product.tagline}</span>
                 </span>
               </Link>
               {i < FLOW.length - 1 && <ChevronDown size={24} className="text-ASTER-400 my-2" />}

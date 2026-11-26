@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Instagram, Linkedin } from 'lucide-react';
 import { PRODUCTS } from '../data/products';
+import { INSTAGRAM_URL, LINKEDIN_URL } from '../config/site';
 
 const cols: { title: string; links: { label: string; to: string }[] }[] = [
   {
@@ -40,6 +41,11 @@ const cols: { title: string; links: { label: string; to: string }[] }[] = [
   },
 ];
 
+const socials = [
+  { Icon: Instagram, href: INSTAGRAM_URL, label: 'Instagram' },
+  { Icon: Linkedin, href: LINKEDIN_URL, label: 'LinkedIn' },
+].filter((s): s is { Icon: typeof Instagram; href: string; label: string } => Boolean(s.href));
+
 export default function Footer() {
   return (
     <footer id="login" className="bg-ink-950 text-white">
@@ -49,16 +55,32 @@ export default function Footer() {
             <p className="font-display text-3xl" style={{ fontWeight: 800 }}>
               ASTER<span className="text-volt-400">.</span>
             </p>
-            <p className="text-white/60 text-[15px] mt-4 max-w-sm leading-relaxed">
+            <p className="text-white/80 text-[15px] mt-4 max-w-sm leading-relaxed">
               Infraestrutura digital para o seu negócio: sites profissionais, comércio e automações com IA.
             </p>
-            <div className="flex gap-2.5 mt-6">
-              {[Instagram, Linkedin].map((Icon, i) => (
-                <a key={i} href="#top" aria-label="Rede social" className="w-10 h-10 rounded-full bg-white/10 hover:bg-ASTER-600 border border-white/10 flex items-center justify-center transition-colors">
-                  <Icon size={17} />
-                </a>
-              ))}
-            </div>
+            {/*
+              * 6.3 - Icone so aparece com URL confirmada em config/site.ts.
+              * Antes os dois apontavam para "#top", o que parecia link de
+              * rede social e nao levava a lugar nenhum.
+              *
+              * TODO(aster): preencher INSTAGRAM_URL e LINKEDIN_URL.
+              */}
+            {socials.length > 0 && (
+              <div className="flex gap-2.5 mt-6">
+                {socials.map(({ Icon, href, label }) => (
+                  <a
+                    key={label}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`${label} da ASTER (abre em uma nova aba)`}
+                    className="w-10 h-10 rounded-full bg-white/10 hover:bg-ASTER-600 border border-white/10 flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-volt-400/60"
+                  >
+                    <Icon size={17} aria-hidden="true" />
+                  </a>
+                ))}
+              </div>
+            )}
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-8">
             {cols.map((c) => (
@@ -67,7 +89,7 @@ export default function Footer() {
                 <ul className="space-y-2.5">
                   {c.links.map((l) => (
                     <li key={l.label}>
-                      <Link to={l.to} className="text-sm text-white/60 hover:text-white transition-colors">{l.label}</Link>
+                      <Link to={l.to} className="text-sm text-white/80 hover:text-white transition-colors">{l.label}</Link>
                     </li>
                   ))}
                 </ul>

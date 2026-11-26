@@ -25,13 +25,13 @@ export default function SolutionPage() {
     <div className="min-h-screen bg-white">
       <section className="bg-gradient-to-b from-ASTER-50/70 via-white to-white px-4 py-16 sm:py-24">
         <div className="max-w-4xl mx-auto">
-          <Link to="/" className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-400 hover:text-ASTER-600 transition-colors mb-8">
+          <Link to="/" className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-600 hover:text-ASTER-600 transition-colors mb-8">
             <ArrowLeft size={16} /> Back to home
           </Link>
           <p className="text-xs font-bold text-ASTER-600 uppercase tracking-wide">Solution</p>
           <h1 className="font-display font-extrabold text-4xl sm:text-5xl text-ink-900 mt-2">{solution.name}</h1>
           <p className="text-ASTER-600 font-semibold text-lg mt-2">{solution.tagline}</p>
-          <p className="text-slate-500 text-base sm:text-lg mt-4 max-w-2xl">{solution.description}</p>
+          <p className="text-slate-600 text-base sm:text-lg mt-4 max-w-2xl">{solution.description}</p>
         </div>
       </section>
 
@@ -69,7 +69,7 @@ export default function SolutionPage() {
                   </span>
                   <span>
                     <span className="block font-display font-semibold text-[15px] text-ink-900">{product.name}</span>
-                    <span className="block text-[13px] text-slate-500 mt-0.5">{product.tagline}</span>
+                    <span className="block text-[13px] text-slate-600 mt-0.5">{product.tagline}</span>
                   </span>
                 </Link>
               );

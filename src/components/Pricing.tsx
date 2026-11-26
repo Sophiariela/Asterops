@@ -45,10 +45,10 @@ export default function Pricing({ onCta }: { onCta: () => void }) {
           <p className="text-slate-600 text-base sm:text-lg mt-4">Sem contrato de fidelidade. Cancele quando quiser.</p>
 
           <div className="inline-flex items-center gap-3 mt-7 bg-ASTER-50 rounded-full p-1.5 pl-5">
-            <button onClick={() => setAnnual(false)} className={`text-sm font-bold px-2 py-1.5 transition-colors ${!annual ? 'text-ASTER-700' : 'text-slate-400'}`}>
+            <button onClick={() => setAnnual(false)} className={`text-sm font-bold px-2 py-1.5 transition-colors ${!annual ? 'text-ASTER-700' : 'text-slate-600'}`}>
               Mensal
             </button>
-            <button onClick={() => setAnnual(true)} className={`text-sm font-bold px-2 py-1.5 transition-colors ${annual ? 'text-ASTER-700' : 'text-slate-400'}`}>
+            <button onClick={() => setAnnual(true)} className={`text-sm font-bold px-2 py-1.5 transition-colors ${annual ? 'text-ASTER-700' : 'text-slate-600'}`}>
               Anual
             </button>
             <span className="bg-volt-400 text-ink-950 text-xs font-extrabold px-3 py-2 rounded-full">-15%</span>
@@ -82,13 +82,13 @@ export default function Pricing({ onCta }: { onCta: () => void }) {
                   <Icon size={22} className={highlight ? 'text-white' : ''} />
                 </div>
                 <h3 className={`font-display font-extrabold text-2xl mt-4 ${highlight ? 'text-white' : 'text-ink-900'}`}>{p.name}</h3>
-                <p className={`text-sm mt-1.5 ${highlight ? 'text-white/60' : 'text-slate-500'}`}>{p.description}</p>
+                <p className={`text-sm mt-1.5 ${highlight ? 'text-white/80' : 'text-slate-600'}`}>{p.description}</p>
                 <div className="mt-5 flex items-end gap-1.5">
-                  <span className={`text-sm font-semibold mb-2 ${highlight ? 'text-white/60' : 'text-slate-400'}`}>R$</span>
+                  <span className={`text-sm font-semibold mb-2 ${highlight ? 'text-white/80' : 'text-slate-600'}`}>R$</span>
                   <span className={`font-display font-extrabold text-5xl ${highlight ? 'text-white' : 'text-ink-900'}`}>
                     {(displayPrice / 100).toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                   </span>
-                  <span className={`text-sm font-medium mb-1.5 ${highlight ? 'text-white/60' : 'text-slate-400'}`}>/mês</span>
+                  <span className={`text-sm font-medium mb-1.5 ${highlight ? 'text-white/80' : 'text-slate-600'}`}>/mês</span>
                 </div>
                 <p className={`text-xs font-medium mt-1 ${highlight ? 'text-volt-400' : 'text-ASTER-600'}`}>
                   {annual ? `no plano anual · ${formatBRL(annualTotal)}/ano` : 'no plano mensal'}
@@ -117,7 +117,7 @@ export default function Pricing({ onCta }: { onCta: () => void }) {
             );
           })}
         </div>
-        <p className="text-center text-xs text-slate-400 mt-6">Precisa de algo sob medida? <button onClick={onCta} className="font-bold text-ASTER-600 hover:underline">Fale com vendas</button>.</p>
+        <p className="text-center text-xs text-slate-600 mt-6">Precisa de algo sob medida? <button onClick={onCta} className="font-bold text-ASTER-600 hover:underline">Fale com vendas</button>.</p>
       </div>
     </section>
   );

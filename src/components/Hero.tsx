@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { trialMessage } from '../config/site';
+import { APP_DOMAIN, trialMessage } from '../config/site';
 import { ArrowRight, Sparkles, CheckCircle2, Layers, Store, Palette } from 'lucide-react';
 
 export default function Hero({ onCta }: { onCta: () => void }) {
@@ -64,16 +64,19 @@ export default function Hero({ onCta }: { onCta: () => void }) {
               <span className="w-3 h-3 rounded-full bg-[#ff5f57]" />
               <span className="w-3 h-3 rounded-full bg-[#febc2e]" />
               <span className="w-3 h-3 rounded-full bg-[#28c840]" />
-              <div className="ml-3 flex-1 max-w-md bg-white border border-slate-200 rounded-full px-4 py-1 text-[12px] text-slate-400 hidden sm:block">app.aster.com/webos/templates</div>
+              <div className="ml-3 flex-1 max-w-md bg-white border border-slate-200 rounded-full px-4 py-1 text-[12px] text-slate-600 hidden sm:block">{APP_DOMAIN}/webos/templates</div>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px]">
               <div className="p-4 sm:p-7">
                 <div className="flex items-center justify-between flex-wrap gap-3">
                   <div>
-                    <p className="text-[12px] font-semibold text-slate-400 uppercase tracking-wider">Biblioteca de Templates</p>
-                    <h3 className="font-display font-bold text-xl sm:text-2xl text-ink-900">Escolha um modelo para o seu setor</h3>
+                    <p className="text-[12px] font-semibold text-slate-600 uppercase tracking-wider">Biblioteca de Templates</p>
+                    {/* Texto dentro do mockup: e ilustracao de interface, nao estrutura
+    do documento. Era <h3> logo depois do <h1>, o que quebrava a
+    hierarquia de headings (heading-order no Lighthouse). */}
+                    <p className="font-display font-bold text-xl sm:text-2xl text-ink-900">Escolha um modelo para o seu setor</p>
                   </div>
-                  <span className="flex items-center gap-1.5 bg-emerald-50 text-emerald-600 text-xs font-bold px-3 py-1.5 rounded-full">
+                  <span className="flex items-center gap-1.5 bg-emerald-50 text-emerald-700 text-xs font-bold px-3 py-1.5 rounded-full">
                     <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" /> 52 modelos disponíveis
                   </span>
                 </div>
@@ -85,21 +88,10 @@ export default function Hero({ onCta }: { onCta: () => void }) {
                   ].map((k) => (
                     <div key={k.label} className="bg-slate-50/80 border border-slate-100 rounded-2xl p-2.5 sm:p-4">
                       <div className={`w-7 h-7 sm:w-9 sm:h-9 rounded-xl ${k.color} flex items-center justify-center mb-2`}><k.icon size={16} /></div>
-                      <p className="text-[11px] sm:text-xs text-slate-500 font-medium truncate">{k.label}</p>
+                      <p className="text-[11px] sm:text-xs text-slate-600 font-medium truncate">{k.label}</p>
                       <p className="font-display font-bold text-sm sm:text-xl text-ink-900">e mais</p>
                     </div>
                   ))}
-                </div>
-                <div className="mt-4 bg-slate-50/80 border border-slate-100 rounded-2xl p-4 sm:p-5">
-                  <div className="flex items-center justify-between mb-3">
-                    <p className="text-xs sm:text-sm font-bold text-ink-900">Categorias da biblioteca</p>
-                    <p className="text-[11px] sm:text-xs text-slate-400 font-medium">7 segmentos</p>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {['Restaurantes', 'Serviços profissionais', 'Beleza e bem-estar', 'Varejo', 'Criadores', 'Educação', 'Serviços locais'].map((c) => (
-                      <span key={c} className="text-[11px] sm:text-xs font-semibold bg-white border border-ASTER-100 text-ink-900 rounded-full px-3 py-1.5">{c}</span>
-                    ))}
-                  </div>
                 </div>
               </div>
               <div className="bg-ink-950 text-white p-4 sm:p-6 flex flex-col relative overflow-hidden">
@@ -111,7 +103,7 @@ export default function Hero({ onCta }: { onCta: () => void }) {
                   </div>
                   <div>
                     <p className="font-display font-bold text-sm">Luna</p>
-                    <p className="text-[11px] text-white/60">Pronta para ajudar</p>
+                    <p className="text-[11px] text-white/80">Pronta para ajudar</p>
                   </div>
                 </div>
                 <div className="relative mt-4 space-y-2.5 text-[12px] sm:text-[13px] flex-1">
