@@ -39,8 +39,8 @@ export default function Portfolio() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-8 mt-8 sm:mt-14">
-          {PORTFOLIO.map((project, index) => (
-            <PortfolioCard key={project.slug} project={project} priority={index === 0} />
+          {PORTFOLIO.map((project) => (
+            <PortfolioCard key={project.slug} project={project} />
           ))}
         </div>
       </div>

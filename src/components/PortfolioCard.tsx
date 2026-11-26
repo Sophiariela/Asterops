@@ -8,13 +8,7 @@ import type { PortfolioProject } from '../data/portfolio';
  * completo só com a imagem estática — nada de iframe nem de site embarcado,
  * que seriam lentos e quebrariam no mobile.
  */
-export default function PortfolioCard({
-  project,
-  priority = false,
-}: {
-  project: PortfolioProject;
-  priority?: boolean;
-}) {
+export default function PortfolioCard({ project }: { project: PortfolioProject }) {
   return (
     <article className="group flex flex-col bg-white rounded-3xl border border-ASTER-100 card-shadow overflow-hidden transition-shadow hover:shadow-xl">
       <a
@@ -30,7 +24,7 @@ export default function PortfolioCard({
           alt=""
           width={1600}
           height={1000}
-          loading={priority ? 'eager' : 'lazy'}
+          loading="lazy"
           decoding="async"
           // A imagem é decorativa aqui: o link textual abaixo já descreve o
           // destino, e o alt completo vive na página /portfolio.
