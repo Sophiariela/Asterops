@@ -93,3 +93,14 @@ export const INSTAGRAM_URL: string | null = null;
 
 // TODO(aster): confirmar a URL do LinkedIn oficial.
 export const LINKEDIN_URL: string | null = null;
+
+/**
+ * E-mail comercial usado no CTA do plano Scale.
+ *
+ * Este endereco ja esta em producao hoje (src/pages/Plans.tsx), entao e
+ * mantido para nao remover um canal de venda que funciona. Note que o
+ * dominio (aster.com.br) diverge do asterops.co usado no resto.
+ */
+// TODO(aster): confirmar se vendas@aster.com.br continua valendo ou se o
+// contato comercial migrou para o dominio asterops.co.
+export const SALES_EMAIL = 'vendas@aster.com.br';

@@ -7,6 +7,8 @@ import { formatBRL } from '../lib/currency';
 import { PLAN_TIERS, FALLBACK_PLANS, findTierForProduct, type BackendPlan } from '../data/plans';
 import { readCachedPlans, writeCachedPlans } from '../lib/plansCache';
 import PaymentMethods from '../components/PaymentMethods';
+import PlanComparison from '../components/PlanComparison';
+import { SALES_EMAIL } from '../config/site';
 import Footer from '../components/Footer';
 import { usePageMeta } from '../lib/meta';
 import { ROUTE_META } from '../config/route-meta';
@@ -40,7 +42,12 @@ export default function Plans() {
   const [backendPlans, setBackendPlans] = useState<BackendPlan[] | null>(
     () => readCachedPlans() ?? FALLBACK_PLANS,
   );
-  const [annual, setAnnual] = useState(true);
+  /*
+   * 5.2 - Mensal e o padrao. Este estado tambem define o billing enviado
+   * ao checkout (ver subscribe), entao o que o visitante ve em destaque e
+   * exatamente o que ele vai contratar.
+   */
+  const [annual, setAnnual] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -101,15 +108,36 @@ export default function Plans() {
             Assine o plano ASTER que acompanha o seu momento — sem contrato de fidelidade.
           </p>
 
-          <div className="inline-flex items-center gap-3 mt-7 bg-ASTER-50 rounded-full p-1.5 pl-5">
-            <button onClick={() => setAnnual(false)} className={`text-sm font-bold px-2 py-1.5 transition-colors ${!annual ? 'text-ASTER-700' : 'text-slate-600'}`}>
+          <div
+            role="radiogroup"
+            aria-label="Forma de cobranca"
+            className="inline-flex items-center gap-1 mt-7 bg-ASTER-50 border border-ASTER-200 rounded-full p-1.5"
+          >
+            <button
+              type="button"
+              role="radio"
+              aria-checked={!annual}
+              onClick={() => setAnnual(false)}
+              className={`text-sm font-bold px-5 py-2.5 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ASTER-600/40 ${!annual ? 'bg-ASTER-600 text-white shadow-sm' : 'text-ASTER-700 hover:bg-white/70'}`}
+            >
               Mensal
             </button>
-            <button onClick={() => setAnnual(true)} className={`text-sm font-bold px-2 py-1.5 transition-colors ${annual ? 'text-ASTER-700' : 'text-slate-600'}`}>
+            <button
+              type="button"
+              role="radio"
+              aria-checked={annual}
+              onClick={() => setAnnual(true)}
+              className={`text-sm font-bold px-5 py-2.5 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ASTER-600/40 ${annual ? 'bg-ASTER-600 text-white shadow-sm' : 'text-ASTER-700 hover:bg-white/70'}`}
+            >
               Anual
             </button>
-            <span className="bg-volt-400 text-ink-950 text-xs font-extrabold px-3 py-2 rounded-full">-15%</span>
           </div>
+
+          <p className="text-sm font-semibold text-ink-900 mt-4">
+            {annual
+              ? 'Voce paga uma vez por ano. O valor em destaque e o equivalente por mes.'
+              : 'Voce paga todo mes. Sem compromisso de 12 meses.'}
+          </p>
         </div>
 
         {!backendPlans && (
@@ -156,12 +184,23 @@ export default function Plans() {
                     <span className="text-sm font-medium mb-1.5 text-slate-600">/mês</span>
                   </div>
                   {annual ? (
-                    <div className="mt-1.5 space-y-0.5">
-                      <p className="text-xs font-medium text-slate-600">Cobrado anualmente · {formatBRL(annualTotal)}/ano</p>
-                      <p className="text-xs font-bold text-ASTER-600">Economize {annualSavingsPct}% no plano anual</p>
+                    <div className="mt-1 space-y-1">
+                      <p className="text-xs text-slate-600">equivalente por mês no plano anual</p>
+                      <p className="text-sm font-bold text-ASTER-700">
+                        Cobrado {formatBRL(annualTotal)} uma vez por ano
+                      </p>
+                      <p className="text-xs font-semibold text-emerald-700">
+                        Economia de {annualSavingsPct}% frente ao mensal
+                      </p>
                     </div>
                   ) : (
-                    <p className="text-xs font-medium mt-1.5 text-slate-600">Cobrança mensal · cancele quando quiser</p>
+                    <div className="mt-1 space-y-1">
+                      <p className="text-xs text-slate-600">por mês</p>
+                      <p className="text-sm font-bold text-ASTER-700">
+                        Cobrado {formatBRL(backendPlan?.price ?? 0)} todo mês
+                      </p>
+                      <p className="text-xs text-slate-600">Cancele quando quiser</p>
+                    </div>
                   )}
 
                   <ul className="mt-6 space-y-3 flex-1">
@@ -189,12 +228,14 @@ export default function Plans() {
         {backendPlans && (
           <p className="text-center text-sm text-slate-600 mt-8">
             Precisa de uma necessidade maior ou condições específicas no plano Scale?{' '}
-            <a href="mailto:vendas@aster.com.br?subject=Plano%20Scale%20personalizado" className="font-bold text-ASTER-600 hover:underline">
+            <a href={`mailto:${SALES_EMAIL}?subject=${encodeURIComponent('Plano Scale personalizado')}`} className="font-bold text-ASTER-600 hover:underline">
               Fale com vendas
             </a>
             .
           </p>
         )}
+
+        <PlanComparison />
 
         <div className="mt-14">
           <PaymentMethods />
