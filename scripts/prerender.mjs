@@ -129,6 +129,34 @@ for (const route of PUBLIC_ROUTES) {
   }
 }
 
+/*
+ * 404.html — a Vercel serve este arquivo com status HTTP 404 de verdade
+ * para qualquer caminho que nao exista e nao seja rota do app. Sem ele, o
+ * rewrite devolvia a home com 200 (soft 404) para qualquer URL errada.
+ *
+ * E renderizado visitando um caminho inexistente de proposito: assim a
+ * pagina gerada e exatamente a que a rota curinga do router mostra.
+ */
+try {
+  await page.goto(`http://localhost:${PORT}/__not-found__`, {
+    waitUntil: 'networkidle',
+    timeout: 45_000,
+  });
+  await page.waitForFunction(
+    () => {
+      const root = document.getElementById('root');
+      return Boolean(root && root.innerText.includes('404'));
+    },
+    { timeout: 20_000 },
+  );
+  const notFoundHtml = await page.content();
+  await writeFile(path.join(DIST, '404.html'), notFoundHtml, 'utf8');
+  console.log(`  ✓ 404.html${' '.repeat(22)}${(Buffer.byteLength(notFoundHtml) / 1024).toFixed(0)} kB`);
+} catch (error) {
+  console.error(`  ✗ 404.html — ${error.message}`);
+  failed.push('/404');
+}
+
 await browser.close();
 server.close();
 

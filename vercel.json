@@ -3,7 +3,59 @@
   "outputDirectory": "dist",
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/login",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/register",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/forgot-password",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/reset-password",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/onboarding",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/dashboard",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/admin",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/checkout",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/checkout/:path*",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/commerce",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/commerce/:path*",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/webos",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/webos/:path*",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/site/:path*",
       "destination": "/index.html"
     }
   ]

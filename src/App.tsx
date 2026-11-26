@@ -26,6 +26,7 @@ const Checkout = lazy(() => import('./pages/Checkout'));
 const CheckoutSuccess = lazy(() => import('./pages/checkout/Success'));
 const Onboarding = lazy(() => import('./pages/Onboarding'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
+const NotFound = lazy(() => import('./pages/NotFound'));
 const Admin = lazy(() => import('./pages/Admin'));
 const CommerceLayout = lazy(() => import('./pages/commerce/CommerceLayout'));
 const PulsePage = lazy(() => import('./pages/commerce/PulsePage'));
@@ -101,6 +102,8 @@ export default function App() {
         <Route element={<ProtectedRoute roles={['ADMIN']} />}>
           <Route path="/admin" element={<Admin />} />
         </Route>
+        {/* Curinga: qualquer caminho desconhecido cai na 404 de verdade. */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
       </Suspense>
       </MotionConfig>

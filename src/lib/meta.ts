@@ -17,6 +17,8 @@ export interface PageMeta {
   /** Caminho começando com "/" — vira canonical e og:url. */
   path: string;
   image?: string;
+  /** Marca a pagina como noindex — usado pela 404. */
+  noindex?: boolean;
 }
 
 const DEFAULT_IMAGE = '/og/aster-cover.png';
@@ -40,7 +42,7 @@ function upsertLink(rel: string, href: string) {
   el.setAttribute('href', href);
 }
 
-export function applyPageMeta({ title, description, path, image = DEFAULT_IMAGE }: PageMeta) {
+export function applyPageMeta({ title, description, path, image = DEFAULT_IMAGE, noindex = false }: PageMeta) {
   const url = `${SITE_URL}${path}`;
   const absoluteImage = image.startsWith('http') ? image : `${SITE_URL}${image}`;
 
@@ -56,6 +58,11 @@ export function applyPageMeta({ title, description, path, image = DEFAULT_IMAGE 
   upsertMeta('meta[property="og:site_name"]', { property: 'og:site_name', content: SITE_NAME });
   upsertMeta('meta[property="og:locale"]', { property: 'og:locale', content: 'pt_BR' });
 
+  upsertMeta('meta[name="robots"]', {
+    name: 'robots',
+    content: noindex ? 'noindex, follow' : 'index, follow',
+  });
+
   upsertMeta('meta[name="twitter:card"]', { name: 'twitter:card', content: 'summary_large_image' });
   upsertMeta('meta[name="twitter:title"]', { name: 'twitter:title', content: title });
   upsertMeta('meta[name="twitter:description"]', { name: 'twitter:description', content: description });
@@ -66,5 +73,5 @@ export function usePageMeta(meta: PageMeta) {
   useEffect(() => {
     applyPageMeta(meta);
     // Dependências explícitas: o objeto literal muda a cada render.
-  }, [meta.title, meta.description, meta.path, meta.image]);
+  }, [meta.title, meta.description, meta.path, meta.image, meta.noindex]);
 }
