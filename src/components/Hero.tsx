@@ -9,7 +9,7 @@ export default function Hero({ onCta }: { onCta: () => void }) {
       <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-ASTER-200/40 blur-[120px] rounded-full pointer-events-none" />
       <div className="absolute top-40 -right-40 w-[500px] h-[500px] bg-volt-400/20 blur-[120px] rounded-full pointer-events-none" />
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 pt-12 sm:pt-20 pb-10 text-center">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 pt-8 sm:pt-20 pb-8 sm:pb-10 text-center">
         <div>
           <button onClick={() => document.getElementById('luna')?.scrollIntoView({ behavior: 'smooth' })} className="inline-flex max-w-full flex-wrap items-center justify-center gap-x-2 gap-y-1 bg-white border border-ASTER-200 rounded-3xl sm:rounded-full px-3 py-2 sm:pl-2 sm:pr-4 sm:py-1.5 text-[13px] sm:text-sm font-semibold text-ASTER-700 card-shadow-sm hover:shadow-md transition-shadow focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ASTER-600/40">
             <span className="bg-ASTER-600 text-white text-[11px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
@@ -94,7 +94,7 @@ export default function Hero({ onCta }: { onCta: () => void }) {
                   ))}
                 </div>
               </div>
-              <div className="bg-ink-950 text-white p-4 sm:p-6 flex flex-col relative overflow-hidden">
+              <div className="hidden lg:flex bg-ink-950 text-white p-4 sm:p-6 flex-col relative overflow-hidden">
                 <div className="absolute -top-20 -right-20 w-56 h-56 bg-ASTER-600/50 blur-[80px] rounded-full" />
                 <div className="relative flex items-center gap-3">
                   <div className="relative">

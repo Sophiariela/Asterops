@@ -124,7 +124,7 @@ export default function LunaSection() {
       <div className="absolute bottom-0 right-0 w-[500px] h-[400px] bg-ASTER-800/60 blur-[140px] rounded-full pointer-events-none" />
       <div className="absolute inset-0 dot-grid opacity-[0.15] pointer-events-none" />
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-24">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-24">
         <div className="text-center max-w-3xl mx-auto">
           <span className="inline-flex items-center gap-2 bg-white/10 border border-white/15 rounded-full px-4 py-1.5 text-sm font-semibold text-volt-400">
             <Sparkles size={15} aria-hidden="true" /> Luna AI
@@ -133,14 +133,14 @@ export default function LunaSection() {
             Ajuda real para construir o seu{' '}
             <span className="text-volt-400">conteúdo</span>
           </h2>
-          <p className="text-white/80 text-base sm:text-lg mt-4 text-balance">
+          <p className="text-white/80 text-[15px] sm:text-lg mt-3 text-balance">
             A Luna sugere o template certo, melhora os textos do seu site e cuida do SEO — você
             revisa e aplica.
           </p>
         </div>
 
         <div
-          className="mt-10 sm:mt-14 grid lg:grid-cols-[340px_1fr] gap-5 sm:gap-6 items-stretch"
+          className="mt-8 sm:mt-14 grid lg:grid-cols-[340px_1fr] gap-4 sm:gap-6 items-stretch"
           onMouseEnter={() => setHovering(true)}
           onMouseLeave={() => setHovering(false)}
         >
@@ -148,7 +148,7 @@ export default function LunaSection() {
             role="tablist"
             aria-label="Exemplos do que a Luna faz"
             aria-orientation="vertical"
-            className="grid grid-cols-2 lg:grid-cols-1 gap-3"
+            className="flex overflow-x-auto gap-2.5 pb-1 -mx-4 px-4 lg:mx-0 lg:px-0 lg:grid lg:grid-cols-1 lg:gap-3 lg:overflow-visible"
           >
             {tabs.map((t, i) => (
               <button
@@ -161,7 +161,7 @@ export default function LunaSection() {
                 tabIndex={i === active ? 0 : -1}
                 onClick={() => { setActive(i); setPlaying(false); }}
                 onKeyDown={(e) => onKeyDown(e, i)}
-                className={`relative text-left rounded-2xl p-4 sm:p-5 border transition-all overflow-hidden focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-volt-400/60 ${
+                className={`relative text-left rounded-2xl p-3 sm:p-5 border transition-all overflow-hidden shrink-0 min-w-[46%] lg:min-w-0 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-volt-400/60 ${
                   i === active
                     ? 'bg-white text-ink-950 border-white card-shadow'
                     : 'bg-white/5 border-white/10 hover:bg-white/10 text-white'
@@ -199,7 +199,7 @@ export default function LunaSection() {
             role="tabpanel"
             aria-labelledby={`luna-tab-${tab.id}`}
             tabIndex={0}
-            className="relative bg-white/[0.06] border border-white/10 rounded-3xl p-5 sm:p-8 overflow-hidden min-h-[420px] flex flex-col focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-volt-400/40"
+            className="relative bg-white/[0.06] border border-white/10 rounded-3xl p-4 sm:p-8 overflow-hidden sm:min-h-[420px] flex flex-col focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-volt-400/40"
           >
             <div className="flex items-center justify-between gap-3 flex-wrap">
               <div className="flex items-center gap-3">
@@ -240,7 +240,7 @@ export default function LunaSection() {
                 <h3 className="font-display font-bold text-lg sm:text-2xl text-balance">{tab.title}</h3>
 
                 <div className="mt-5 space-y-3">
-                  <div className="flex justify-end">
+                  <div className="hidden sm:flex justify-end">
                     <div className="max-w-[85%] bg-ASTER-600 rounded-2xl rounded-tr-md px-4 py-3 text-sm sm:text-[15px]">
                       <p className="text-[11px] font-bold text-white/80 mb-1">VOCÊ PERGUNTA</p>
                       {tab.prompt}

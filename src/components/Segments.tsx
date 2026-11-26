@@ -19,7 +19,7 @@ const segments: { name: string; icon: LucideIcon; desc: string; accent: string; 
 
 export default function Segments({ onCta }: { onCta: () => void }) {
   return (
-    <section className="py-16 sm:py-24 bg-white overflow-hidden">
+    <section className="py-10 sm:py-24 bg-white overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <motion.div
           className="flex flex-col sm:flex-row sm:items-end justify-between gap-6"
@@ -28,7 +28,7 @@ export default function Segments({ onCta }: { onCta: () => void }) {
             <h2 className="font-display font-extrabold text-3xl sm:text-5xl tracking-tight text-ink-900 text-balance">
               Um template pronto para o seu setor
             </h2>
-            <p className="text-slate-600 text-base sm:text-lg mt-4">7 categorias, mais de 50 modelos — escolha e personalize.</p>
+            <p className="text-slate-600 text-[15px] sm:text-lg mt-3">7 categorias, mais de 50 modelos — escolha e personalize.</p>
           </div>
           <button
             onClick={onCta}
@@ -38,24 +38,27 @@ export default function Segments({ onCta }: { onCta: () => void }) {
           </button>
         </motion.div>
 
-        <div className="mt-10 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">
+        <div className="mt-6 sm:mt-10 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-5">
           {segments.map((s, i) => (
             <motion.div
               key={s.name}
               initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.01, margin: '0px 0px 240px 0px' }} transition={{ duration: 0.35, delay: Math.min(i * 0.04, 0.12), ease: 'easeOut' }}
-              className="group flex flex-col text-left bg-white border border-ASTER-100 rounded-[26px] p-6 hover:-translate-y-1 hover:card-shadow transition-all duration-300"
+              className="group flex flex-row sm:flex-col items-center sm:items-start gap-3 sm:gap-0 text-left bg-white border border-ASTER-100 rounded-2xl sm:rounded-[26px] p-4 sm:p-6 sm:hover:-translate-y-1 hover:card-shadow transition-all duration-300"
             >
-              <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${s.bg} ${s.accent} flex items-center justify-center`}>
+              <div className={`w-11 h-11 sm:w-14 sm:h-14 shrink-0 rounded-2xl bg-gradient-to-br ${s.bg} ${s.accent} flex items-center justify-center`}>
                 <s.icon size={24} aria-hidden="true" />
               </div>
-              <h3 className="font-display font-extrabold text-ink-900 text-lg mt-4">{s.name}</h3>
-              <p className="text-slate-600 text-sm mt-1">{s.desc}</p>
+              <div className="flex-1 min-w-0"><h3 className="font-display font-extrabold text-ink-900 text-base sm:text-lg sm:mt-4">{s.name}</h3>
+              <p className="text-slate-600 text-[13px] sm:text-sm mt-0.5 sm:mt-1">{s.desc}</p></div>
 
               <Link
                 to="/products/webos"
-                className="mt-4 inline-flex items-center gap-2 text-ASTER-600 font-bold text-sm hover:gap-3 transition-all w-fit rounded-md focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ASTER-600/40"
+                className="shrink-0 inline-flex items-center gap-1.5 sm:gap-2 sm:mt-4 text-ASTER-600 font-bold text-[12px] sm:text-sm hover:gap-3 transition-all w-fit rounded-md focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ASTER-600/40"
               >
-                Ver modelos <ArrowRight size={16} aria-hidden="true" />
+                <span className="hidden sm:inline">Ver modelos</span>
+                <span className="sm:hidden">Modelos</span>
+                <ArrowRight size={14} className="sm:hidden" aria-hidden="true" />
+                <ArrowRight size={16} className="hidden sm:inline" aria-hidden="true" />
                 <span className="sr-only">de {s.name}</span>
               </Link>
 
@@ -65,7 +68,7 @@ export default function Segments({ onCta }: { onCta: () => void }) {
                   href={getPortfolioBySegment(s.name)!.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-2 inline-flex items-center gap-1.5 text-[13px] font-bold text-ink-900 hover:text-ASTER-600 transition-colors w-fit rounded-md focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ASTER-600/40"
+                  className="shrink-0 sm:mt-2 hidden min-[420px]:inline-flex sm:inline-flex items-center gap-1.5 text-[12px] sm:text-[13px] font-bold text-ASTER-600 sm:text-ink-900 hover:text-ASTER-600 transition-colors w-fit rounded-md focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ASTER-600/40"
                 >
                   Ver exemplo real <ArrowUpRight size={14} aria-hidden="true" />
                   <span className="sr-only">

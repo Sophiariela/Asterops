@@ -13,17 +13,17 @@ import PortfolioCard from './PortfolioCard';
  */
 export default function Portfolio() {
   return (
-    <section id="portfolio" className="scroll-mt-32 py-16 sm:py-24 bg-white border-y border-ASTER-100/70">
+    <section id="portfolio" className="scroll-mt-32 py-10 sm:py-24 bg-white border-y border-ASTER-100/70">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
           <div className="max-w-2xl">
             <p className="text-xs sm:text-sm font-bold uppercase tracking-wider text-ASTER-700">
               Portfólio
             </p>
-            <h2 className="font-display font-extrabold text-3xl sm:text-4xl lg:text-5xl text-ink-900 mt-3 tracking-tight text-balance">
+            <h2 className="font-display font-extrabold text-3xl sm:text-4xl lg:text-5xl text-ink-900 mt-2 tracking-tight text-balance">
               Sites reais, feitos com a ASTER
             </h2>
-            <p className="text-slate-600 text-base sm:text-lg mt-4 leading-relaxed">
+            <p className="text-slate-600 text-[15px] sm:text-lg mt-3 leading-relaxed">
               Projetos desenvolvidos para negócios reais, com soluções digitais pensadas para cada
               operação.
             </p>
@@ -38,7 +38,7 @@ export default function Portfolio() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 mt-10 sm:mt-14">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-8 mt-8 sm:mt-14">
           {PORTFOLIO.map((project, index) => (
             <PortfolioCard key={project.slug} project={project} priority={index === 0} />
           ))}

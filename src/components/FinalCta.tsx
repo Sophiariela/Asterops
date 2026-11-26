@@ -3,7 +3,7 @@ import { ArrowRight, CheckCircle2, Sparkles } from 'lucide-react';
 
 export default function FinalCta({ onCta }: { onCta: () => void }) {
   return (
-    <section className="py-16 sm:py-24 bg-white">
+    <section className="py-12 sm:py-11 sm:py-24 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <motion.div
           className="relative bg-gradient-to-br from-ASTER-700 via-ASTER-600 to-ASTER-500 rounded-[32px] overflow-hidden"
@@ -20,7 +20,7 @@ export default function FinalCta({ onCta }: { onCta: () => void }) {
               <h2 className="font-display font-extrabold text-white text-3xl sm:text-5xl tracking-tight mt-5 leading-[1.05] text-balance">
                 Pronto para ter o site que o seu negócio merece?
               </h2>
-              <p className="text-white/75 text-base sm:text-lg mt-4">
+              <p className="text-white/75 text-[15px] sm:text-lg mt-3">
                 Escolha um template, personalize e publique — com a Luna te ajudando no conteúdo.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 mt-8">

@@ -33,7 +33,7 @@ export default function Faq() {
   const [open, setOpen] = useState<number | null>(0);
 
   return (
-    <section className="py-16 sm:py-24 bg-cream-50">
+    <section className="py-10 sm:py-24 bg-cream-50">
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
         <motion.div
           className="text-center"
@@ -41,12 +41,12 @@ export default function Faq() {
           <span className="inline-flex items-center gap-2 bg-white border border-ASTER-200 rounded-full px-4 py-1.5 text-sm font-semibold text-ASTER-700 card-shadow-sm">
             <Headset size={15} /> Ajuda e atendimento
           </span>
-          <h2 className="font-display font-extrabold text-3xl sm:text-5xl tracking-tight text-ink-900 mt-5">
+          <h2 className="font-display font-extrabold text-3xl sm:text-5xl tracking-tight text-ink-900 mt-4">
             Perguntas frequentes
           </h2>
         </motion.div>
 
-        <div className="mt-10 space-y-3">
+        <div className="mt-8 sm:mt-10 space-y-2 sm:space-y-3">
           {faqs.map((f, i) => (
             <motion.div
               key={i}
@@ -55,7 +55,7 @@ export default function Faq() {
             >
               <button
                 onClick={() => setOpen(open === i ? null : i)}
-                className="w-full flex items-center justify-between gap-4 text-left px-6 py-5"
+                className="w-full flex items-center justify-between gap-4 text-left px-6 py-4 sm:py-5"
               >
                 <span className="font-display font-bold text-[15px] sm:text-lg text-ink-900">{f.q}</span>
                 <span className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all ${open === i ? 'bg-ASTER-600 text-white rotate-45' : 'bg-ASTER-50 text-ASTER-600'}`}>

@@ -73,16 +73,16 @@ export default function Pricing({ onCta }: { onCta: () => void }) {
   }
 
   return (
-    <section id="planos" className="scroll-mt-32 py-16 sm:py-24 bg-white">
+    <section id="planos" className="scroll-mt-32 py-10 sm:py-24 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center max-w-2xl mx-auto">
           <span className="inline-flex items-center gap-2 bg-ASTER-50 border border-ASTER-200 rounded-full px-4 py-1.5 text-sm font-semibold text-ASTER-700">
             Planos
           </span>
-          <h2 className="font-display font-extrabold text-3xl sm:text-5xl tracking-tight text-ink-900 mt-5">
+          <h2 className="font-display font-extrabold text-3xl sm:text-5xl tracking-tight text-ink-900 mt-4">
             Um plano para cada momento do seu negócio
           </h2>
-          <p className="text-slate-600 text-base sm:text-lg mt-4">
+          <p className="text-slate-600 text-[15px] sm:text-lg mt-3">
             Sem contrato de fidelidade. Cancele quando quiser.
           </p>
 
@@ -131,7 +131,13 @@ export default function Pricing({ onCta }: { onCta: () => void }) {
         </div>
 
         {/* 5.3 — Starter, Growth e Business na linha principal. */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-12 items-stretch max-w-5xl mx-auto">
+        <div
+          className="mt-10 flex gap-4 overflow-x-auto snap-x snap-mandatory pb-2 -mx-4 px-4 items-stretch
+                     sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:gap-6 sm:mt-12 sm:overflow-visible sm:mx-0 sm:px-0 sm:pb-0
+                     max-w-5xl sm:mx-auto"
+          role="group"
+          aria-label="Planos Starter, Growth e Business"
+        >
           {primary.map((p, i) => {
             const Icon = TIER_ICON[p.slug] ?? Rocket;
             const highlight = p.slug === HIGHLIGHT_SLUG;
@@ -144,7 +150,7 @@ export default function Pricing({ onCta }: { onCta: () => void }) {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.01, margin: '0px 0px 240px 0px' }}
                 transition={{ duration: 0.35, delay: Math.min(i * 0.04, 0.12), ease: 'easeOut' }}
-                className={`relative rounded-[28px] p-7 sm:p-8 flex flex-col transition-transform hover:-translate-y-1.5 duration-300 ${
+                className={`relative rounded-[28px] p-6 sm:p-8 flex flex-col transition-transform sm:hover:-translate-y-1.5 duration-300 min-w-[86%] snap-center shrink-0 sm:min-w-0 sm:shrink ${
                   highlight
                     ? 'bg-ink-950 text-white card-shadow lg:scale-[1.04] border-2 border-ASTER-600'
                     : 'bg-white border border-ASTER-100 card-shadow-sm'
@@ -183,8 +189,8 @@ export default function Pricing({ onCta }: { onCta: () => void }) {
                 </p>
 
                 <ul className="mt-6 space-y-3 flex-1">
-                  {p.features.slice(0, 4).map((f) => (
-                    <li key={f} className={`flex items-start gap-2.5 text-sm font-medium ${highlight ? 'text-white/90' : 'text-[#2c1a63]'}`}>
+                  {p.features.slice(0, 4).map((f, fi) => (
+                    <li key={f} className={`${fi < 3 ? 'flex' : 'hidden sm:flex'} items-start gap-2.5 text-sm font-medium ${highlight ? 'text-white/90' : 'text-[#2c1a63]'}`}>
                       <span className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${highlight ? 'bg-volt-400 text-ink-950' : 'bg-emerald-50 text-emerald-700'}`}>
                         <Check size={12} strokeWidth={3} aria-hidden="true" />
                       </span>
@@ -208,10 +214,14 @@ export default function Pricing({ onCta }: { onCta: () => void }) {
           })}
         </div>
 
+        <p className="sm:hidden text-center text-xs text-slate-600 mt-3">
+          Deslize para ver os três planos
+        </p>
+
         {/* 5.3 — Scale em faixa horizontal, sem perder preco nem assinatura. */}
         {scale && (
-          <div className="max-w-5xl mx-auto mt-6 rounded-[28px] border border-ASTER-200 bg-ASTER-50/50 p-7 sm:p-8">
-            <div className="flex flex-col lg:flex-row lg:items-center gap-6 lg:gap-10">
+          <div className="max-w-5xl mx-auto mt-5 rounded-[28px] border border-ASTER-200 bg-ASTER-50/50 p-5 sm:p-8">
+            <div className="flex flex-col lg:flex-row lg:items-center gap-4 lg:gap-10">
               <div className="flex items-start gap-4 flex-1">
                 <span className="w-12 h-12 rounded-2xl bg-white border border-ASTER-200 text-ASTER-600 flex items-center justify-center shrink-0">
                   <Gem size={22} aria-hidden="true" />

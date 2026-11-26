@@ -33,23 +33,11 @@ const products: Product[] = [
     accent: 'text-emerald-500',
     bg: 'bg-emerald-50',
   },
-  {
-    icon: Sparkles,
-    tag: 'Luna AI',
-    title: 'Seu conteúdo e seu SEO, com ajuda da Luna',
-    desc: 'A Luna revisa o texto do seu site, sugere um título melhor para a página inicial e gera metadados de SEO — você sempre revisa antes de aplicar.',
-    luna: 'Disponível direto no painel do seu site, sem configuração extra.',
-    cta: 'Testar a Luna',
-    ctaHref: '/products/luna-ai',
-    features: ['Sugestão de template por setor', 'Melhoria de título e subtítulo', 'Geração de metadados de SEO'],
-    accent: 'text-ASTER-600',
-    bg: 'bg-ASTER-50',
-  },
 ];
 
 export default function Ecosystem() {
   return (
-    <section id="ecossistema" className="relative bg-cream-50 py-16 sm:py-24 overflow-hidden">
+    <section id="ecossistema" className="relative bg-cream-50 py-10 sm:py-24 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <motion.div
           className="text-center max-w-3xl mx-auto"
@@ -60,37 +48,15 @@ export default function Ecosystem() {
           <h2 className="font-display font-extrabold text-3xl sm:text-5xl tracking-tight text-ink-900 mt-5 text-balance">
             Tudo o que o seu negócio precisa para vender online
           </h2>
-          <p className="text-slate-600 text-base sm:text-lg mt-4">WebOS cria o seu site. CommerceOS organiza as suas vendas. A Luna ajuda em tudo.</p>
+          <p className="text-slate-600 text-[15px] sm:text-lg mt-3">WebOS cria o seu site, CommerceOS organiza as suas vendas e a Luna ajuda em tudo — sobre a mesma base de dados.</p>
         </motion.div>
 
-        {/* WebOS + CommerceOS wide cards */}
+        {/* CommerceOS: o site e os setores ficam na grade de setores. */}
         <div className="grid lg:grid-cols-2 gap-5 mt-12">
-          <motion.div
-            className="relative bg-ink-950 text-white rounded-[28px] p-7 sm:p-10 overflow-hidden group"
-          >
-            <div className="absolute -top-24 -right-24 w-72 h-72 bg-ASTER-600/50 blur-[100px] rounded-full group-hover:scale-125 transition-transform duration-700" />
-            <div className="absolute inset-0 dot-grid opacity-10" />
-            <div className="relative">
-              <span className="inline-flex items-center gap-2 bg-white/10 border border-white/15 rounded-full px-4 py-1.5 text-[13px] font-bold text-volt-400">
-                <Layers size={14} /> WebOS
-              </span>
-              <h3 className="font-display font-extrabold text-2xl sm:text-[34px] leading-tight mt-4 text-balance">
-                Seu site, com a estrutura certa para o seu setor
-              </h3>
-              <p className="text-white/80 mt-3 text-[15px] sm:text-base">
-                Cada modelo já vem com a estrutura certa para o tipo de negócio — e a lista
-                completa de setores fica logo abaixo, em um lugar só.
-              </p>
-              <p className="font-display font-bold text-volt-400 mt-4 text-lg">7 categorias de templates</p>
-              <Link to="/products/webos" className="mt-7 inline-flex items-center gap-2 font-bold text-white hover:gap-3 transition-all rounded-md focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-volt-400/60">
-                Explorar modelos <ArrowRight size={18} className="text-volt-400" aria-hidden="true" />
-              </Link>
-            </div>
-          </motion.div>
 
           <motion.div
             initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.01, margin: '0px 0px 240px 0px' }} transition={{ duration: 0.35, delay: 0.1, ease: 'easeOut' }}
-            className="relative bg-white rounded-[28px] p-7 sm:p-10 overflow-hidden card-shadow border border-ASTER-100 group"
+            className="relative bg-white rounded-[28px] p-5 sm:p-10 overflow-hidden card-shadow border border-ASTER-100 group"
           >
             <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-volt-400/30 blur-[100px] rounded-full group-hover:scale-125 transition-transform duration-700" />
             <div className="relative">
@@ -123,14 +89,14 @@ export default function Ecosystem() {
         </div>
 
         {/* Product grid */}
-        <div className="grid sm:grid-cols-2 gap-5 mt-5">
+        <div className="grid sm:grid-cols-2 gap-3 mt-4">
           {products.map((p, i) => (
             <motion.div
               key={p.tag}
               initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.01, margin: '0px 0px 240px 0px' }} transition={{ duration: 0.35, delay: (i % 2) * 0.05, ease: 'easeOut' }}
               className="bg-white rounded-[28px] card-shadow-sm border border-ASTER-100 overflow-hidden hover:card-shadow hover:-translate-y-1 transition-all duration-300 flex flex-col"
             >
-              <div className="p-7 sm:p-8 flex-1 flex flex-col">
+              <div className="p-4 sm:p-8 flex-1 flex flex-col">
                 <div className="flex items-center gap-3">
                   <span className={`w-12 h-12 rounded-2xl ${p.bg} ${p.accent} flex items-center justify-center`}>
                     <p.icon size={22} />
@@ -139,7 +105,7 @@ export default function Ecosystem() {
                 </div>
                 <h3 className="font-display font-extrabold text-xl sm:text-2xl text-ink-900 mt-4 text-balance">{p.title}</h3>
                 <p className="text-slate-600 mt-2.5 text-[15px] leading-relaxed">{p.desc}</p>
-                <ul className="mt-4 space-y-2">
+                <ul className="mt-3 space-y-1.5">
                   {p.features.map((f) => (
                     <li key={f} className="flex items-center gap-2 text-sm font-medium text-[#2c1a63]">
                       <span className="w-5 h-5 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center shrink-0"><Check size={12} strokeWidth={3} /></span>
@@ -147,7 +113,7 @@ export default function Ecosystem() {
                     </li>
                   ))}
                 </ul>
-                <div className="mt-5 bg-gradient-to-r from-ASTER-50 to-volt-400/10 border border-ASTER-100 rounded-2xl p-4 flex gap-3">
+                <div className="mt-4 bg-gradient-to-r from-ASTER-50 to-volt-400/10 border border-ASTER-100 rounded-2xl p-4 flex gap-3">
                   <Sparkles size={18} className="text-ASTER-600 shrink-0 mt-0.5" />
                   <p className="text-[13.5px] text-[#2c1a63] leading-relaxed"><strong>Com a Luna:</strong> {p.luna}</p>
                 </div>

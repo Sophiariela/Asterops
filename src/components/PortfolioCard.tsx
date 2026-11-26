@@ -34,11 +34,11 @@ export default function PortfolioCard({
           decoding="async"
           // A imagem é decorativa aqui: o link textual abaixo já descreve o
           // destino, e o alt completo vive na página /portfolio.
-          className="w-full h-auto aspect-[16/10] object-cover object-top transition-transform duration-500 group-hover:scale-[1.02]"
+          className="w-full h-auto aspect-[16/9] sm:aspect-[16/10] object-cover object-top transition-transform duration-500 group-hover:scale-[1.02]"
         />
       </a>
 
-      <div className="flex flex-col flex-1 p-6 sm:p-7">
+      <div className="flex flex-col flex-1 p-5 sm:p-7">
         <p className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-ASTER-700">
           {project.category}
         </p>
@@ -50,10 +50,13 @@ export default function PortfolioCard({
         </p>
 
         <ul className="flex flex-wrap gap-2 mt-5">
-          {project.features.map((feature) => (
+          {project.features.map((feature, i) => (
             <li
               key={feature.label}
-              className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-semibold bg-ASTER-50 text-ASTER-700 border border-ASTER-100 rounded-full px-3 py-1.5"
+              /* No mobile so as 3 primeiras: a lista completa esta em /portfolio. */
+              className={`items-center gap-1.5 text-[11px] sm:text-xs font-semibold bg-ASTER-50 text-ASTER-700 border border-ASTER-100 rounded-full px-3 py-1.5 ${
+                i < 3 ? 'inline-flex' : 'hidden sm:inline-flex'
+              }`}
             >
               <feature.icon size={13} aria-hidden="true" />
               {feature.label}
