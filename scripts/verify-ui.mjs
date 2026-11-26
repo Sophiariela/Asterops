@@ -13,7 +13,7 @@
  *  - erro de console e request que falhou;
  *  - âncora não parando atrás do header fixo.
  */
-import { chromium } from 'playwright';
+import { launchBrowser } from './launch-browser.mjs';
 import { mkdir } from 'node:fs/promises';
 import path from 'node:path';
 
@@ -32,7 +32,7 @@ function visibleEnough(box, opacity) {
   return Boolean(box) && box.width > 0 && box.height > 0 && Number(opacity) > 0.95;
 }
 
-const browser = await chromium.launch({ channel: 'chrome', headless: true });
+const browser = await launchBrowser();
 await mkdir(OUT, { recursive: true });
 
 let failures = 0;

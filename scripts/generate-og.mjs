@@ -8,7 +8,7 @@
  * logo novo e não inclui número, prêmio ou métrica: só o nome, a marca e a
  * mesma promessa que o <title> do site já faz.
  */
-import { chromium } from 'playwright';
+import { launchBrowser } from './launch-browser.mjs';
 import { mkdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 
@@ -98,7 +98,7 @@ const html = `<!doctype html>
 </body>
 </html>`;
 
-const browser = await chromium.launch({ channel: 'chrome', headless: true });
+const browser = await launchBrowser();
 const page = await browser.newPage({ viewport: { width: WIDTH, height: HEIGHT }, deviceScaleFactor: 1 });
 await page.setContent(html, { waitUntil: 'networkidle' });
 await page.evaluate(() => document.fonts.ready);

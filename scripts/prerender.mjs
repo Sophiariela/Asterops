@@ -22,7 +22,7 @@
  * Também gera sitemap.xml e robots.txt a partir da mesma lista de rotas,
  * para os três nunca saírem de sincronia.
  */
-import { chromium } from 'playwright';
+import { launchBrowser } from './launch-browser.mjs';
 import { createServer } from 'node:http';
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { existsSync, statSync } from 'node:fs';
@@ -89,7 +89,7 @@ function robots() {
 const server = serveDist();
 await new Promise((resolve) => server.listen(PORT, resolve));
 
-const browser = await chromium.launch({ channel: 'chrome', headless: true });
+const browser = await launchBrowser();
 const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
 
 let ok = 0;

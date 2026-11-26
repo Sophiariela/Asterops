@@ -13,7 +13,7 @@
  *  - se um site não responder, o script NÃO gera imagem falsa nem
  *    substituta: ele falha para aquele item, avisa, e deixa o TODO.
  */
-import { chromium } from "playwright";
+import { launchBrowser } from './launch-browser.mjs';
 import sharp from "sharp";
 import { mkdir, writeFile, unlink } from "node:fs/promises";
 import { existsSync } from "node:fs";
@@ -118,7 +118,7 @@ async function capture(browser, target) {
   }
 }
 
-const browser = await chromium.launch({ channel: "chrome", headless: true });
+const browser = await launchBrowser();
 const results = [];
 for (const target of TARGETS) {
   results.push(await capture(browser, target));
