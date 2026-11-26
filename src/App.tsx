@@ -1,41 +1,51 @@
+import { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { MotionConfig } from 'framer-motion';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
-import Login from './pages/auth/Login';
-import Register from './pages/auth/Register';
-import ForgotPassword from './pages/auth/ForgotPassword';
-import ResetPassword from './pages/auth/ResetPassword';
 import Plans from './pages/Plans';
 import PortfolioPage from './pages/Portfolio';
-import Checkout from './pages/Checkout';
-import CheckoutSuccess from './pages/checkout/Success';
-import Onboarding from './pages/Onboarding';
-import Dashboard from './pages/Dashboard';
-import Admin from './pages/Admin';
 import ProductPage from './pages/products/ProductPage';
 import SolutionPage from './pages/solutions/SolutionPage';
 import EcosystemPage from './pages/Ecosystem';
-import CommerceLayout from './pages/commerce/CommerceLayout';
-import PulsePage from './pages/commerce/PulsePage';
-import OpportunitiesPage from './pages/commerce/OpportunitiesPage';
-import AuditPage from './pages/commerce/AuditPage';
-import ProductsPage from './pages/commerce/ProductsPage';
-import CategoriesPage from './pages/commerce/CategoriesPage';
-import InventoryPage from './pages/commerce/InventoryPage';
-import OrdersPage from './pages/commerce/OrdersPage';
-import OrderDetailPage from './pages/commerce/OrderDetailPage';
-import CustomersPage from './pages/commerce/CustomersPage';
-import CustomerDetailPage from './pages/commerce/CustomerDetailPage';
-import WebOSLayout from './pages/webos/WebOSLayout';
-import WebOSWizard from './pages/webos/WebOSWizard';
-import DraftPreviewPage from './pages/webos/DraftPreviewPage';
-import TemplatePreviewPage from './pages/webos/TemplatePreviewPage';
-import SitesPage from './pages/webos/SitesPage';
-import SiteDetailPage from './pages/webos/SiteDetailPage';
-import TemplateLibraryPage from './pages/webos/TemplateLibraryPage';
-import PublicSitePage from './pages/webos/PublicSitePage';
+
+/*
+ * Code splitting por rota.
+ *
+ * O bundle unico tinha 809 kB: quem abria so a home baixava tambem o
+ * dashboard, o commerce, o webos e o admin. As rotas de marketing ficam
+ * no bundle inicial (sao as que o visitante ve primeiro e as que o
+ * prerender renderiza); o resto carrega sob demanda.
+ */
+const Login = lazy(() => import('./pages/auth/Login'));
+const Register = lazy(() => import('./pages/auth/Register'));
+const ForgotPassword = lazy(() => import('./pages/auth/ForgotPassword'));
+const ResetPassword = lazy(() => import('./pages/auth/ResetPassword'));
+const Checkout = lazy(() => import('./pages/Checkout'));
+const CheckoutSuccess = lazy(() => import('./pages/checkout/Success'));
+const Onboarding = lazy(() => import('./pages/Onboarding'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Admin = lazy(() => import('./pages/Admin'));
+const CommerceLayout = lazy(() => import('./pages/commerce/CommerceLayout'));
+const PulsePage = lazy(() => import('./pages/commerce/PulsePage'));
+const OpportunitiesPage = lazy(() => import('./pages/commerce/OpportunitiesPage'));
+const AuditPage = lazy(() => import('./pages/commerce/AuditPage'));
+const ProductsPage = lazy(() => import('./pages/commerce/ProductsPage'));
+const CategoriesPage = lazy(() => import('./pages/commerce/CategoriesPage'));
+const InventoryPage = lazy(() => import('./pages/commerce/InventoryPage'));
+const OrdersPage = lazy(() => import('./pages/commerce/OrdersPage'));
+const OrderDetailPage = lazy(() => import('./pages/commerce/OrderDetailPage'));
+const CustomersPage = lazy(() => import('./pages/commerce/CustomersPage'));
+const CustomerDetailPage = lazy(() => import('./pages/commerce/CustomerDetailPage'));
+const WebOSLayout = lazy(() => import('./pages/webos/WebOSLayout'));
+const WebOSWizard = lazy(() => import('./pages/webos/WebOSWizard'));
+const DraftPreviewPage = lazy(() => import('./pages/webos/DraftPreviewPage'));
+const TemplatePreviewPage = lazy(() => import('./pages/webos/TemplatePreviewPage'));
+const SitesPage = lazy(() => import('./pages/webos/SitesPage'));
+const SiteDetailPage = lazy(() => import('./pages/webos/SiteDetailPage'));
+const TemplateLibraryPage = lazy(() => import('./pages/webos/TemplateLibraryPage'));
+const PublicSitePage = lazy(() => import('./pages/webos/PublicSitePage'));
 
 export default function App() {
   return (
@@ -43,6 +53,7 @@ export default function App() {
       {/* reducedMotion="user" faz todo framer-motion do app respeitar
           prefers-reduced-motion sem precisar tratar componente a componente. */}
       <MotionConfig reducedMotion="user">
+      <Suspense fallback={<div className="min-h-screen bg-white" aria-busy="true" />}>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
@@ -91,6 +102,7 @@ export default function App() {
           <Route path="/admin" element={<Admin />} />
         </Route>
       </Routes>
+      </Suspense>
       </MotionConfig>
     </AuthProvider>
   );
