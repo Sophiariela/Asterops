@@ -97,7 +97,7 @@ export default function Footer() {
             ))}
           </div>
         </div>
-        <div className="pt-7 flex flex-col sm:flex-row items-center justify-between gap-4 text-[13px] text-white/40">
+        <div className="pt-7 flex flex-col sm:flex-row items-center justify-between gap-4 text-[13px] text-white/70">
           <p>ASTER — plataforma de infraestrutura digital</p>
           <p>© 2026 ASTER · Todos os direitos reservados</p>
         </div>
